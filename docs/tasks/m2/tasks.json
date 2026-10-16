@@ -1,0 +1,157 @@
+[
+  {
+    "id": "M2-T01",
+    "title": "SQLite 持久化与迁移",
+    "state": "verified",
+    "depends_on": [
+      "M1-T08"
+    ],
+    "requirements": [
+      "REQ-007",
+      "NFR-004",
+      "NFR-006",
+      "HAR-010"
+    ],
+    "card": "docs/tasks/m2/01-storage.md",
+    "acceptance": [
+      "M2-T01-AC01",
+      "M2-T01-AC02",
+      "M2-T01-AC03"
+    ],
+    "implementation": [
+      "services/agent/src/prodops/adapters/storage/sqlite.py",
+      "services/agent/src/prodops/adapters/storage/models.py",
+      "services/agent/src/prodops/adapters/storage/migrations/versions/0001_storage.py",
+      "services/agent/src/prodops/application/storage.py",
+      "services/agent/src/prodops/domain/records.py",
+      "services/agent/tests/test_storage.py",
+      "scripts/check_delivery.py"
+    ],
+    "verification": "docs/verification/m2-t01.json",
+    "review": "docs/reviews/m2-t01.json"
+  },
+  {
+    "id": "M2-T02",
+    "title": "受保护的会话与任务 API",
+    "state": "not_started",
+    "depends_on": [
+      "M2-T01"
+    ],
+    "requirements": [
+      "REQ-004",
+      "REQ-005",
+      "REQ-007",
+      "REQ-014",
+      "NFR-004"
+    ],
+    "card": "docs/tasks/m2/02-api.md",
+    "acceptance": [
+      "M2-T02-AC01",
+      "M2-T02-AC02",
+      "M2-T02-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M2-T03",
+    "title": "数据库调度与显式 mock 排查",
+    "state": "not_started",
+    "depends_on": [
+      "M2-T02"
+    ],
+    "requirements": [
+      "REQ-005",
+      "REQ-006",
+      "REQ-011",
+      "REQ-019",
+      "HAR-006"
+    ],
+    "card": "docs/tasks/m2/03-runner.md",
+    "acceptance": [
+      "M2-T03-AC01",
+      "M2-T03-AC02",
+      "M2-T03-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M2-T04",
+    "title": "取消与中断核对",
+    "state": "not_started",
+    "depends_on": [
+      "M2-T03"
+    ],
+    "requirements": [
+      "REQ-009",
+      "REQ-010",
+      "REQ-019",
+      "HAR-007"
+    ],
+    "card": "docs/tasks/m2/04-recovery.md",
+    "acceptance": [
+      "M2-T04-AC01",
+      "M2-T04-AC02",
+      "M2-T04-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M2-T05",
+    "title": "SSE 与历史补发",
+    "state": "not_started",
+    "depends_on": [
+      "M2-T04"
+    ],
+    "requirements": [
+      "REQ-008",
+      "NFR-003",
+      "HAR-007"
+    ],
+    "card": "docs/tasks/m2/05-events.md",
+    "acceptance": [
+      "M2-T05-AC01",
+      "M2-T05-AC02",
+      "M2-T05-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M2-T06",
+    "title": "任务核心集成验收",
+    "state": "not_started",
+    "depends_on": [
+      "M2-T04",
+      "M2-T05"
+    ],
+    "requirements": [
+      "REQ-005",
+      "REQ-006",
+      "REQ-007",
+      "REQ-008",
+      "REQ-009",
+      "REQ-010",
+      "REQ-019",
+      "NFR-003",
+      "NFR-004",
+      "HAR-006",
+      "HAR-007"
+    ],
+    "card": "docs/tasks/m2/06-acceptance.md",
+    "acceptance": [
+      "M2-T06-AC01",
+      "M2-T06-AC02",
+      "M2-T06-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  }
+]

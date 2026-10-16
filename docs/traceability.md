@@ -18,7 +18,7 @@
 | REQ-004 | M3 | 未开始 | 8 16 | - | - | 会话与上下文 |
 | REQ-005 | M2 | 进行中 | 8 11 | [任务与事件 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | M1-T03 契约已验证；创建、执行、持久化与进度推送仍在 M2 |
 | REQ-006 | M2 | 未开始 | 8 9 13 | - | - | 证据和解决状态 |
-| REQ-007 | M2 | 未开始 | 13 | - | - | 持久化历史 |
+| REQ-007 | M2 | 进行中 | 13 | [SQLite 存储](../services/agent/src/prodops/adapters/storage/sqlite.py)、[版本迁移](../services/agent/src/prodops/adapters/storage/migrations/versions/0001_storage.py) | [存储基础验证](verification/2026-10-16-m2-t01-storage.md) | 稳定身份、记录往返和数据库约束已验证；历史 API 与任务执行待后续切片 |
 | REQ-008 | M2 | 进行中 | 11 | [快照与重放 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | 事件序列、水位与游标模型已验证；SSE、持久化补发与去重仍在 M2 |
 | REQ-009 | M2 | 未开始 | 9 | - | - | 协作取消 |
 | REQ-010 | M2 | 未开始 | 9 | - | - | 中断核对 |
@@ -36,9 +36,9 @@
 | NFR-001 | M4 | 未开始 | 6 18 | - | - | 双模式场景集 |
 | NFR-002 | M4 | 进行中 | 5 14 15 | [受限桥接](../apps/desktop/src/preload/index.ts)、[请求边界](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md) | 无凭据开发状态读取边界已验证；生产密钥、授权资源与导出脱敏仍在后续阶段 |
 | NFR-003 | M2 | 未开始 | 11 15 | - | - | 关联日志与错误分类 |
-| NFR-004 | M4 | 未开始 | 9 12 13 | - | - | 两种数据库分别验证 |
+| NFR-004 | M4 | 进行中 | 9 12 13 | [事务存储基础](../services/agent/src/prodops/adapters/storage/sqlite.py) | [SQLite 基础验证](verification/2026-10-16-m2-t01-storage.md) | SQLite 回滚、并发会话、外键与事件序号已验证；任务幂等/活跃槽及 PostgreSQL 仍待后续 |
 | NFR-005 | M6 | 待定 | 10 18 | - | - | 参考环境与数值门槛待测量 |
-| NFR-006 | M0 | 已实现 | 18 | [追踪表](traceability.md) | - | 追踪机制已建立，后续需持续维护 |
+| NFR-006 | M0 | 已验证 | 18 | [追踪表](traceability.md)、[阶段交付校验](../scripts/check_delivery.py) | [跨阶段追踪验证](verification/2026-10-16-m2-t01-storage.md) | 当前需求/阶段/实现/AC证据映射与跨阶段依赖验证通过；后续变更持续维护 |
 
 ## 2 Harness 约束
 

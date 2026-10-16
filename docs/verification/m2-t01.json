@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T01",
+  "environment": {
+    "os": "Windows 11",
+    "arch": "AMD64",
+    "python": "3.13.2",
+    "sqlalchemy": "2.1.4",
+    "alembic": "1.20.0",
+    "aiosqlite": "0.22.1",
+    "greenlet": "3.5.6"
+  },
+  "source": {
+    "revision": "40c182f",
+    "worktree": "uncommitted SQLite adapter, migrations, stage manifests and delivery validation",
+    "scope": "isolated SQLite foundation; not task API or production acceptance"
+  },
+  "criteria": [
+    {
+      "id": "M2-T01-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m2-t01-storage.md"
+    },
+    {
+      "id": "M2-T01-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m2-t01-storage.md"
+    },
+    {
+      "id": "M2-T01-AC03",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m2-t01-storage.md"
+    }
+  ]
+}

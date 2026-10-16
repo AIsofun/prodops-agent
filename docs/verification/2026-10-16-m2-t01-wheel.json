@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "wheel": "prodops_agent-0.1.0-py3-none-any.whl",
+  "migration_files": [
+    "prodops/adapters/storage/migrations/env.py",
+    "prodops/adapters/storage/migrations/versions/0001_storage.py"
+  ],
+  "scope": "package contents only; not installer acceptance"
+}

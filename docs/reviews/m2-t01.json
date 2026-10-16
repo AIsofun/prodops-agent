@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T01",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-16-m2-t01-storage.md",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Persisted an explicit default workspace reference and tested identity after adding another workspace."
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Closed native SQLite fixture connections explicitly; Windows cleanup and all storage tests now pass."
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Serialized Alembic's global migration context in worker threads and tested concurrent initialization."
+    }
+  ]
+}

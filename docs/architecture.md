@@ -1,6 +1,6 @@
 # 智能制造桌面 Agent 架构设计
 
-日期：2026 年 10 月 16 日。状态：目标架构方案，尚未实现。产品范围以 [需求文档](requirements.md) 为依据，新增或调整的设计需同步 [追踪表](traceability.md) 和 [工程约束](engineering-constraints.md)。
+日期：2026 年 10 月 16 日。状态：目标架构方案，完整产品尚未实现；切片状态见追踪表。产品范围以 [需求文档](requirements.md) 为依据，新增或调整的设计需同步 [追踪表](traceability.md) 和 [工程约束](engineering-constraints.md)。
 
 产品采用 Electron、React、TypeScript、CSS 和 Python。桌面端先支持 Windows，后续扩展 macOS 和 Linux；Python 服务面向 Windows 和 Linux。本机和工厂内网服务器使用相同的业务服务与接口，客户端通过连接配置选择服务。
 
@@ -260,6 +260,8 @@ SSE 历史回放和实时推送通过同一递增序列衔接，订阅切换窗�
 M1-T03 的当前实现范围与完整目标不同：[契约说明](../contracts/README.md) 区分三个实际路径和预留 DTO。当前协议精确匹配 `1.0`，能力查询可无版本头发现、显式不兼容返回 426；M1 的 deployment_id 仅是实例标识，持久部署身份随 M2/M4 数据层完成。统一错误当前只接入版本及请求校验错误。未提供通用 details 的原因是尚无公开详情字段，避免意外泄露输入；后续新增专用字段时继续检查兼容性。这些为切片实现与设计细化，不增加产品需求或宣称完整业务路由已完成。
 
 ## 13 数据与配置
+
+M2-T01 的 SQLite 基础将版本化迁移放在服务包 adapters/storage/migrations 中，随 wheel 携带，替代目标目录示意中的仓库外置迁移目录。原因是安装后不应依赖源码根路径；这属于打包布局细化，不新增需求。适配器显式 start 才迁移，默认 HTTP 骨架尚未装配存储；业务入口在下一切片接入。实现与边界见[存储说明](../services/agent/src/prodops/adapters/storage/README.md)。
 
 | 数据对象 | 主要内容 |
 | --- | --- |

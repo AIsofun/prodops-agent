@@ -283,6 +283,18 @@ class DeliveryRecords(WorkspaceCase):
         (self.root / "alias").mkdir()
         self.assertEqual(check_delivery(self.root / "alias" / ".."), [])
 
+    def test_cross_milestone_dependency_requires_verified_delivery(self) -> None:
+        self.completed_task()
+        self.manifest([self.task])
+        self.write("docs/tasks/m2/one.md", "# Task\nM2-T01-AC01\n")
+        second = {"id": "M2-T01", "state": "in_progress", "depends_on": ["M1-T01"],
+                  "requirements": ["REQ-001"], "acceptance": ["M2-T01-AC01"], "card": "docs/tasks/m2/one.md"}
+        self.write("docs/tasks/m2/tasks.json", json.dumps([second]))
+        self.assertEqual(check_delivery(self.root), [])
+        self.task["state"] = "implemented"
+        self.manifest([self.task])
+        self.assertTrue(any("unfinished dependencies" in error for error in check_delivery(self.root)))
+
     def test_open_review_finding_prevents_verified(self) -> None:
         self.completed_task()
         review = json.loads((self.root / "review.json").read_text(encoding="utf-8"))

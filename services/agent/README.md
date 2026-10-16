@@ -55,4 +55,6 @@ python scripts/check.py --profile service
 
 M1-T03 增加 `GET /api/v1/capabilities`、正式 DTO、OpenAPI 快照和生成的 TypeScript 类型，协议与生成方式见 [契约说明](../../contracts/README.md)。服务行为测试也覆盖契约校验、版本拒绝、导出无外部访问、生成漂移与 TS 消费编译。
 
+M2-T01 增加独立的[SQLite 存储适配器](src/prodops/adapters/storage/README.md)、随包版本迁移与隔离数据库回归。当前 HTTP 工厂仍保持只读骨架，尚未装配数据库；业务路由、开发认证和任务提交按 M2-T02 接入。
+
 当前不包含任务执行、SSE、数据库、模型、桌面窗口、安装包或 CI。后续按 [M1 任务卡](../../docs/tasks/m1/README.md) 推进。

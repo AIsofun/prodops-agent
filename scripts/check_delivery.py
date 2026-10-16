@@ -1,4 +1,4 @@
-"""Validate M1 task dependencies and evidence/review receipts."""
+"""Validate milestone task dependencies and evidence/review receipts."""
 
 from __future__ import annotations
 
@@ -22,13 +22,20 @@ def repository_file(root: Path, value: object) -> Path | None:
 
 
 def validate(root: Path) -> list[str]:
-    manifest = root / "docs/tasks/m1/tasks.json"
-    if not manifest.is_file():
-        return ["M1 task manifest is missing"]
-    data: object = json.loads(manifest.read_text(encoding="utf-8"))
-    if not isinstance(data, list) or not data:
-        return ["M1 task manifest must be a nonempty array"]
+    manifests = sorted((root / "docs/tasks").glob("m*/tasks.json"))
+    if not manifests:
+        return ["Milestone task manifest is missing"]
+    data: list[object] = []
     errors: list[str] = []
+    for manifest in manifests:
+        parsed: object = json.loads(manifest.read_text(encoding="utf-8"))
+        if not isinstance(parsed, list) or not parsed:
+            errors.append(f"Task manifest must be a nonempty array: {manifest.parent.name}")
+            continue
+        for item in parsed:
+            if isinstance(item, dict) and not str(item.get("id", "")).startswith(manifest.parent.name.upper() + "-"):
+                errors.append(f"Task id must match manifest milestone: {item.get('id')}")
+        data.extend(parsed)
     tasks: dict[str, dict[str, object]] = {}
     known = {cells[0] for name in ("requirements.md", "engineering-constraints.md")
              for cells in rows((root / "docs" / name).read_text(encoding="utf-8"))}
@@ -38,8 +45,8 @@ def validate(root: Path) -> list[str]:
             continue
         task = cast(dict[str, object], raw)
         identifier = str(task["id"])
-        if not re.fullmatch(r"M1-T\d{2}", identifier):
-            errors.append(f"Invalid M1 task id: {identifier}")
+        if not re.fullmatch(r"M[1-9]\d*-T\d{2}", identifier):
+            errors.append(f"Invalid milestone task id: {identifier}")
         if identifier in tasks:
             errors.append(f"Duplicate task: {identifier}")
         tasks[identifier] = task
@@ -131,7 +138,7 @@ def main() -> int:
     for error in errors:
         print("ERROR: " + error)
     if not errors:
-        print("PASS: M1 task graph, requirement mappings and delivery receipts")
+        print("PASS: milestone task graphs, requirement mappings and delivery receipts")
     return 1 if errors else 0
 
 
