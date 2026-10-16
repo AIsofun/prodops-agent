@@ -9,8 +9,9 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-from scripts.check import Result, aggregate, execute
+from scripts.check import Result, aggregate, execute, run
 from scripts.check_boundaries import check as check_python
 from scripts.check_contracts import EXPORTER, GENERATOR, SNAPSHOT, TYPES
 from scripts.check_contracts import check as check_contracts, has_external_reference
@@ -54,6 +55,27 @@ class GateResults(WorkspaceCase):
     def test_external_tool_exit_two_is_a_failure(self) -> None:
         result = execute("external", [sys.executable, "-c", "raise SystemExit(2)"], self.root)
         self.assertEqual(result.status, "FAIL")
+
+    def test_service_profile_runs_behavior_and_excludes_unbuilt_desktop(self) -> None:
+        def fake_execute(name: str, args: list[str], root: Path,
+                         required: list[Path] | None = None, *, unready_exit: bool = False) -> Result:
+            return Result(name, "PASS", "fixture", args)
+
+        with patch("scripts.check.environment_check", return_value=Result("environment", "PASS", "", [])):
+            with patch("scripts.check.execute", side_effect=fake_execute):
+                results = run(self.root, "service")
+        names = [result.name for result in results]
+        self.assertIn("harness-regressions", names)
+        self.assertIn("product-python-types", names)
+        self.assertIn("product-python-boundaries", names)
+        self.assertIn("product-python-behavior", names)
+        self.assertNotIn("product-typescript-types", names)
+        self.assertNotIn("product-contracts", names)
+
+    def test_missing_service_behavior_suite_is_not_ready(self) -> None:
+        result = execute("product-python-behavior", [sys.executable, "-m", "unittest", "discover"],
+                         self.root, [self.root / "services/agent/tests/test_service.py"])
+        self.assertEqual(result.status, "NOT_READY")
 
     def test_mypy_rejects_real_assignment_error(self) -> None:
         config = self.write("mypy.ini", "[mypy]\n")

@@ -4,7 +4,7 @@
 
 本表维护新桌面产品的实际实现状态，旧 demo 不计作新版本完成。状态采用“未开始、进行中、已实现、已验证、暂缓、待定”；“已确认”仅为需求来源，不是实现状态。实现和证据栏使用本地文件链接，没有时填写 `-`。
 
-需求基线 1.0 已于 2026 年 10 月 16 日由用户整体确认。当前建设 M1 工程设施，产品功能尚未开始实现；阶段切片另见 [M1 任务清单](tasks/m1/tasks.json)。
+需求基线 1.0 已于 2026 年 10 月 16 日由用户整体确认。M1 工程质量基础与 Python 服务骨架已验证，完整业务功能按后续阶段推进；阶段切片另见 [M1 任务清单](tasks/m1/tasks.json)。
 
 “已实现”要求实现引用存在；“已验证”同时要求实现和证据引用存在。链接存在只是机械检查，验证内容还需与需求验收标准一致。暂缓项写明原因，待定项不进入完成率。
 
@@ -13,8 +13,8 @@
 | 编号 | 阶段 | 状态 | 设计章节 | 实现 | 验证证据 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
 | REQ-001 | M3 | 未开始 | 5 17 | - | - | 干净 Windows 安装验证 |
-| REQ-002 | M3 | 未开始 | 6.1 | - | - | 本机生命周期 |
-| REQ-003 | M4 | 未开始 | 6.2 | - | - | 服务器独立运行 |
+| REQ-002 | M3 | 进行中 | 6.1 | [服务装配](../services/agent/src/prodops/bootstrap/app.py) | [骨架验证](verification/2026-10-16-m1-t02-service.md) | M1 开发入口已验证；桌面启动管道、令牌和进程生命周期仍在 M3 |
+| REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [骨架验证](verification/2026-10-16-m1-t02-service.md) | 共用业务包的 server 回环开发入口；正式认证、数据库和内网运行仍在 M4 |
 | REQ-004 | M3 | 未开始 | 8 16 | - | - | 会话与上下文 |
 | REQ-005 | M2 | 未开始 | 8 11 | - | - | 任务和进度 |
 | REQ-006 | M2 | 未开始 | 8 9 13 | - | - | 证据和解决状态 |
@@ -46,9 +46,9 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | HAR-001 | M0 | 已验证 | 18 | [文档检查脚本](../scripts/check_project_docs.py) | [初始检查记录](verification/2026-10-16-docs.md) | 机械检查，证据质量仍需审阅 |
 | HAR-002 | M0 | 已验证 | 17 | [开发入口](../AGENTS.md) | [导航检查记录](verification/2026-10-16-docs.md) | 简短导航与执行规则 |
-| HAR-003 | M1 | 进行中 | 7 17 | [边界检查器](../scripts/check_boundaries.py) | [工具验证](verification/2026-10-16-m1-tooling.md) | Python/TS 检查器与夹具回归已建立，真实产品接入在 T06 |
+| HAR-003 | M1 | 进行中 | 7 17 | [边界检查器](../scripts/check_boundaries.py)、[Python 产品类型](../services/agent/pyproject.toml) | [工具验证](verification/2026-10-16-m1-tooling.md)、[服务验证](verification/2026-10-16-m1-t02-service.md) | Python 产品类型与边界已通过；TS 产品及整体接入仍在 T06 |
 | HAR-004 | M1 | 进行中 | 5 12 | [契约检查器](../scripts/check_contracts.py) | [工具验证](verification/2026-10-16-m1-tooling.md) | 检查器已建立，实际 API 导出与类型在 T03 |
-| HAR-005 | M1 | 进行中 | 17 | [统一入口](../scripts/check.py) | [工具验证](verification/2026-10-16-m1-tooling.md) | 工具锁定与入口已建立，产品范围尚未就绪 |
+| HAR-005 | M1 | 进行中 | 17 | [统一入口](../scripts/check.py) | [工具验证](verification/2026-10-16-m1-tooling.md)、[服务验证](verification/2026-10-16-m1-t02-service.md) | service 范围通过；默认 M1 尚有桌面和契约未就绪项 |
 | HAR-006 | M4 | 未开始 | 8 18 | - | - | M2 mock，M4 真实模型评测 |
 | HAR-007 | M2 | 未开始 | 9 11 | - | - | 故障注入回归待实现 |
 | HAR-008 | M3 | 未开始 | 5 6 17 | - | - | 桌面与安装包验证待建立 |

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T02",
+  "environment": {"os":"Windows 11 10.0.26200","arch":"AMD64","python":"3.13.2","uv":"0.11.17","node":"24.14.1","mypy":"1.19.0","fastapi":"0.143.2","pydantic":"2.14.1","uvicorn":"0.54.0","starlette":"1.8.0","httpx2":"2.13.1"},
+  "source": {"revision":"91e6b6d12dfe5b4b88dcc879decce41d63b15069","worktree":"uncommitted T02 implementation and quality entry changes","scope":"Python service skeleton only; not desktop or production server acceptance"},
+  "criteria": [
+    {"id":"M1-T02-AC01","status":"PASS","evidence":"docs/verification/2026-10-16-m1-t02-service.md"},
+    {"id":"M1-T02-AC02","status":"PASS","evidence":"docs/verification/2026-10-16-m1-t02-service.md"},
+    {"id":"M1-T02-AC03","status":"PASS","evidence":"docs/verification/2026-10-16-m1-t02-service.md"}
+  ]
+}

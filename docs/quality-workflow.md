@@ -11,13 +11,14 @@ uv sync --frozen --group dev --cache-dir .quality-reports/uv-cache --link-mode c
 npm ci --ignore-scripts --no-audit --no-fund
 ```
 
-Python 工具放在项目 `.venv`，Node 工具放在 `node_modules`，不需要全局安装 mypy 或 TypeScript。uv 缓存也保存在被忽略的项目目录，避免检查受全局缓存权限影响。`uv.lock` 与 `package-lock.json` 固定依赖。本轮只安装工程工具，不将原 demo 的运行依赖或尚未建立的产品依赖混入其中。
+Python 工具放在项目 `.venv`，Node 工具放在 `node_modules`，不需要全局安装 mypy 或 TypeScript。uv 缓存也保存在被忽略的项目目录，避免检查受全局缓存权限影响。`uv.lock` 与 `package-lock.json` 固定依赖。Python 使用 uv workspace：服务有自己的依赖清单，根开发组以可编辑方式安装服务及测试依赖，不安装旧 demo 的依赖。说明见 [服务运行方式](../services/agent/README.md)。
 
-## 2 三种检查范围
+## 2 四种检查范围
 
 ```text
 python scripts/check.py --profile docs
 python scripts/check.py --profile harness
+python scripts/check.py --profile service
 python scripts/check.py
 ```
 
@@ -25,11 +26,12 @@ python scripts/check.py
 | --- | --- | --- |
 | docs | 需求文档检查、任务依赖和交付回执检查 | 文档及引用结构一致 |
 | harness | 环境、docs、Python/TS 工具代码类型检查、检查器回归场景 | 工程设施在当前环境可以工作 |
-| m1 默认 | harness，再检查实际产品 Python/TS 类型、跨层导入、API 导出与生成类型漂移 | M1 静态检查通过，运行和 CI 仍需另验收 |
+| service | harness，再检查服务及其测试的 Python 类型、跨层导入、服务行为 | 当前 Python 骨架验收范围通过，不代表完整业务服务或 M1 完成 |
+| m1 默认 | service，再检查实际产品 TS 类型、跨层导入、API 导出与生成类型漂移 | M1 静态检查和骨架行为通过，桌面运行和 CI 仍需另验收 |
 
 结果只有 PASS、FAIL、NOT_READY，进程退出码分别为 0、1、2。有失败时整体 FAIL；没有失败但存在未就绪项时整体 NOT_READY。外部工具的任何非零退出都按失败处理，只有本项目明确约定的就绪检查才把 2 解释为 NOT_READY。
 
-缺少产品目录、类型配置、契约导出器或生成文件时不能空跑后返回成功。harness 通过不代表产品实现，docs 通过也不代表证据内容充分。m1 不替代运行测试、桌面截图、安装包或 CI 验收。
+缺少产品目录、类型配置、服务测试、契约导出器或生成文件时不能空跑后返回成功。harness 通过不代表产品实现，docs 通过也不代表证据内容充分。m1 包含当前服务骨架行为测试，不替代完整业务运行测试、桌面截图、安装包或 CI 验收。
 
 默认报告写入被忽略的 `.quality-reports/`。需要保留时使用 `--report docs/verification/实际记录名.json`，以仓库实际路径替换文件名；报告包含作用范围、时间、命令、逐项结果和耗时，不能跨范围解释为验收通过。
 
@@ -48,3 +50,5 @@ Python 检查通过 AST 解析静态 import、相对 import 和常见动态导�
 任务状态为 not_started、in_progress、implemented、verified。进入 implemented 时实现文件必须存在；进入 verified 时全部 AC 必须有通过的证据、复核回执正确、没有 open 发现且依赖任务已验证。结构检查不能判定证据内容真假或完备性，人工及实际运行复核仍需负责。
 
 自查明确记录 self_review，不标成独立 Agent 或人工审查。对实际运行环境、远端检查或生产数据没有验证时，直接填写未验证范围。任务卡完成只代表该卡约定的切片完成，不能把它覆盖的需求整体提前标为已验证。
+
+实现依据：[uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) 支持成员独立依赖与共同锁文件；服务用 [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/) 管理生命周期，测试遵循 [上下文管理器用法](https://fastapi.tiangolo.com/advanced/testing-events/)。当前锁定的 Starlette 测试客户端使用 [httpx2](https://starlette.dev/testclient/)。

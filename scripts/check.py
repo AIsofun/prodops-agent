@@ -1,4 +1,4 @@
-"""Unified quality entry: docs, harness tooling, or M1 product static gates."""
+"""Unified quality entry: docs, harness, Python service, or M1 product gates."""
 
 from __future__ import annotations
 
@@ -126,11 +126,15 @@ def run(root: Path, profile: str) -> list[Result]:
         return results
     backend = root / "services/agent"
     desktop = root / "apps/desktop"
-    results.append(execute("product-python-types", [str(python), "-m", "mypy", "--config-file", str(backend / "pyproject.toml"), str(backend / "src/prodops")], root,
+    results.append(execute("product-python-types", [str(python), "-m", "mypy", "--config-file", str(backend / "pyproject.toml")], root,
                            [python, backend / "pyproject.toml", backend / "src/prodops/__init__.py"]))
+    results.append(execute("product-python-boundaries", [sys.executable, "-m", "scripts.check_boundaries"], root, unready_exit=True))
+    results.append(execute("product-python-behavior", [str(python), "-m", "unittest", "discover", "-s", "services/agent/tests", "-v"], root,
+                           [python, backend / "tests/test_service.py"]))
+    if profile == "service":
+        return results
     results.append(execute("product-typescript-types", [node, str(tsc), "--noEmit", "-p", str(desktop / "tsconfig.json")], root,
                            [tsc, desktop / "tsconfig.json"]))
-    results.append(execute("product-python-boundaries", [sys.executable, "-m", "scripts.check_boundaries"], root, unready_exit=True))
     results.append(execute("product-typescript-boundaries", [node, "scripts/check_ts_boundaries.ts"], root, [tsc], unready_exit=True))
     results.append(execute("product-contracts", [str(python), "-m", "scripts.check_contracts", "--node", node], root, [python], unready_exit=True))
     return results
@@ -138,7 +142,7 @@ def run(root: Path, profile: str) -> list[Result]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=["docs", "harness", "m1"], default="m1")
+    parser.add_argument("--profile", choices=["docs", "harness", "service", "m1"], default="m1")
     parser.add_argument("--report", type=Path, help="JSON output path inside this repository")
     args = parser.parse_args()
     profile = str(args.profile)
@@ -158,7 +162,7 @@ def main() -> int:
     output.write_text(json.dumps({
         "schema_version": 1, "profile": profile, "status": status,
         "exit_code": exit_code, "created_at": datetime.now(UTC).isoformat(),
-        "scope": "harness only; not product acceptance" if profile == "harness" else "M1 static gates; runtime, packaging and CI acceptance separate" if profile == "m1" else profile,
+        "scope": "harness only; not product acceptance" if profile == "harness" else "M1 static gates and service skeleton behavior; desktop runtime, packaging and CI acceptance separate" if profile == "m1" else "Python service skeleton types, boundaries and behavior; not full M1 acceptance" if profile == "service" else profile,
         "checks": [asdict(result) for result in results],
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"OVERALL {status}: {output.relative_to(ROOT)}")

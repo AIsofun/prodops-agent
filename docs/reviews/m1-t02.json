@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T02",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-16-m1-t02-service.md",
+  "findings": [
+    {"id":"R1","severity":"P2","status":"fixed","reason":"Added py.typed and product mypy_path for the editable src-layout package; strict checks now cover service and tests without suppressing missing types."},
+    {"id":"R2","severity":"P2","status":"fixed","reason":"Replaced deprecated httpx TestClient dependency with supported httpx2, refreshed lock and installation, and reran service behavior checks without the warning."}
+  ]
+}

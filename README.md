@@ -2,7 +2,7 @@
 
 桌面产品依次维护 [需求文档](docs/requirements.md)、[需求追踪表](docs/traceability.md)、[架构设计](docs/architecture.md) 和 [实施计划](docs/implementation-plan.md)，开发约束见 [Harness 工程约束](docs/engineering-constraints.md) 与 [开发入口](AGENTS.md)。技术栈为 Electron、React、TypeScript 和 Python，Windows 优先，同时支持本机与工厂内网服务器部署。以下内容仍描述当前 Demo 的运行方式。
 
-后续开发从 [M1 阶段任务卡](docs/tasks/m1/README.md) 开始，工程检查与交付格式见 [统一质量入口](docs/quality-workflow.md)。工程工具环境独立于下述 Demo 运行依赖。
+开发进度见 [M1 阶段任务卡](docs/tasks/m1/README.md)，工程检查与交付格式见 [统一质量入口](docs/quality-workflow.md)。新的 [Python 服务骨架](services/agent/README.md) 已支持 local/server 开发入口和健康检查；安装与运行方式见其说明。新的 workspace 环境独立于下述 Demo 运行依赖。
 
 一个"**教学型但工程化**"的最小 Agent 演示项目，真正带
 **Think → Act → Observe** 主循环、可插拔工具、可插拔 LLM 的 Agent 骨架。

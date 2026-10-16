@@ -28,8 +28,9 @@
 ```text
 python scripts/check.py --profile docs
 python scripts/check.py --profile harness
+python scripts/check.py --profile service
 python scripts/check.py
 git diff --check
 ```
 
-安装本地工具与检查范围见 [质量检查说明](docs/quality-workflow.md)。默认命令执行 M1 静态检查，产品缺失时返回 NOT_READY；harness 仅验证工程设施。产品运行测试、安装包和远端 CI 仍需按对应任务建立。
+安装本地工具与检查范围见 [质量检查说明](docs/quality-workflow.md)。默认命令执行 M1 静态检查与 Python 骨架行为测试，产品缺失时返回 NOT_READY；harness 仅验证工程设施，service 增加当前服务类型、模块边界与行为检查。完整业务运行、桌面、安装包和远端 CI 仍需按对应任务建立。
