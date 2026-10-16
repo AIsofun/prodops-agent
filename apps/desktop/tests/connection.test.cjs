@@ -1,9 +1,11 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const http = require("node:http");
-const { developmentConnection, getConnectionStatus } = require("../dist/main/connection.js");
-const { createStatusHandler } = require("../dist/main/ipc.js");
-const { parseConnectionStatus, validateStatusRequest } = require("../dist/shared/connection.js");
+const path = require("node:path");
+const build = process.env.PRODOPS_TEST_BUILD ?? path.resolve(__dirname, "../dist");
+const { developmentConnection, getConnectionStatus } = require(path.join(build, "main/connection.js"));
+const { createStatusHandler } = require(path.join(build, "main/ipc.js"));
+const { parseConnectionStatus, validateStatusRequest } = require(path.join(build, "shared/connection.js"));
 const { validateHealth, validateCapabilities } = require("../../../packages/api-client/src/validators.cjs");
 
 const id = "44444444-4444-4444-8444-444444444444";

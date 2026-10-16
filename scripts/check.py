@@ -135,8 +135,12 @@ def run(root: Path, profile: str) -> list[Result]:
         return results
     results.append(execute("product-typescript-types", [node, str(tsc), "--noEmit", "-p", str(desktop / "tsconfig.json")], root,
                            [tsc, desktop / "tsconfig.json"]))
+    results.append(execute("product-renderer-types", [node, str(tsc), "--noEmit", "-p", str(desktop / "tsconfig.renderer.json")], root,
+                           [tsc, desktop / "tsconfig.renderer.json"]))
     results.append(execute("product-typescript-boundaries", [node, "scripts/check_ts_boundaries.ts"], root, [tsc], unready_exit=True))
     results.append(execute("product-contracts", [str(python), "-m", "scripts.check_contracts", "--node", node], root, [python], unready_exit=True))
+    results.append(execute("product-desktop-behavior", [node, "apps/desktop/scripts/check.mjs"], root,
+                           [tsc, desktop / "scripts/check.mjs", desktop / "tests/connection.test.cjs", desktop / "tsconfig.electron.json"]))
     return results
 
 

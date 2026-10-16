@@ -46,7 +46,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | HAR-001 | M0 | 已验证 | 18 | [文档检查脚本](../scripts/check_project_docs.py) | [初始检查记录](verification/2026-10-16-docs.md) | 机械检查，证据质量仍需审阅 |
 | HAR-002 | M0 | 已验证 | 17 | [开发入口](../AGENTS.md) | [导航检查记录](verification/2026-10-16-docs.md) | 简短导航与执行规则 |
-| HAR-003 | M1 | 进行中 | 7 17 | [边界检查器](../scripts/check_boundaries.py)、[Python 产品类型](../services/agent/pyproject.toml) | [工具验证](verification/2026-10-16-m1-tooling.md)、[服务验证](verification/2026-10-16-m1-t02-service.md) | Python 产品类型与边界已通过；TS 产品及整体接入仍在 T06 |
+| HAR-003 | M1 | 已验证 | 7 17 | [统一产品检查](../scripts/check.py)、[缺陷注入](../scripts/verify_product_gates.py)、[桌面类型](../apps/desktop/tsconfig.json)、[Python 产品类型](../services/agent/pyproject.toml) | [产品检查验证](verification/2026-10-16-m1-t06-gates.md) | 当前实际 Python/TS 模块类型、导入边界与缺陷阻断通过；后续新增模块持续遵守 |
 | HAR-004 | M1 | 进行中 | 5 12 | [契约检查器](../scripts/check_contracts.py)、[正式模型](../services/agent/src/prodops/api/models.py)、[生成类型](../packages/api-client/src/schema.d.ts)、[生成校验器](../packages/api-client/src/validators.cjs)、[IPC 校验](../apps/desktop/src/main/ipc.ts) | [契约验证](verification/2026-10-16-m1-t03-contracts.md)、[桥接验证](verification/2026-10-16-m1-t05-bridge.md) | T03/T05 API、事件、IPC 边界及漂移已验证；CI 接入仍在 T07 |
 | HAR-005 | M1 | 进行中 | 17 | [统一入口](../scripts/check.py) | [工具验证](verification/2026-10-16-m1-tooling.md)、[服务验证](verification/2026-10-16-m1-t02-service.md) | service 范围通过；默认 M1 尚有桌面和契约未就绪项 |
 | HAR-006 | M4 | 未开始 | 8 18 | - | - | M2 mock，M4 真实模型评测 |

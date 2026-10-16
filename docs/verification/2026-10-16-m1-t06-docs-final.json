@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "profile": "docs",
+  "status": "PASS",
+  "exit_code": 0,
+  "created_at": "2026-10-16T09:49:19.347542+00:00",
+  "scope": "docs",
+  "checks": [
+    {
+      "name": "documents",
+      "status": "PASS",
+      "detail": "PASS: 37 requirement and harness definitions have consistent tracking.\nLocal file links, statuses, phases, evidence references and fences checked.\nThis check does not establish product acceptance or evidence quality.",
+      "command": [
+        "E:\\Application\\Miniconda3\\python.exe",
+        "-m",
+        "scripts.check_project_docs"
+      ],
+      "seconds": 0.088
+    },
+    {
+      "name": "task-delivery-records",
+      "status": "PASS",
+      "detail": "PASS: M1 task graph, requirement mappings and delivery receipts",
+      "command": [
+        "E:\\Application\\Miniconda3\\python.exe",
+        "-m",
+        "scripts.check_delivery"
+      ],
+      "seconds": 0.075
+    }
+  ]
+}

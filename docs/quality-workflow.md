@@ -29,7 +29,7 @@ python scripts/check.py
 | docs | 需求文档检查、任务依赖和交付回执检查 | 文档及引用结构一致 |
 | harness | 环境、docs、Python/TS 工具代码类型检查、检查器回归场景 | 工程设施在当前环境可以工作 |
 | service | harness，再检查服务、导出器及测试的 Python 类型、跨层导入、服务和契约行为、TS 契约消费编译 | 当前服务及契约切片通过，不代表任务执行、完整业务服务或 M1 完成 |
-| m1 默认 | service，再检查实际产品 TS 类型、跨层导入、API 导出与生成类型漂移 | M1 静态检查和骨架行为通过，桌面运行和 CI 仍需另验收 |
+| m1 默认 | service，再检查实际产品与独立 renderer TS 类型、跨层导入、API/生成类型/运行时校验器漂移、桌面连接与IPC行为 | M1 静态检查和骨架行为通过，真实窗口运行和 CI 仍需另验收 |
 
 结果只有 PASS、FAIL、NOT_READY，进程退出码分别为 0、1、2。有失败时整体 FAIL；没有失败但存在未就绪项时整体 NOT_READY。外部工具的任何非零退出都按失败处理，只有本项目明确约定的就绪检查才把 2 解释为 NOT_READY。
 
@@ -46,6 +46,8 @@ Python 检查通过 AST 解析静态 import、相对 import 和常见动态导�
 契约检查约定服务导出器接受 `--output FILE`，输出真实应用和模型的 OpenAPI；与 `contracts/openapi.json` 比较，再在临时目录用锁定的 openapi-typescript 生成类型，与 `packages/api-client/src/schema.d.ts` 比较。检查不会自动覆盖仓库快照或生成文件。导出器是否真正反映应用，由产品测试与复核共同确认。
 
 T05 增加同源的 Ajv 运行时校验器，`npm run contracts:validators` 显式更新 `packages/api-client/src/validators.cjs`；契约检查使用重新导出的临时 OpenAPI 生成并比较该文件。三类漂移都被拒绝，已有快照不作为实时导出来源。
+
+T06 的 `python -m scripts.verify_product_gates` 将真实产品源文件复制到工作区隔离目录，先跑正常基线，再注入类型、边界和生成漂移；API 修改由副本实际导出，旧 demo 不参加产品替身验证。脚本保存预期与实际结果，不修改正式源文件。默认桌面行为检查仅编译到忽略的 .test-build，不覆盖正式 preload bundle，不启动窗口。
 
 M1-T03 的真实应用导出器、预留事件模型及类型生成方式见 [契约说明](../contracts/README.md)。生成类型的消费检查只编译契约夹具，不代表 Electron/React 产品已建立；service 回归使用真实产物副本验证 schema 和 TS 漂移均被拒绝，且检查不改写副本。
 
