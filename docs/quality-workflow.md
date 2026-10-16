@@ -1,0 +1,50 @@
+# 统一质量检查与交付方法
+
+本入口落实 HAR-003、HAR-004、HAR-005 和 HAR-010 的工程基础。M1 任务见 [任务卡索引](tasks/m1/README.md)，业务需求的完成情况仍以 [追踪表](traceability.md) 为准。
+
+## 1 安装本地工具
+
+工具环境使用 Python 3.12 或 3.13、Node.js 22.18 至 24.x，以及 uv 和 npm。先运行：
+
+```text
+uv sync --frozen --group dev --cache-dir .quality-reports/uv-cache --link-mode copy
+npm ci --ignore-scripts --no-audit --no-fund
+```
+
+Python 工具放在项目 `.venv`，Node 工具放在 `node_modules`，不需要全局安装 mypy 或 TypeScript。uv 缓存也保存在被忽略的项目目录，避免检查受全局缓存权限影响。`uv.lock` 与 `package-lock.json` 固定依赖。本轮只安装工程工具，不将原 demo 的运行依赖或尚未建立的产品依赖混入其中。
+
+## 2 三种检查范围
+
+```text
+python scripts/check.py --profile docs
+python scripts/check.py --profile harness
+python scripts/check.py
+```
+
+| 范围 | 实际执行 | 通过意味着什么 |
+| --- | --- | --- |
+| docs | 需求文档检查、任务依赖和交付回执检查 | 文档及引用结构一致 |
+| harness | 环境、docs、Python/TS 工具代码类型检查、检查器回归场景 | 工程设施在当前环境可以工作 |
+| m1 默认 | harness，再检查实际产品 Python/TS 类型、跨层导入、API 导出与生成类型漂移 | M1 静态检查通过，运行和 CI 仍需另验收 |
+
+结果只有 PASS、FAIL、NOT_READY，进程退出码分别为 0、1、2。有失败时整体 FAIL；没有失败但存在未就绪项时整体 NOT_READY。外部工具的任何非零退出都按失败处理，只有本项目明确约定的就绪检查才把 2 解释为 NOT_READY。
+
+缺少产品目录、类型配置、契约导出器或生成文件时不能空跑后返回成功。harness 通过不代表产品实现，docs 通过也不代表证据内容充分。m1 不替代运行测试、桌面截图、安装包或 CI 验收。
+
+默认报告写入被忽略的 `.quality-reports/`。需要保留时使用 `--report docs/verification/实际记录名.json`，以仓库实际路径替换文件名；报告包含作用范围、时间、命令、逐项结果和耗时，不能跨范围解释为验收通过。
+
+## 3 模块与契约检查
+
+Python 检查通过 AST 解析静态 import、相对 import 和常见动态导入，按架构允许方向验证；领域层只允许标准库与领域代码。TypeScript 检查使用编译器 API，识别 import、re-export、require、动态 import 和 tsconfig 路径别名；renderer/shared 禁止导入 Electron 或 Node，preload 禁止 Node 原生模块，main 负责相应系统能力。
+
+检查器不是完整的动态程序分析器；反射、包装后的加载器和第三方包内部行为仍需代码复核、类型检查和运行权限共同约束。工具检查中的假产品只用于验证规则，不登记为真实产品覆盖。
+
+契约检查约定服务导出器接受 `--output FILE`，输出真实应用和模型的 OpenAPI；与 `contracts/openapi.json` 比较，再在临时目录用锁定的 openapi-typescript 生成类型，与 `packages/api-client/src/schema.d.ts` 比较。检查不会自动覆盖仓库快照或生成文件。导出器是否真正反映应用，由产品测试与复核共同确认。
+
+## 4 复核与证据格式
+
+使用 [代码复核模板](templates/code-review.md) 和 [验证证据模板](templates/verification.md)。详细记录放在 `docs/reviews/` 与 `docs/verification/`，JSON 回执供任务清单引用。机读示例见本轮 [验证回执](verification/m1-t01.json) 与 [复核回执](reviews/m1-t01.json)。
+
+任务状态为 not_started、in_progress、implemented、verified。进入 implemented 时实现文件必须存在；进入 verified 时全部 AC 必须有通过的证据、复核回执正确、没有 open 发现且依赖任务已验证。结构检查不能判定证据内容真假或完备性，人工及实际运行复核仍需负责。
+
+自查明确记录 self_review，不标成独立 Agent 或人工审查。对实际运行环境、远端检查或生产数据没有验证时，直接填写未验证范围。任务卡完成只代表该卡约定的切片完成，不能把它覆盖的需求整体提前标为已验证。

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T01",
+  "environment": {"os":"Windows","python":"3.13.2","node":"24.14.1","mypy":"1.19.0","typescript":"5.9.3","openapi-typescript":"7.10.1"},
+  "source": {"revision":"9c45bbda685acb25ed826f8df4925c29e970a4b5","worktree":"uncommitted changes","scope":"M1 tooling, task cards and delivery formats only"},
+  "criteria": [
+    {"id":"M1-T01-AC01","status":"PASS","evidence":"docs/verification/2026-10-16-m1-tooling.md"},
+    {"id":"M1-T01-AC02","status":"PASS","evidence":"docs/verification/2026-10-16-m1-tooling.md"},
+    {"id":"M1-T01-AC03","status":"PASS","evidence":"docs/verification/2026-10-16-m1-tooling.md"},
+    {"id":"M1-T01-AC04","status":"PASS","evidence":"docs/verification/2026-10-16-m1-tooling.md"}
+  ]
+}

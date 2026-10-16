@@ -1,0 +1,15 @@
+{
+  "name": "prodops-agent-tooling",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.18 <25" },
+  "scripts": {
+    "check:tooling-types": "tsc --noEmit -p tooling/tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "openapi-typescript": "7.10.1",
+    "typescript": "5.9.3"
+  }
+}

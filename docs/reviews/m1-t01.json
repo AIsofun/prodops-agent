@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T01",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-16-m1-tooling.md",
+  "findings": [
+    {"id":"R1","severity":"P1","status":"fixed","reason":"External type tools can return exit code 2 for real failures; only readiness-aware internal commands may interpret 2 as NOT_READY. Added regression coverage."},
+    {"id":"R2","severity":"P2","status":"fixed","reason":"Verified task state requires complete acceptance evidence and review receipt, not merely an existing implementation file. Added positive and rejection cases."}
+  ]
+}
