@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -37,6 +38,23 @@ class WorkspaceCase(unittest.TestCase):
 
 
 class GateResults(WorkspaceCase):
+    def test_report_and_unicode_output_survive_a_legacy_windows_encoding(self) -> None:
+        script = '''
+import sys
+from pathlib import Path
+import scripts.check as check
+check.ROOT = Path(sys.argv[1]).resolve()
+check.run = lambda root, profile: [check.Result("unicode", "PASS", "\\u2714 \\u4e2d\\u6587", [])]
+sys.argv = ["check", "--profile", "docs", "--report", "unicode.json"]
+raise SystemExit(check.main())
+'''
+        result = subprocess.run([sys.executable, "-c", script, str(self.root)], cwd=REPO,
+                                env={**os.environ, "PYTHONUTF8": "0", "PYTHONIOENCODING": "cp1252"},
+                                capture_output=True, text=True, encoding="utf-8", timeout=20, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("\u2714 \u4e2d\u6587", result.stdout)
+        self.assertEqual(json.loads((self.root / "unicode.json").read_text(encoding="utf-8"))["status"], "PASS")
+
     def test_no_checks_is_not_success(self) -> None:
         self.assertEqual(aggregate([]), ("NOT_READY", 2))
 
@@ -258,6 +276,12 @@ class DeliveryRecords(WorkspaceCase):
         self.completed_task()
         self.manifest([self.task])
         self.assertEqual(check_delivery(self.root), [])
+
+    def test_receipts_work_with_a_noncanonical_workspace_root(self) -> None:
+        self.completed_task()
+        self.manifest([self.task])
+        (self.root / "alias").mkdir()
+        self.assertEqual(check_delivery(self.root / "alias" / ".."), [])
 
     def test_open_review_finding_prevents_verified(self) -> None:
         self.completed_task()

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import shutil
@@ -145,6 +146,9 @@ def run(root: Path, profile: str) -> list[Result]:
 
 
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if isinstance(stream, io.TextIOWrapper):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile", choices=["docs", "harness", "service", "m1"], default="m1")
     parser.add_argument("--report", type=Path, help="JSON output path inside this repository")
@@ -158,10 +162,6 @@ def main() -> int:
     except (OSError, ValueError, KeyError, StopIteration) as exc:
         results = [Result("configuration", "FAIL", str(exc), [])]
     status, exit_code = aggregate(results)
-    for result in results:
-        print(f"[{result.status}] {result.name}")
-        if result.detail:
-            print(result.detail)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps({
         "schema_version": 1, "profile": profile, "status": status,
@@ -169,6 +169,10 @@ def main() -> int:
         "scope": "harness only; not product acceptance" if profile == "harness" else "M1 static gates and service skeleton behavior; desktop runtime, packaging and CI acceptance separate" if profile == "m1" else "Python service skeleton types, boundaries and behavior; not full M1 acceptance" if profile == "service" else profile,
         "checks": [asdict(result) for result in results],
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    for result in results:
+        print(f"[{result.status}] {result.name}")
+        if result.detail:
+            print(result.detail)
     print(f"OVERALL {status}: {output.relative_to(ROOT)}")
     return exit_code
 

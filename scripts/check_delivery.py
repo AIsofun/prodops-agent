@@ -16,8 +16,9 @@ STATES = {"not_started", "in_progress", "implemented", "verified"}
 def repository_file(root: Path, value: object) -> Path | None:
     if not isinstance(value, str):
         return None
-    path = (root / value).resolve()
-    return path if path.is_relative_to(root) and path.is_file() else None
+    base = root.resolve()
+    path = (base / value).resolve()
+    return path if path.is_relative_to(base) and path.is_file() else None
 
 
 def validate(root: Path) -> list[str]:
