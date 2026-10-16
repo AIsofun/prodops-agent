@@ -45,6 +45,8 @@ Python 检查通过 AST 解析静态 import、相对 import 和常见动态导�
 
 契约检查约定服务导出器接受 `--output FILE`，输出真实应用和模型的 OpenAPI；与 `contracts/openapi.json` 比较，再在临时目录用锁定的 openapi-typescript 生成类型，与 `packages/api-client/src/schema.d.ts` 比较。检查不会自动覆盖仓库快照或生成文件。导出器是否真正反映应用，由产品测试与复核共同确认。
 
+T05 增加同源的 Ajv 运行时校验器，`npm run contracts:validators` 显式更新 `packages/api-client/src/validators.cjs`；契约检查使用重新导出的临时 OpenAPI 生成并比较该文件。三类漂移都被拒绝，已有快照不作为实时导出来源。
+
 M1-T03 的真实应用导出器、预留事件模型及类型生成方式见 [契约说明](../contracts/README.md)。生成类型的消费检查只编译契约夹具，不代表 Electron/React 产品已建立；service 回归使用真实产物副本验证 schema 和 TS 漂移均被拒绝，且检查不改写副本。
 
 ## 4 复核与证据格式

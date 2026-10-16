@@ -1,3 +1,5 @@
+import type { ConnectionStatus } from "./connection.js";
+
 export interface DesktopInfo {
   name: string;
   version: string;
@@ -5,6 +7,7 @@ export interface DesktopInfo {
 
 export interface DesktopBridge {
   getInfo(): DesktopInfo;
+  connections: { getStatus(): Promise<ConnectionStatus> };
 }
 
 declare global {

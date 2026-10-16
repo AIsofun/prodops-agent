@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "scenarios": [
+    {
+      "name": "ready-local",
+      "expected": "ready",
+      "exit_code": 0,
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t05-integration/ready-local/runtime.json"
+    },
+    {
+      "name": "offline-local",
+      "expected": "offline",
+      "exit_code": 0,
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t05-integration/offline-local/runtime.json"
+    },
+    {
+      "name": "ready-server",
+      "expected": "ready",
+      "exit_code": 0,
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t05-integration/ready-server/runtime.json"
+    },
+    {
+      "name": "offline-server",
+      "expected": "offline",
+      "exit_code": 0,
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t05-integration/offline-server/runtime.json"
+    },
+    {
+      "name": "incompatible-fixture",
+      "expected": "incompatible",
+      "exit_code": 0,
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t05-integration/incompatible-fixture/runtime.json"
+    }
+  ],
+  "limitations": "Development services only. Python children terminated for isolated test cleanup; graceful service lifecycle remains M3."
+}

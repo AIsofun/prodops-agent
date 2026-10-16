@@ -24,7 +24,7 @@
 | REQ-010 | M2 | 未开始 | 9 | - | - | 中断核对 |
 | REQ-011 | M4 | 未开始 | 7 8 | - | - | mock 与真实模型分别验收 |
 | REQ-012 | M5 | 未开始 | 7 14 | - | - | 现场连接器未确定 |
-| REQ-013 | M4 | 未开始 | 6.3 13 | - | - | 跨连接隔离 |
+| REQ-013 | M4 | 进行中 | 6.3 13 | [固定开发连接](../apps/desktop/src/main/connection.ts)、[受限 IPC](../apps/desktop/src/main/ipc.ts) | [开发连接验证](verification/2026-10-16-m1-t05-bridge.md) | T05 固定回环连接和状态读取已验证；持久配置、切换及跨连接缓存隔离仍在 M4 |
 | REQ-014 | M4 | 未开始 | 6.2 12 14 | - | - | 身份与资源权限 |
 | REQ-015 | M4 | 未开始 | 12 13 | - | - | P1 附件，上限待定 |
 | REQ-016 | M5 | 未开始 | 14 | - | - | P1，开放写操作前必需 |
@@ -34,7 +34,7 @@
 | REQ-020 | M6 | 未开始 | 13 17 | - | - | 数据及附件恢复 |
 | REQ-021 | M6 | 未开始 | 12 17 | - | - | 协议与离线升级 |
 | NFR-001 | M4 | 未开始 | 6 18 | - | - | 双模式场景集 |
-| NFR-002 | M4 | 未开始 | 5 14 15 | - | - | 密钥和资源边界 |
+| NFR-002 | M4 | 进行中 | 5 14 15 | [受限桥接](../apps/desktop/src/preload/index.ts)、[请求边界](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md) | 无凭据开发状态读取边界已验证；生产密钥、授权资源与导出脱敏仍在后续阶段 |
 | NFR-003 | M2 | 未开始 | 11 15 | - | - | 关联日志与错误分类 |
 | NFR-004 | M4 | 未开始 | 9 12 13 | - | - | 两种数据库分别验证 |
 | NFR-005 | M6 | 待定 | 10 18 | - | - | 参考环境与数值门槛待测量 |
@@ -47,7 +47,7 @@
 | HAR-001 | M0 | 已验证 | 18 | [文档检查脚本](../scripts/check_project_docs.py) | [初始检查记录](verification/2026-10-16-docs.md) | 机械检查，证据质量仍需审阅 |
 | HAR-002 | M0 | 已验证 | 17 | [开发入口](../AGENTS.md) | [导航检查记录](verification/2026-10-16-docs.md) | 简短导航与执行规则 |
 | HAR-003 | M1 | 进行中 | 7 17 | [边界检查器](../scripts/check_boundaries.py)、[Python 产品类型](../services/agent/pyproject.toml) | [工具验证](verification/2026-10-16-m1-tooling.md)、[服务验证](verification/2026-10-16-m1-t02-service.md) | Python 产品类型与边界已通过；TS 产品及整体接入仍在 T06 |
-| HAR-004 | M1 | 进行中 | 5 12 | [契约检查器](../scripts/check_contracts.py)、[实际导出器](../services/agent/scripts/export_contracts.py)、[正式模型](../services/agent/src/prodops/api/models.py)、[生成类型](../packages/api-client/src/schema.d.ts) | [契约验证](verification/2026-10-16-m1-t03-contracts.md) | T03 API/事件导出、类型、非法输入与版本检查已验证；IPC 在 T05，CI 接入在 T07 |
+| HAR-004 | M1 | 进行中 | 5 12 | [契约检查器](../scripts/check_contracts.py)、[正式模型](../services/agent/src/prodops/api/models.py)、[生成类型](../packages/api-client/src/schema.d.ts)、[生成校验器](../packages/api-client/src/validators.cjs)、[IPC 校验](../apps/desktop/src/main/ipc.ts) | [契约验证](verification/2026-10-16-m1-t03-contracts.md)、[桥接验证](verification/2026-10-16-m1-t05-bridge.md) | T03/T05 API、事件、IPC 边界及漂移已验证；CI 接入仍在 T07 |
 | HAR-005 | M1 | 进行中 | 17 | [统一入口](../scripts/check.py) | [工具验证](verification/2026-10-16-m1-tooling.md)、[服务验证](verification/2026-10-16-m1-t02-service.md) | service 范围通过；默认 M1 尚有桌面和契约未就绪项 |
 | HAR-006 | M4 | 未开始 | 8 18 | - | - | M2 mock，M4 真实模型评测 |
 | HAR-007 | M2 | 未开始 | 9 11 | - | - | 故障注入回归待实现 |

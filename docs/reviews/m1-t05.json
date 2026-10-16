@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T05",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-16-m1-t05-bridge.md",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Bundled shared runtime validation into sandboxed preload, with electron as the sole external module."
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Generated runtime validators from formal OpenAPI and added temporary regeneration comparison and drift regressions."
+    }
+  ]
+}

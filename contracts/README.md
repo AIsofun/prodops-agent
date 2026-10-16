@@ -36,11 +36,12 @@ RunEvent 通过 event_type 判别 12 种事件，每种 payload 都是正式 Pyd
 ```text
 .venv\Scripts\python.exe services/agent/scripts/export_contracts.py --output contracts/openapi.json
 npm run contracts:types
+npm run contracts:validators
 .venv\Scripts\python.exe scripts/check_contracts.py
 node node_modules/typescript/bin/tsc --noEmit -p packages/api-client/tsconfig.json
 python scripts/check.py --profile service
 ```
 
-前两条是显式更新命令。导出器调用实际应用工厂与 OpenAPI 路由解析，再把正式预留模型注册进同一 schema，不读旧快照、不启动服务或访问设备、模型和数据库。依赖锁定的 openapi-typescript 7.10.1 生成 TS 类型；检查在临时目录重新导出和生成，比较快照及 TS 内容，不覆盖仓库产物。仅 TS 声明不能替代运行时校验，桌面消费与 IPC 输入校验在 T05 建立。
+前三条是显式更新命令。导出器调用实际应用工厂与 OpenAPI 路由解析，再把正式预留模型注册进同一 schema，不读旧快照、不启动服务或访问设备、模型和数据库。依赖锁定的 openapi-typescript 7.10.1 生成 TS 类型；T05 增加 Ajv 从同一 OpenAPI 生成健康与能力响应校验器。检查在临时目录重新导出和生成，比较快照、TS 与运行时校验器，不覆盖仓库产物。桌面用生成校验器读取 HTTP，并通过独立 IPC 模型校验请求和返回值，见[桥接证据](../docs/verification/2026-10-16-m1-t05-bridge.md)。
 
 service 范围包含契约边界测试、真实生成产物漂移回归和 TS 消费编译。默认 M1 额外独立执行 product-contracts；缺少桌面产品时整体仍应 NOT_READY。CI 在 T07 接入，当前本地检查不能代表远端通过。

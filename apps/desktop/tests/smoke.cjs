@@ -28,10 +28,22 @@ app.once("browser-window-created", (_event, window) => {
       assert.equal(result.heading, "从异常描述开始排查");
       assert.equal(result.node, "undefined");
       assert.equal(result.process, "undefined");
-      assert.deepEqual(result.bridgeKeys, ["getInfo"]);
+      assert.deepEqual(result.bridgeKeys.sort(), ["connections", "getInfo"]);
       assert.equal(result.info.name, "ProdOps");
       assert.ok(result.csp.includes("script-src 'self'"));
       assert.ok(!result.csp.includes("unsafe-eval"));
+      const expected = process.env.PRODOPS_EXPECT_CONNECTION ?? "offline";
+      const state = await window.webContents.executeJavaScript(`new Promise((resolve) => {
+        function probe() {
+          const element = document.querySelector('[data-connection-state]');
+          if (!element || element.dataset.connectionState === 'checking') { setTimeout(probe, 20); return; }
+          resolve({ state: element.dataset.connectionState, text: element.innerText });
+        } probe();
+      })`);
+      assert.equal(state.state, expected);
+      const malformed = await window.webContents.executeJavaScript(`window.prodops.connections.getStatus({url:'http://attacker.example'}).then(() => false, () => true)`);
+      assert.equal(malformed, true);
+      result.connection = state;
       await new Promise((resolve) => setTimeout(resolve, 350));
       fs.writeFileSync(path.join(output, "desktop.png"), (await window.webContents.capturePage()).toPNG());
       fs.writeFileSync(path.join(output, "runtime.json"), JSON.stringify({ status: "PASS", versions: process.versions, preferences: { contextIsolation: prefs.contextIsolation, sandbox: prefs.sandbox, nodeIntegration: prefs.nodeIntegration, webSecurity: prefs.webSecurity, webviewTag: prefs.webviewTag }, renderer: result, checks: ["React rendered", "renderer has no Node globals", "restricted bridge", "window closes and app exits"] }, null, 2) + "\n");

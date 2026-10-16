@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 from scripts.check import Result, aggregate, execute, run
 from scripts.check_boundaries import check as check_python
-from scripts.check_contracts import EXPORTER, GENERATOR, SNAPSHOT, TYPES
+from scripts.check_contracts import EXPORTER, GENERATOR, SNAPSHOT, TYPES, VALIDATOR_GENERATOR, VALIDATORS
 from scripts.check_contracts import check as check_contracts, has_external_reference
 from scripts.check_delivery import validate as check_delivery
 
@@ -168,6 +168,8 @@ class Contracts(WorkspaceCase):
             "paths": {}, "components": {"schemas": {"Health": {
                 "type": "object", "properties": {"status": {"type": "string"}}, "required": ["status"]}}}}
         self.write(SNAPSHOT, json.dumps(self.schema))
+        self.write(VALIDATORS, "// harness validator fixture\n")
+        self.write(VALIDATOR_GENERATOR, 'import fs from "node:fs";\nfs.writeFileSync(process.argv[process.argv.indexOf("--output") + 1], "// harness validator fixture\\n");\n')
         self.write(EXPORTER, "import json,sys\nfrom pathlib import Path\n"
                    f"schema = json.loads({json.dumps(self.schema)!r})\n"
                    "Path(sys.argv[sys.argv.index('--output') + 1]).write_text(json.dumps(schema), encoding='utf-8')\n")
@@ -197,6 +199,12 @@ class Contracts(WorkspaceCase):
     def test_missing_exporter_is_not_ready(self) -> None:
         (self.root / EXPORTER).unlink()
         self.assertEqual(check_contracts(self.root, sys.executable, NODE, REPO)[1], 2)
+
+    def test_stale_runtime_validators_are_rejected(self) -> None:
+        self.write(VALIDATORS, "// stale runtime validator\n")
+        errors, code = check_contracts(self.root, sys.executable, NODE, REPO)
+        self.assertEqual(code, 1)
+        self.assertTrue(any("runtime validators differ" in error for error in errors))
 
     def test_nested_external_references_are_rejected(self) -> None:
         self.assertTrue(has_external_reference({"components": [{"$ref": "https://example.invalid/schema.json"}]}))

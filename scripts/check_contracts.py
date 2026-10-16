@@ -14,6 +14,8 @@ EXPORTER = Path("services/agent/scripts/export_contracts.py")
 SNAPSHOT = Path("contracts/openapi.json")
 TYPES = Path("packages/api-client/src/schema.d.ts")
 GENERATOR = Path("node_modules/openapi-typescript/bin/cli.js")
+VALIDATOR_GENERATOR = Path("packages/api-client/scripts/generate-validators.mjs")
+VALIDATORS = Path("packages/api-client/src/validators.cjs")
 
 
 def has_external_reference(value: object) -> bool:
@@ -33,7 +35,7 @@ def command(args: list[str], root: Path) -> subprocess.CompletedProcess[str]:
 
 
 def check(root: Path, python: str, node: str, tools_root: Path | None = None) -> tuple[list[str], int]:
-    missing = [str(item) for item in (EXPORTER, SNAPSHOT, TYPES) if not (root / item).is_file()]
+    missing = [str(item) for item in (EXPORTER, SNAPSHOT, TYPES, VALIDATOR_GENERATOR, VALIDATORS) if not (root / item).is_file()]
     if missing:
         return ["NOT_READY: missing product contract artifacts: " + ", ".join(missing)], 2
     generator = (tools_root or root) / GENERATOR
@@ -64,6 +66,13 @@ def check(root: Path, python: str, node: str, tools_root: Path | None = None) ->
         expected_types = (root / TYPES).read_text(encoding="utf-8").replace("\r\n", "\n").rstrip()
         if actual_types != expected_types:
             errors.append("Generated TS types differ from packages/api-client/src/schema.d.ts")
+        validators = temp / "validators.cjs"
+        result = command([node, str(root / VALIDATOR_GENERATOR), "--schema", str(exported),
+                          "--output", str(validators), "--tools-root", str(tools_root or root)], root)
+        if result.returncode or not validators.is_file():
+            return errors + ["Runtime validator generation failed: " + result.stdout], 1
+        if validators.read_text(encoding="utf-8").replace("\r\n", "\n").rstrip() != (root / VALIDATORS).read_text(encoding="utf-8").replace("\r\n", "\n").rstrip():
+            errors.append("Generated runtime validators differ from packages/api-client/src/validators.cjs")
     return errors, 1 if errors else 0
 
 
@@ -80,7 +89,7 @@ def main() -> int:
     for error in errors:
         print(error)
     if not code:
-        print("PASS: exported API contract and generated TypeScript are consistent")
+        print("PASS: exported API contract, generated TypeScript and runtime validators are consistent")
     return code
 
 

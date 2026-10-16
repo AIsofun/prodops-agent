@@ -190,14 +190,14 @@ with patch("socket.socket.connect", side_effect=AssertionError("network access")
         self.assertIn("RunSnapshot", schema["components"]["schemas"])
 
     def test_real_artifact_drift_is_rejected_without_rewriting(self) -> None:
-        from scripts.check_contracts import EXPORTER as exporter, SNAPSHOT, TYPES, check
+        from scripts.check_contracts import EXPORTER as exporter, SNAPSHOT, TYPES, VALIDATORS, VALIDATOR_GENERATOR, check
 
         node = shutil.which("node")
         self.assertIsNotNone(node, "locked Node environment required")
         assert node is not None
         with tempfile.TemporaryDirectory(prefix="prodops-drift-test-") as directory:
             root = Path(directory)
-            for relative in (exporter, SNAPSHOT, TYPES):
+            for relative in (exporter, SNAPSHOT, TYPES, VALIDATORS, VALIDATOR_GENERATOR):
                 target = root / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / relative, target)
@@ -218,6 +218,13 @@ with patch("socket.socket.connect", side_effect=AssertionError("network access")
             self.assertEqual(code, 1)
             self.assertTrue(any("Generated TS types differ" in error for error in errors))
             self.assertEqual((root / TYPES).read_bytes(), before_types)
+            shutil.copyfile(ROOT / TYPES, root / TYPES)
+            (root / VALIDATORS).write_text("// invalid runtime validator", encoding="utf-8")
+            before_validators = (root / VALIDATORS).read_bytes()
+            errors, code = check(root, sys.executable, node, ROOT)
+            self.assertEqual(code, 1)
+            self.assertTrue(any("runtime validators differ" in error for error in errors))
+            self.assertEqual((root / VALIDATORS).read_bytes(), before_validators)
 
 
 if __name__ == "__main__":

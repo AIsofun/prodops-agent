@@ -1,5 +1,8 @@
-import { app, BrowserWindow, session } from "electron";
+import { app, BrowserWindow, ipcMain, session } from "electron";
 import path from "node:path";
+import { developmentConnection, getConnectionStatus } from "./connection.js";
+import { createStatusHandler } from "./ipc.js";
+import { STATUS_CHANNEL } from "../shared/connection.js";
 
 function rendererAddress(): string | null {
   const value = process.env.PRODOPS_RENDERER_URL;
@@ -33,6 +36,9 @@ async function createWindow(): Promise<void> {
     },
   });
   window.removeMenu();
+  const connection = developmentConnection(process.env);
+  ipcMain.handle(STATUS_CHANNEL, createStatusHandler(() => window, () => getConnectionStatus(connection)));
+  window.once("closed", () => ipcMain.removeHandler(STATUS_CHANNEL));
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.webContents.on("will-attach-webview", (event) => event.preventDefault());

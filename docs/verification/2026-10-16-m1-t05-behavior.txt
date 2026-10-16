@@ -1,0 +1,21 @@
+✔ main-only configuration cannot contain a URL, credentials or invalid port (1.1641ms)
+✔ read-only requests use fixed paths and version header then return validated ready data (24.7429ms)
+✔ service not ready is distinct from offline and does not fetch capabilities (3.3549ms)
+✔ incompatible HTTP status and explicit unsupported protocol are distinguished (4.8949ms)
+✔ invalid service DTOs, wrong modes and secret extra fields cannot cross the boundary (10.1077ms)
+✔ redirects are rejected without following arbitrary targets (2.4907ms)
+✔ timeouts do not retry and cannot leave the caller waiting indefinitely (35.5767ms)
+✔ oversized, malformed and non-JSON responses are rejected (5.3458ms)
+✔ IPC refuses malformed input before any network request (0.3845ms)
+✔ IPC refuses another window, a subframe, a missing frame and a closed window (0.2156ms)
+✔ concurrent status reads share only the current in-flight request (21.0063ms)
+✔ preload response validation rejects unknown fields and invalid state combinations (0.3918ms)
+✔ generated HTTP validators enforce the actual schema without type coercion (0.1197ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 172.2331
