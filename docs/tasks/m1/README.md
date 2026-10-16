@@ -11,8 +11,8 @@
 | [M1-T05 受限桥接与连接](05-bridge.md) | T03 T04 | 已验证：真实服务状态、IPC 校验与受限连接 |
 | [M1-T06 产品检查接入](06-gates.md) | T03 T05 | 已验证：实际产品统一检查与缺陷注入阻断 |
 | [M1-T07 CI 接入](07-ci.md) | T06 | 已验证：真实 Windows CI 和现有合并策略审计，强制限制未配置 |
-| [M1-T08 集成验收](08-acceptance.md) | T06 T07 | 开发窗口、服务和契约链路整体验收 |
+| [M1-T08 集成验收](08-acceptance.md) | T06 T07 | 已验证：冻结安装、开发窗口/服务/桥接和真实 CI 整体验收 |
 
 按依赖顺序推进，可独立的任务不代表必须启用多个 Agent。每张卡列出可逐项验证的 AC 编号，完成后填写 [复核模板](../../templates/code-review.md) 和 [验证模板](../../templates/verification.md)。机读回执格式见 [交付格式说明](../../quality-workflow.md)。
 
-T01 至 T07 已验证；[真实 CI 证据](../../verification/2026-10-16-m1-t07-ci.md) 与 [自查](../../reviews/2026-10-16-m1-t07-ci.md) 已保存。默认 M1 静态和骨架单元检查、真实副本缺陷注入与 Windows CI 通过；下一任务 T08 集成验收。main 的必要检查合并限制尚未配置，另在 HAR-009 追踪。
+T01 至 T08 的 M1 技术骨架切片已验证，[集成证据](../../verification/2026-10-16-m1-t08-acceptance.md) 与 [自查](../../reviews/2026-10-16-m1-t08-acceptance.md) 已保存。冻结安装、实际 Vite/Electron 窗口与 Python 连接、本地和 Windows CI 检查通过；下一阶段 M2 任务核心与 mock 排查。main 必要检查合并限制尚未配置，另在 HAR-009 追踪；M1 切片完成不代表完整产品、生产服务或安装包完成。

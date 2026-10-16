@@ -10,7 +10,9 @@ fs.mkdirSync(output, { recursive: true });
 const scenarios = [];
 async function smoke(name, port, mode, expected) {
   const target = path.join(output, name);
-  const child = spawn(process.execPath, ["apps/desktop/scripts/smoke.mjs", target], { cwd: root, stdio: "inherit", windowsHide: true,
+  const args = ["apps/desktop/scripts/smoke.mjs", target];
+  if (process.argv.includes("--dev")) args.push("--dev");
+  const child = spawn(process.execPath, args, { cwd: root, stdio: "inherit", windowsHide: true,
     env: { ...process.env, PRODOPS_SERVICE_PORT: String(port), PRODOPS_SERVICE_MODE: mode, PRODOPS_EXPECT_CONNECTION: expected } });
   const code = await new Promise((resolve, reject) => { child.on("error", reject); child.on("exit", resolve); });
   scenarios.push({ name, expected, exit_code: code, status: code === 0 ? "PASS" : "FAIL", evidence: path.relative(root, path.join(target, "runtime.json")).replaceAll("\\", "/") });
@@ -52,5 +54,5 @@ try {
   finally { fixture.closeAllConnections(); await new Promise((resolve) => fixture.close(resolve)); }
   console.log("PASS: real Python local/server connections, offline transitions and explicit mismatch fixture");
 } finally {
-  fs.writeFileSync(path.join(output, "integration.json"), JSON.stringify({ status: scenarios.length === 5 && scenarios.every((s) => s.status === "PASS") ? "PASS" : "FAIL", scenarios, limitations: "Development services only. Python children terminated for isolated test cleanup; graceful service lifecycle remains M3." }, null, 2) + "\n");
+  fs.writeFileSync(path.join(output, "integration.json"), JSON.stringify({ status: scenarios.length === 5 && scenarios.every((s) => s.status === "PASS") ? "PASS" : "FAIL", mode: process.argv.includes("--dev") ? "vite-development" : "built-renderer", scenarios, limitations: "Development services only. Python children terminated for isolated test cleanup; graceful service lifecycle remains M3." }, null, 2) + "\n");
 }

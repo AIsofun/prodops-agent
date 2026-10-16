@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T08",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-16-m1-t08-acceptance.md",
+  "findings": []
+}

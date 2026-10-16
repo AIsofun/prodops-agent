@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T08",
+  "environment": {
+    "os": "Windows 11 10.0.26200",
+    "arch": "AMD64",
+    "python": "3.13.2",
+    "node": "24.14.1",
+    "electron": "44.8.0"
+  },
+  "source": {
+    "revision": "5a813996cd5a19db7f486281e7d9060b7212e89e",
+    "worktree": "development-mode integration test switch and delivery records",
+    "scope": "Windows development skeleton only; not production or installer acceptance"
+  },
+  "criteria": [
+    {
+      "id": "M1-T08-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t08-acceptance.md"
+    },
+    {
+      "id": "M1-T08-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t08-acceptance.md"
+    },
+    {
+      "id": "M1-T08-AC03",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t08-acceptance.md"
+    }
+  ]
+}

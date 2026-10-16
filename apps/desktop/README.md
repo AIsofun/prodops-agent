@@ -38,6 +38,7 @@ npm run desktop:smoke -- .quality-reports/desktop-built
 npm run desktop:smoke -- .quality-reports/desktop-dev --dev
 python scripts/check.py
 node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-integration
+node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-dev --dev
 ```
 
 smoke 测试在真实 Electron 内导入正式主入口，探测渲染、权限设置和桥接范围，保存 screenshot 与 runtime.json，并验证关闭窗口后进程正常退出。测试需要桌面会话与允许启动 Electron 的环境，不能用浏览器截图替代。构建验证不包含随包 Python、自动服务启动、托盘、诊断任务、安装包或 CI。

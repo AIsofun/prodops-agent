@@ -1,0 +1,6 @@
+   Building prodops-agent @ file:///F:/code/myCode/prodops-agent/services/agent
+      Built prodops-agent @ file:///F:/code/myCode/prodops-agent/services/agent
+Prepared 1 package in 4.05s
+Uninstalled 1 package in 12ms
+Installed 1 package in 119ms
+ ~ prodops-agent==0.1.0 (from file:///F:/code/myCode/prodops-agent/services/agent)

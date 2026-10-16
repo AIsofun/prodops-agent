@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "profile": "m1",
+  "status": "PASS",
+  "exit_code": 0,
+  "created_at": "2026-10-16T15:12:47.428920+00:00",
+  "scope": "M1 static gates and service skeleton behavior; desktop runtime, packaging and CI acceptance separate",
+  "checks": [
+    {
+      "name": "environment",
+      "status": "PASS",
+      "detail": "Python 3.13.2, mypy 1.19.0\nNode v24.14.1",
+      "command": [],
+      "seconds": 0
+    },
+    {
+      "name": "documents",
+      "status": "PASS",
+      "detail": "PASS: 37 requirement and harness definitions have consistent tracking.\nLocal file links, statuses, phases, evidence references and fences checked.\nThis check does not establish product acceptance or evidence quality.",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.13.2\\x64\\python.exe",
+        "-m",
+        "scripts.check_project_docs"
+      ],
+      "seconds": 0.058
+    },
+    {
+      "name": "task-delivery-records",
+      "status": "PASS",
+      "detail": "PASS: M1 task graph, requirement mappings and delivery receipts",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.13.2\\x64\\python.exe",
+        "-m",
+        "scripts.check_delivery"
+      ],
+      "seconds": 0.046
+    },
+    {
+      "name": "harness-python-types",
+      "status": "PASS",
+      "detail": "Success: no issues found in 9 source files",
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "seconds": 1.273
+    },
+    {
+      "name": "harness-typescript-types",
+      "status": "PASS",
+      "detail": "",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "D:\\a\\prodops-agent\\prodops-agent\\node_modules\\typescript\\bin\\tsc",
+        "--noEmit",
+        "-p",
+        "tooling/tsconfig.json"
+      ],
+      "seconds": 0.642
+    },
+    {
+      "name": "harness-regressions",
+      "status": "PASS",
+      "detail": "test_matching_export_and_generated_types_pass (tests.harness.test_quality.Contracts.test_matching_export_and_generated_types_pass) ... ok\ntest_missing_exporter_is_not_ready (tests.harness.test_quality.Contracts.test_missing_exporter_is_not_ready) ... ok\ntest_nested_external_references_are_rejected (tests.harness.test_quality.Contracts.test_nested_external_references_are_rejected) ... ok\ntest_stale_runtime_validators_are_rejected (tests.harness.test_quality.Contracts.test_stale_runtime_validators_are_rejected) ... ok\ntest_stale_schema_is_rejected (tests.harness.test_quality.Contracts.test_stale_schema_is_rejected) ... ok\ntest_stale_types_are_rejected (tests.harness.test_quality.Contracts.test_stale_types_are_rejected) ... ok\ntest_complete_receipts_are_valid (tests.harness.test_quality.DeliveryRecords.test_complete_receipts_are_valid) ... ok\ntest_dependency_cycle_is_rejected (tests.harness.test_quality.DeliveryRecords.test_dependency_cycle_is_rejected) ... ok\ntest_fake_verified_task_is_rejected (tests.harness.test_quality.DeliveryRecords.test_fake_verified_task_is_rejected) ... ok\ntest_missing_acceptance_evidence_prevents_verified (tests.harness.test_quality.DeliveryRecords.test_missing_acceptance_evidence_prevents_verified) ... ok\ntest_open_review_finding_prevents_verified (tests.harness.test_quality.DeliveryRecords.test_open_review_finding_prevents_verified) ... ok\ntest_receipts_work_with_a_noncanonical_workspace_root (tests.harness.test_quality.DeliveryRecords.test_receipts_work_with_a_noncanonical_workspace_root) ... ok\ntest_undefined_requirement_is_rejected (tests.harness.test_quality.DeliveryRecords.test_undefined_requirement_is_rejected) ... ok\ntest_unstarted_card_is_valid (tests.harness.test_quality.DeliveryRecords.test_unstarted_card_is_valid) ... ok\ntest_external_tool_exit_two_is_a_failure (tests.harness.test_quality.GateResults.test_external_tool_exit_two_is_a_failure) ... ok\ntest_failure_takes_precedence (tests.harness.test_quality.GateResults.test_failure_takes_precedence) ... ok\ntest_missing_service_behavior_suite_is_not_ready (tests.harness.test_quality.GateResults.test_missing_service_behavior_suite_is_not_ready) ... ok\ntest_mypy_rejects_real_assignment_error (tests.harness.test_quality.GateResults.test_mypy_rejects_real_assignment_error) ... ok\ntest_no_checks_is_not_success (tests.harness.test_quality.GateResults.test_no_checks_is_not_success) ... ok\ntest_report_and_unicode_output_survive_a_legacy_windows_encoding (tests.harness.test_quality.GateResults.test_report_and_unicode_output_survive_a_legacy_windows_encoding) ... ok\ntest_service_profile_runs_behavior_and_excludes_unbuilt_desktop (tests.harness.test_quality.GateResults.test_service_profile_runs_behavior_and_excludes_unbuilt_desktop) ... ok\ntest_subprocess_status_and_reported_command (tests.harness.test_quality.GateResults.test_subprocess_status_and_reported_command) ... ok\ntest_typescript_rejects_real_assignment_error (tests.harness.test_quality.GateResults.test_typescript_rejects_real_assignment_error) ... ok\ntest_unready_check_prevents_success (tests.harness.test_quality.GateResults.test_unready_check_prevents_success) ... ok\ntest_comments_are_not_imports (tests.harness.test_quality.PythonBoundaries.test_comments_are_not_imports) ... ok\ntest_domain_cannot_depend_on_fastapi (tests.harness.test_quality.PythonBoundaries.test_domain_cannot_depend_on_fastapi) ... ok\ntest_domain_stdlib_and_application_domain_are_allowed (tests.harness.test_quality.PythonBoundaries.test_domain_stdlib_and_application_domain_are_allowed) ... ok\ntest_dynamic_loading_is_rejected (tests.harness.test_quality.PythonBoundaries.test_dynamic_loading_is_rejected) ... ok\ntest_missing_product_is_not_ready (tests.harness.test_quality.PythonBoundaries.test_missing_product_is_not_ready) ... ok\ntest_relative_import_cannot_cross_into_api (tests.harness.test_quality.PythonBoundaries.test_relative_import_cannot_cross_into_api) ... ok\ntest_reversed_adapter_dependency_is_rejected (tests.harness.test_quality.PythonBoundaries.test_reversed_adapter_dependency_is_rejected) ... ok\ntest_alias_cannot_hide_main_import (tests.harness.test_quality.TypeScriptBoundaries.test_alias_cannot_hide_main_import) ... ok\ntest_nonliteral_dynamic_loading_is_rejected (tests.harness.test_quality.TypeScriptBoundaries.test_nonliteral_dynamic_loading_is_rejected) ... ok\ntest_preload_cannot_import_child_process (tests.harness.test_quality.TypeScriptBoundaries.test_preload_cannot_import_child_process) ... ok\ntest_reexport_of_node_module_is_rejected (tests.harness.test_quality.TypeScriptBoundaries.test_reexport_of_node_module_is_rejected) ... ok\ntest_require_cannot_hide_main_import (tests.harness.test_quality.TypeScriptBoundaries.test_require_cannot_hide_main_import) ... ok\ntest_shared_types_and_comments_are_allowed (tests.harness.test_quality.TypeScriptBoundaries.test_shared_types_and_comments_are_allowed) ... ok\n\n----------------------------------------------------------------------\nRan 37 tests in 7.230s\n\nOK",
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/harness",
+        "-t",
+        ".",
+        "-v"
+      ],
+      "seconds": 7.456
+    },
+    {
+      "name": "product-python-types",
+      "status": "PASS",
+      "detail": "Success: no issues found in 19 source files",
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "--config-file",
+        "D:\\a\\prodops-agent\\prodops-agent\\services\\agent\\pyproject.toml"
+      ],
+      "seconds": 2.915
+    },
+    {
+      "name": "product-python-boundaries",
+      "status": "PASS",
+      "detail": "PASS: Python static import boundaries",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.13.2\\x64\\python.exe",
+        "-m",
+        "scripts.check_boundaries"
+      ],
+      "seconds": 0.039
+    },
+    {
+      "name": "product-python-behavior",
+      "status": "PASS",
+      "detail": "test_capabilities_and_exact_protocol_negotiation_in_both_modes (test_contracts.BoundaryTests.test_capabilities_and_exact_protocol_negotiation_in_both_modes) ... ok\ntest_reserved_request_validation_with_a_test_only_route_is_sanitized (test_contracts.BoundaryTests.test_reserved_request_validation_with_a_test_only_route_is_sanitized) ... ok\ntest_event_envelope_rejects_bad_versions_cursors_ids_and_timestamps (test_contracts.DTOTests.test_event_envelope_rejects_bad_versions_cursors_ids_and_timestamps) ... ok\ntest_event_payload_cannot_be_swapped_or_contain_unknown_fields (test_contracts.DTOTests.test_event_payload_cannot_be_swapped_or_contain_unknown_fields) ... ok\ntest_examples_cover_all_event_variants_and_four_outcomes (test_contracts.DTOTests.test_examples_cover_all_event_variants_and_four_outcomes) ... ok\ntest_pagination_idempotency_and_replay_bounds (test_contracts.DTOTests.test_pagination_idempotency_and_replay_bounds) ... ok\ntest_export_matches_both_apps_and_cli_is_inert_even_from_another_directory (test_contracts.ExportTests.test_export_matches_both_apps_and_cli_is_inert_even_from_another_directory) ... ok\ntest_generated_types_compile_with_a_typed_consumer (test_contracts.ExportTests.test_generated_types_compile_with_a_typed_consumer) ... ok\ntest_real_artifact_drift_is_rejected_without_rewriting (test_contracts.ExportTests.test_real_artifact_drift_is_rejected_without_rewriting) ... ok\ntest_schema_uses_actual_routes_and_formal_reserved_models (test_contracts.ExportTests.test_schema_uses_actual_routes_and_formal_reserved_models) ... ok\ntest_applications_do_not_share_readiness (test_service.ApplicationTests.test_applications_do_not_share_readiness) ... ok\ntest_host_header_is_restricted_and_no_cors_is_granted (test_service.ApplicationTests.test_host_header_is_restricted_and_no_cors_is_granted) ... ok\ntest_import_and_factory_do_not_connect_or_bind_or_create_database (test_service.ApplicationTests.test_import_and_factory_do_not_connect_or_bind_or_create_database) ... ok\ntest_liveness_readiness_and_shutdown_for_both_entry_points (test_service.ApplicationTests.test_liveness_readiness_and_shutdown_for_both_entry_points) ... ok\ntest_startup_failure_is_not_reported_ready_and_cleanup_runs (test_service.ApplicationTests.test_startup_failure_is_not_reported_ready_and_cleanup_runs) ... ok\ntest_configuration_rejects_unsafe_and_invalid_values_without_echoing_them (test_service.ConfigurationTests.test_configuration_rejects_unsafe_and_invalid_values_without_echoing_them) ... ok\ntest_explicit_mode_is_required (test_service.ConfigurationTests.test_explicit_mode_is_required) ... ok\ntest_modes_use_same_settings_and_cli_overrides_environment (test_service.ConfigurationTests.test_modes_use_same_settings_and_cli_overrides_environment) ... ok\ntest_programmatic_settings_also_reject_network_exposure (test_service.ConfigurationTests.test_programmatic_settings_also_reject_network_exposure) ... ok\ntest_unknown_configuration_does_not_silently_fall_back (test_service.ConfigurationTests.test_unknown_configuration_does_not_silently_fall_back) ... ok\ntest_cli_missing_required_configuration_exits_before_starting (test_service.ProcessTests.test_cli_missing_required_configuration_exits_before_starting) ... ok\ntest_cli_refuses_exposure_and_production_and_sanitizes_values (test_service.ProcessTests.test_cli_refuses_exposure_and_production_and_sanitizes_values) ... ok\ntest_port_conflict_is_a_real_startup_failure (test_service.ProcessTests.test_port_conflict_is_a_real_startup_failure) ... ok\ntest_real_local_and_server_processes_serve_health_on_random_ports (test_service.ProcessTests.test_real_local_and_server_processes_serve_health_on_random_ports) ... ok\n\n----------------------------------------------------------------------\nRan 24 tests in 6.890s\n\nOK",
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "services/agent/tests",
+        "-v"
+      ],
+      "seconds": 7.68
+    },
+    {
+      "name": "product-typescript-types",
+      "status": "PASS",
+      "detail": "",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "D:\\a\\prodops-agent\\prodops-agent\\node_modules\\typescript\\bin\\tsc",
+        "--noEmit",
+        "-p",
+        "D:\\a\\prodops-agent\\prodops-agent\\apps\\desktop\\tsconfig.json"
+      ],
+      "seconds": 1.882
+    },
+    {
+      "name": "product-renderer-types",
+      "status": "PASS",
+      "detail": "",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "D:\\a\\prodops-agent\\prodops-agent\\node_modules\\typescript\\bin\\tsc",
+        "--noEmit",
+        "-p",
+        "D:\\a\\prodops-agent\\prodops-agent\\apps\\desktop\\tsconfig.renderer.json"
+      ],
+      "seconds": 1.163
+    },
+    {
+      "name": "product-typescript-boundaries",
+      "status": "PASS",
+      "detail": "PASS: TypeScript boundaries (8 files)",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "scripts/check_ts_boundaries.ts"
+      ],
+      "seconds": 0.244
+    },
+    {
+      "name": "product-contracts",
+      "status": "PASS",
+      "detail": "PASS: exported API contract, generated TypeScript and runtime validators are consistent",
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "scripts.check_contracts",
+        "--node",
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE"
+      ],
+      "seconds": 0.784
+    },
+    {
+      "name": "product-desktop-behavior",
+      "status": "PASS",
+      "detail": "✔ main-only configuration cannot contain a URL, credentials or invalid port (1.2257ms)\n✔ read-only requests use fixed paths and version header then return validated ready data (17.6354ms)\n✔ service not ready is distinct from offline and does not fetch capabilities (3.1263ms)\n✔ incompatible HTTP status and explicit unsupported protocol are distinguished (5.0695ms)\n✔ invalid service DTOs, wrong modes and secret extra fields cannot cross the boundary (9.9866ms)\n✔ redirects are rejected without following arbitrary targets (2.5142ms)\n✔ timeouts do not retry and cannot leave the caller waiting indefinitely (44.7916ms)\n✔ oversized, malformed and non-JSON responses are rejected (4.9888ms)\n✔ IPC refuses malformed input before any network request (0.4395ms)\n✔ IPC refuses another window, a subframe, a missing frame and a closed window (0.2518ms)\n✔ concurrent status reads share only the current in-flight request (25.1447ms)\n✔ preload response validation rejects unknown fields and invalid state combinations (0.3607ms)\n✔ generated HTTP validators enforce the actual schema without type coercion (0.1828ms)\nℹ tests 13\nℹ suites 0\nℹ pass 13\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 166.9097",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "apps/desktop/scripts/check.mjs"
+      ],
+      "seconds": 2.083
+    }
+  ]
+}

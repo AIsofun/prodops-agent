@@ -4,7 +4,7 @@
 
 本表维护新桌面产品的实际实现状态，旧 demo 不计作新版本完成。状态采用“未开始、进行中、已实现、已验证、暂缓、待定”；“已确认”仅为需求来源，不是实现状态。实现和证据栏使用本地文件链接，没有时填写 `-`。
 
-需求基线 1.0 已于 2026 年 10 月 16 日由用户整体确认。M1 工程质量基础、Python 服务骨架与 API/事件契约切片已验证，完整业务功能按后续阶段推进；阶段切片另见 [M1 任务清单](tasks/m1/tasks.json)。
+需求基线 1.0 已于 2026 年 10 月 16 日由用户整体确认。M1 八项技术骨架切片已验证，包括 Windows 开发窗口、受限服务连接与真实 CI；完整业务功能按后续阶段推进。HAR-009 合并强制检查缺口单独保留；阶段切片见 [M1 任务清单](tasks/m1/tasks.json)。
 
 “已实现”要求实现引用存在；“已验证”同时要求实现和证据引用存在。链接存在只是机械检查，验证内容还需与需求验收标准一致。暂缓项写明原因，待定项不进入完成率。
 
@@ -12,9 +12,9 @@
 
 | 编号 | 阶段 | 状态 | 设计章节 | 实现 | 验证证据 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
-| REQ-001 | M3 | 进行中 | 5 17 | [桌面开发入口](../apps/desktop/src/main/index.ts) | [开发窗口验证](verification/2026-10-16-m1-t04-desktop.md) | T04 开发窗口已验证；干净 Windows 安装、双击与随包运行时仍在 M3 |
-| REQ-002 | M3 | 进行中 | 6.1 | [服务装配](../services/agent/src/prodops/bootstrap/app.py) | [骨架验证](verification/2026-10-16-m1-t02-service.md) | M1 开发入口已验证；桌面启动管道、令牌和进程生命周期仍在 M3 |
-| REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [骨架验证](verification/2026-10-16-m1-t02-service.md) | 共用业务包的 server 回环开发入口；正式认证、数据库和内网运行仍在 M4 |
+| REQ-001 | M3 | 进行中 | 5 17 | [桌面开发入口](../apps/desktop/src/main/index.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 开发窗口与冻结安装链路已验证；干净 Windows 安装、双击与随包运行时仍在 M3 |
+| REQ-002 | M3 | 进行中 | 6.1 | [服务装配](../services/agent/src/prodops/bootstrap/app.py)、[开发连接](../apps/desktop/src/main/connection.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 手工启动服务后的桌面读取已验证；自动启动管道、令牌和进程生命周期仍在 M3 |
+| REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 共用业务包的 server 回环开发连接已验证；正式认证、数据库和内网运行仍在 M4 |
 | REQ-004 | M3 | 未开始 | 8 16 | - | - | 会话与上下文 |
 | REQ-005 | M2 | 进行中 | 8 11 | [任务与事件 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | M1-T03 契约已验证；创建、执行、持久化与进度推送仍在 M2 |
 | REQ-006 | M2 | 未开始 | 8 9 13 | - | - | 证据和解决状态 |
