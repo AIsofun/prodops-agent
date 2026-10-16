@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T07",
+  "environment": {
+    "runner": "GitHub windows-2025",
+    "python": "3.13.2",
+    "node": "24.14.1",
+    "uv": "0.11.17"
+  },
+  "source": {
+    "revision": "e3172747281c45390b6e633c4b23c1920cc31ce7",
+    "run": "https://github.com/AIsofun/prodops-agent/actions/runs/38884050478",
+    "scope": "actual Windows CI and read-only merge policy audit; enforcement not configured"
+  },
+  "criteria": [
+    {
+      "id": "M1-T07-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t07-ci.md"
+    },
+    {
+      "id": "M1-T07-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t07-ci.md"
+    },
+    {
+      "id": "M1-T07-AC03",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t07-ci.md"
+    }
+  ]
+}

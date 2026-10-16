@@ -59,4 +59,6 @@ M1-T03 的真实应用导出器、预留事件模型及类型生成方式见 [�
 
 自查明确记录 self_review，不标成独立 Agent 或人工审查。对实际运行环境、远端检查或生产数据没有验证时，直接填写未验证范围。任务卡完成只代表该卡约定的切片完成，不能把它覆盖的需求整体提前标为已验证。
 
+GitHub Windows CI 已实际运行，同一本地入口和真实产品故障注入会保存两个质量 JSON。[CI 说明](ci.md)和[远端证据](verification/2026-10-16-m1-t07-ci.md)区分运行通过与合并限制：main 当前没有必要检查保护，不能宣称平台已阻止失败代码合并。
+
 实现依据：[uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) 支持成员独立依赖与共同锁文件；服务用 [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/) 管理生命周期，测试遵循 [上下文管理器用法](https://fastapi.tiangolo.com/advanced/testing-events/)。当前锁定的 Starlette 测试客户端使用 [httpx2](https://starlette.dev/testclient/)。
