@@ -12,7 +12,7 @@
 ## 1. 项目目录结构
 
 ```
-agentDemo/
+prodops-agent/
 ├── app/
 │   ├── agent/
 │   │   ├── core.py       # Agent 主循环（Think-Act-Observe）
@@ -508,3 +508,7 @@ def enhance_with_cases(user_query: str) -> str:
 | 是否有安全约束层 | 取决于实现 | 难 | ✅ policy + dry_run |
 
 运行 `python -m app.main "2号相机掉线了"` 看终端里逐步出现的 **PLAN / ACT / OBSERVE**，是感受 Agent 与上述两者区别最直接的方式。
+
+---
+
+[返回 AIsofun 项目目录](https://github.com/AIsofun/playground)
