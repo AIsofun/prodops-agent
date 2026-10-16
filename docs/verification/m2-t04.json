@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T04",
+  "environment": {
+    "os": "Windows 11",
+    "arch": "AMD64",
+    "python": "3.13.2",
+    "node": "24.14.1"
+  },
+  "source": {
+    "revision": "6668b2d",
+    "worktree": "uncommitted cancellation, process lock, reviewed recovery and protocol 1.3",
+    "scope": "isolated SQLite/mock cancellation and hard process-death recovery"
+  },
+  "criteria": [
+    {
+      "id": "M2-T04-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t04-recovery.md"
+    },
+    {
+      "id": "M2-T04-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t04-recovery.md"
+    },
+    {
+      "id": "M2-T04-AC03",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t04-recovery.md"
+    }
+  ]
+}

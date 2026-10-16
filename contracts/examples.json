@@ -224,6 +224,18 @@
           "55555555-5555-4555-8555-555555555555"
         ]
       }
+    },
+    {
+      "schema_version": "1.1",
+      "run_id": "22222222-2222-4222-8222-222222222222",
+      "seq": 20,
+      "event_type": "run.recovery_approved",
+      "occurred_at": "2026-10-16T08:00:00Z",
+      "payload": {
+        "prior_attempt_id": null,
+        "reviewed_tool_call_ids": [],
+        "decision": "retry_mock_reads"
+      }
     }
   ],
   "errors": [

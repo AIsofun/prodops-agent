@@ -18,6 +18,7 @@ from prodops.adapters.storage.paging import decode_cursor, encode_cursor
 from prodops.adapters.storage.sqlite import SQLiteStore
 from prodops.application.errors import ActiveRunConflict, IdempotencyConflict, QueueFull, ResourceNotFound, StorageFailure
 from prodops.domain.execution import ExecutionPolicy
+from prodops.domain.events import EVENT_SCHEMA_VERSION
 from prodops.domain.records import ConversationRecord, EvidenceRecord, MessageRecord, RecordPage, RunErrorRecord, RunRecord, RunSubmission, WorkspaceRecord
 from prodops.domain.runs import ResolutionStatus, RunStatus
 
@@ -36,15 +37,41 @@ def storage_operation(method: Callable[P, Awaitable[T]]) -> Callable[P, Coroutin
 
 
 def run_json(run: RunRecord) -> dict[str, object]:
-    return {"run_id": str(run.run_id), "deployment_id": str(run.deployment_id), "workspace_id": str(run.workspace_id),
-            "conversation_id": str(run.conversation_id), "status": run.status.value, "resolution_status": run.resolution_status.value,
-            "version": run.version, "last_event_seq": run.last_event_seq, "created_at": run.created_at.isoformat(), "updated_at": run.updated_at.isoformat()}
+    value: dict[str, object] = json.loads(json.dumps(asdict(run), default=lambda item: item.isoformat() if isinstance(item, datetime) else str(item)))
+    return value
+
+
+def stored_evidence(value: object) -> tuple[EvidenceRecord, ...]:
+    if not isinstance(value, list):
+        raise StorageFailure()
+    records: list[EvidenceRecord] = []
+    for item in value:
+        if not isinstance(item, dict):
+            raise StorageFailure()
+        records.append(EvidenceRecord(UUID(str(item["evidence_id"])), UUID(str(item["tool_call_id"])),
+                                      str(item["source"]), datetime.fromisoformat(str(item["collected_at"])), str(item["summary"])))
+    return tuple(records)
+
+
+def stored_error(value: object) -> RunErrorRecord | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise StorageFailure()
+    return RunErrorRecord(str(value["code"]), str(value["message"]))
+
+
+def stored_ids(value: object) -> tuple[UUID, ...]:
+    if not isinstance(value, list):
+        raise StorageFailure()
+    return tuple(UUID(str(item)) for item in value)
 
 
 def cached_run(value: dict[str, object]) -> RunRecord:
     return RunRecord(UUID(str(value["run_id"])), UUID(str(value["deployment_id"])), UUID(str(value["workspace_id"])),
                      UUID(str(value["conversation_id"])), RunStatus(str(value["status"])), ResolutionStatus(str(value["resolution_status"])),
-                     int(str(value["version"])), int(str(value["last_event_seq"])), datetime.fromisoformat(str(value["created_at"])), datetime.fromisoformat(str(value["updated_at"])))
+                     int(str(value["version"])), int(str(value["last_event_seq"])), datetime.fromisoformat(str(value["created_at"])), datetime.fromisoformat(str(value["updated_at"])),
+                     stored_evidence(value.get("evidence", [])), stored_error(value.get("error")), stored_ids(value.get("unknown_tool_call_ids", [])))
 
 
 class SQLiteTaskStore(SQLiteStore):
@@ -150,23 +177,13 @@ class SQLiteTaskStore(SQLiteStore):
             if changed is None:
                 raise ActiveRunConflict()
             session.add(MessageRow(id=str(uuid4()), conversation_id=resource, run_id=run_id, role="user", content=normalized, created_at=now))
-            session.add(RunEventRow(run_id=run_id, seq=1, schema_version="1.0", event_type="run.created", occurred_at=now, payload={"conversation_id": resource}))
+            session.add(RunEventRow(run_id=run_id, seq=1, schema_version=EVENT_SCHEMA_VERSION, event_type="run.created", occurred_at=now, payload={"conversation_id": resource}))
             run = self._run(row)
             session.add(IdempotencyRow(workspace_id=workspace, actor_id=actor_id, resource_id=resource, operation="runs.create", key=str(key), request_hash=fingerprint, run_id=run_id, response=run_json(run), created_at=now))
             await session.flush()
         return RunSubmission(run, False)
 
     def _run(self, row: RunRow) -> RunRecord:
-        evidence = row.checkpoint.get("evidence", [])
-        error = row.checkpoint.get("error")
-        if not isinstance(evidence, list) or (error is not None and not isinstance(error, dict)):
-            raise StorageFailure()
-        records: list[EvidenceRecord] = []
-        for item in evidence:
-            if not isinstance(item, dict):
-                raise StorageFailure()
-            records.append(EvidenceRecord(UUID(str(item["evidence_id"])), UUID(str(item["tool_call_id"])),
-                                          str(item["source"]), datetime.fromisoformat(str(item["collected_at"])), str(item["summary"])))
-        failure = RunErrorRecord(str(error["code"]), str(error["message"])) if isinstance(error, dict) else None
         return RunRecord(UUID(row.id), self.identity.deployment_id, UUID(row.workspace_id), UUID(row.conversation_id),
-                         RunStatus(row.status), ResolutionStatus(row.resolution_status), row.version, row.last_event_seq, row.created_at, row.updated_at, tuple(records), failure)
+                         RunStatus(row.status), ResolutionStatus(row.resolution_status), row.version, row.last_event_seq, row.created_at, row.updated_at,
+                         stored_evidence(row.checkpoint.get("evidence", [])), stored_error(row.checkpoint.get("error")), stored_ids(row.checkpoint.get("unknown_tool_call_ids", [])))

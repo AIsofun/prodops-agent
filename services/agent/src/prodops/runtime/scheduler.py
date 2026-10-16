@@ -6,7 +6,7 @@ from contextlib import suppress
 from time import monotonic
 from uuid import uuid4
 
-from prodops.application.errors import ExecutionBudgetExceeded, LostOwnership, StorageFailure
+from prodops.application.errors import CancellationRequested, ExecutionBudgetExceeded, LostOwnership, StorageFailure
 from prodops.application.execution import DiagnosticAgent, DiagnosticTools, ExecutionStore
 from prodops.domain.execution import ExecutionLease, Observation, ToolRequest
 
@@ -104,8 +104,8 @@ class Scheduler:
             if remaining <= 0:
                 raise ExecutionBudgetExceeded()
             async with asyncio.timeout(remaining):
-                observations: list[Observation] = []
-                for request in self.agent.plan(lease.content):
+                observations: list[Observation] = list(lease.observations)
+                for request in self.agent.plan(lease.content)[lease.completed_steps:]:
                     lease, call_id = await self.store.begin_tool(lease, request, elapsed())
                     try:
                         async with asyncio.timeout(lease.policy.tool_timeout):
@@ -116,6 +116,9 @@ class Scheduler:
                     lease = await self.store.finish_tool(lease, call_id, observation, elapsed())
                     observations.append(observation)
                 await self.store.complete(lease, self.agent.answer(tuple(observations)), elapsed())
+        except CancellationRequested:
+            with suppress(LostOwnership):
+                await self.store.acknowledge_cancel(lease, elapsed())
         except (TimeoutError, ExecutionBudgetExceeded):
             await fail("budget_exceeded", "Task execution budget exceeded. No further tools were scheduled.")
         except LostOwnership:

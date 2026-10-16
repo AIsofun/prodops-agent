@@ -41,13 +41,13 @@ class BoundaryTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 200)
                 body = response.json()
                 ids.add(body.pop("deployment_id"))
-                self.assertEqual(body, {"protocol_version": "1.2", "event_schema_version": "1.0",
+                self.assertEqual(body, {"protocol_version": "1.3", "event_schema_version": "1.1",
                     "mode": mode, "scope": "service_skeleton", "authentication": "unavailable",
                     "conversations": False, "runs": False, "event_stream": False, "execution_enabled": False})
                 self.assertEqual(response.headers["cache-control"], "no-store")
                 self.assertEqual(client.get("/api/v1/capabilities").json()["deployment_id"], response.json()["deployment_id"])
-                self.assertEqual(client.get("/api/v1/capabilities", headers={"X-ProdOps-Protocol": "1.2"}).status_code, 200)
-                for version in ("2.0", "1.1", "1.0", "1", "", " 1.2", "secret-client-input"):
+                self.assertEqual(client.get("/api/v1/capabilities", headers={"X-ProdOps-Protocol": "1.3"}).status_code, 200)
+                for version in ("2.0", "1.2", "1.1", "1.0", "1", "", " 1.3", "secret-client-input"):
                     rejected = client.get("/api/v1/capabilities", headers={"X-ProdOps-Protocol": version})
                     self.assertEqual(rejected.status_code, 426)
                     error = ErrorResponse.model_validate(rejected.json())
@@ -186,7 +186,7 @@ with patch("socket.socket.connect", side_effect=AssertionError("network access")
         self.assertEqual(set(create_local_app().openapi()["paths"]),
                          {"/health/live", "/health/ready", "/api/v1/capabilities", "/api/v1/workspaces",
                           "/api/v1/workspaces/{workspace_id}/conversations", "/api/v1/conversations/{conversation_id}/messages",
-                          "/api/v1/conversations/{conversation_id}/runs", "/api/v1/runs/{run_id}"})
+                          "/api/v1/conversations/{conversation_id}/runs", "/api/v1/runs/{run_id}", "/api/v1/runs/{run_id}/cancel", "/api/v1/runs/{run_id}/recover"})
         registry = schema["components"]["schemas"]["ReservedContracts"]
         self.assertEqual(registry["properties"]["event"]["discriminator"]["propertyName"], "event_type")
         self.assertIn("RunSnapshot", schema["components"]["schemas"])

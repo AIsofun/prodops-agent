@@ -97,7 +97,7 @@ return errors === 0;
 validate21.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
 exports.validateCapabilities = validate22;
-const schema34 = {"additionalProperties":false,"properties":{"authentication":{"default":"unavailable","enum":["unavailable","development_token"],"title":"Authentication","type":"string"},"conversations":{"default":false,"title":"Conversations","type":"boolean"},"deployment_id":{"description":"Durable identity when storage is configured; otherwise ephemeral instance ID.","format":"uuid","title":"Deployment Id","type":"string"},"event_schema_version":{"const":"1.0","title":"Event Schema Version","type":"string"},"event_stream":{"const":false,"default":false,"title":"Event Stream","type":"boolean"},"execution_enabled":{"default":false,"title":"Execution Enabled","type":"boolean"},"mode":{"$ref":"#/$defs/DeploymentMode"},"protocol_version":{"const":"1.2","title":"Protocol Version","type":"string"},"runs":{"default":false,"title":"Runs","type":"boolean"},"scope":{"default":"service_skeleton","enum":["service_skeleton","development"],"title":"Scope","type":"string"}},"required":["protocol_version","event_schema_version","deployment_id","mode"],"title":"CapabilitiesResponse","type":"object"};
+const schema34 = {"additionalProperties":false,"properties":{"authentication":{"default":"unavailable","enum":["unavailable","development_token"],"title":"Authentication","type":"string"},"conversations":{"default":false,"title":"Conversations","type":"boolean"},"deployment_id":{"description":"Durable identity when storage is configured; otherwise ephemeral instance ID.","format":"uuid","title":"Deployment Id","type":"string"},"event_schema_version":{"const":"1.1","title":"Event Schema Version","type":"string"},"event_stream":{"const":false,"default":false,"title":"Event Stream","type":"boolean"},"execution_enabled":{"default":false,"title":"Execution Enabled","type":"boolean"},"mode":{"$ref":"#/$defs/DeploymentMode"},"protocol_version":{"const":"1.3","title":"Protocol Version","type":"string"},"runs":{"default":false,"title":"Runs","type":"boolean"},"scope":{"default":"service_skeleton","enum":["service_skeleton","development"],"title":"Scope","type":"string"}},"required":["protocol_version","event_schema_version","deployment_id","mode"],"title":"CapabilitiesResponse","type":"object"};
 const func1 = Object.prototype.hasOwnProperty;
 const formats0 = /^(?:urn:uuid:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 
@@ -187,8 +187,8 @@ if(typeof data3 !== "string"){
 validate22.errors = [{instancePath:instancePath+"/event_schema_version",schemaPath:"#/properties/event_schema_version/type",keyword:"type",params:{type: "string"},message:"must be string"}];
 return false;
 }
-if("1.0" !== data3){
-validate22.errors = [{instancePath:instancePath+"/event_schema_version",schemaPath:"#/properties/event_schema_version/const",keyword:"const",params:{allowedValue: "1.0"},message:"must be equal to constant"}];
+if("1.1" !== data3){
+validate22.errors = [{instancePath:instancePath+"/event_schema_version",schemaPath:"#/properties/event_schema_version/const",keyword:"const",params:{allowedValue: "1.1"},message:"must be equal to constant"}];
 return false;
 }
 var valid0 = _errs8 === errors;
@@ -250,8 +250,8 @@ if(typeof data7 !== "string"){
 validate22.errors = [{instancePath:instancePath+"/protocol_version",schemaPath:"#/properties/protocol_version/type",keyword:"type",params:{type: "string"},message:"must be string"}];
 return false;
 }
-if("1.2" !== data7){
-validate22.errors = [{instancePath:instancePath+"/protocol_version",schemaPath:"#/properties/protocol_version/const",keyword:"const",params:{allowedValue: "1.2"},message:"must be equal to constant"}];
+if("1.3" !== data7){
+validate22.errors = [{instancePath:instancePath+"/protocol_version",schemaPath:"#/properties/protocol_version/const",keyword:"const",params:{allowedValue: "1.3"},message:"must be equal to constant"}];
 return false;
 }
 var valid0 = _errs17 === errors;

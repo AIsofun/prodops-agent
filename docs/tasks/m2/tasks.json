@@ -101,7 +101,7 @@
   {
     "id": "M2-T04",
     "title": "取消与中断核对",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M2-T03"
     ],
@@ -117,9 +117,17 @@
       "M2-T04-AC02",
       "M2-T04-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "services/agent/src/prodops/adapters/storage/recovery.py",
+      "services/agent/src/prodops/adapters/storage/lock.py",
+      "services/agent/src/prodops/runtime/scheduler.py",
+      "services/agent/src/prodops/api/business.py",
+      "services/agent/src/prodops/api/models.py",
+      "services/agent/src/prodops/bootstrap/app.py",
+      "services/agent/tests/test_recovery.py"
+    ],
+    "verification": "docs/verification/m2-t04.json",
+    "review": "docs/reviews/m2-t04.json"
   },
   {
     "id": "M2-T05",

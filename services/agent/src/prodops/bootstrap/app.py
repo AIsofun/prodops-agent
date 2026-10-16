@@ -1,13 +1,15 @@
 """Local/server composition roots share the same HTTP and application code."""
 
 from collections.abc import AsyncIterator
+import asyncio
 from contextlib import asynccontextmanager
 from uuid import uuid4
 
 from fastapi import FastAPI
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from prodops.adapters.storage.execution import SQLiteExecutionStore
+from prodops.adapters.storage.recovery import SQLiteRecoveryStore
+from prodops.adapters.storage.lock import DatabaseServiceLock
 from prodops.adapters.mock_tools import MockTools
 from prodops.agent.mock import MockDiagnosticAgent
 from prodops.api.body_limit import BodyLimitMiddleware
@@ -28,7 +30,8 @@ def create_app(settings: ServiceSettings) -> FastAPI:
     health = HealthService(mode=settings.mode)
     policy = ExecutionPolicy(settings.max_concurrent_runs or (1 if settings.mode == DeploymentMode.LOCAL else 4),
                              settings.queue_limit, settings.max_tool_calls, settings.run_timeout, settings.tool_timeout)
-    store = SQLiteExecutionStore(settings.database, policy) if settings.database is not None else None
+    store = SQLiteRecoveryStore(settings.database, policy) if settings.database is not None else None
+    service_lock = DatabaseServiceLock(settings.database) if settings.database is not None else None
     tasks = TaskService(store) if store is not None else None
     access = DevelopmentAccess(settings.development_token.get_secret_value()) if settings.development_token is not None else None
     instance_id = uuid4()
@@ -41,8 +44,11 @@ def create_app(settings: ServiceSettings) -> FastAPI:
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         nonlocal deployment_id
         try:
+            if service_lock is not None:
+                await asyncio.to_thread(service_lock.acquire)
             if store is not None:
                 await store.start()
+                await store.recover_orphans()
                 deployment_id = store.identity.deployment_id
             if scheduler is not None:
                 await tools.start()
@@ -50,11 +56,17 @@ def create_app(settings: ServiceSettings) -> FastAPI:
             await health.start()
             yield
         finally:
-            await health.stop()
-            if scheduler is not None:
-                await scheduler.stop()
-            if store is not None:
-                await store.close()
+            try:
+                await health.stop()
+                try:
+                    if scheduler is not None:
+                        await scheduler.stop()
+                finally:
+                    if store is not None:
+                        await store.close()
+            finally:
+                if service_lock is not None:
+                    service_lock.release()
 
     app = ContractAPI(title="ProdOps Agent development service", version="0.1.0",
                       lifespan=lifespan, docs_url=None, redoc_url=None)

@@ -10,8 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from prodops.adapters.storage.models import ConversationRow, MessageRow, RunEventRow, RunRow, ToolCallRow
 from prodops.adapters.storage.tasks import SQLiteTaskStore, storage_operation
-from prodops.application.errors import ExecutionBudgetExceeded, LostOwnership, StorageFailure
+from prodops.application.errors import CancellationRequested, ExecutionBudgetExceeded, LostOwnership, StorageFailure
 from prodops.domain.execution import ExecutionLease, ExecutionPolicy, Observation, ToolRequest
+from prodops.domain.events import EVENT_SCHEMA_VERSION
 
 
 def persisted_policy(value: object) -> ExecutionPolicy:
@@ -57,12 +58,18 @@ class SQLiteExecutionStore(SQLiteTaskStore):
             row.checkpoint, row.status = checkpoint, "running"
             self._event(session, row, "run.started", {"attempt_id": attempt_id})
             await session.flush()
-            return ExecutionLease(UUID(row.id), owner_id, row.version, content, policy, used, float(elapsed))
+            evidence = self._run(row).evidence
+            observations = tuple(Observation(item.source, item.summary) for item in evidence)
+            return ExecutionLease(UUID(row.id), owner_id, row.version, content, policy, used, float(elapsed), len(evidence), observations)
 
-    async def _owned(self, session: AsyncSession, lease: ExecutionLease) -> RunRow:
+    async def _owned(self, session: AsyncSession, lease: ExecutionLease, *, allow_cancelling: bool = False) -> RunRow:
         row = await session.get(RunRow, str(lease.run_id))
-        if row is None or row.workspace_id != str(self.identity.workspace_id) or row.status != "running" or row.version != lease.version or row.checkpoint.get("owner_id") != str(lease.owner_id):
+        if row is None or row.workspace_id != str(self.identity.workspace_id) or row.status not in ("running", "cancelling") or row.checkpoint.get("owner_id") != str(lease.owner_id):
             raise LostOwnership()
+        if row.version != lease.version and not (row.status == "cancelling" and row.version == lease.version + 1):
+            raise LostOwnership()
+        if row.status == "cancelling" and not allow_cancelling:
+            raise CancellationRequested()
         return row
 
     @staticmethod
@@ -70,7 +77,7 @@ class SQLiteExecutionStore(SQLiteTaskStore):
         row.last_event_seq += 1
         row.version += 1
         row.updated_at = datetime.now(UTC)
-        session.add(RunEventRow(run_id=row.id, seq=row.last_event_seq, schema_version="1.0", event_type=kind, occurred_at=row.updated_at, payload=payload))
+        session.add(RunEventRow(run_id=row.id, seq=row.last_event_seq, schema_version=EVENT_SCHEMA_VERSION, event_type=kind, occurred_at=row.updated_at, payload=payload))
 
     @staticmethod
     def _checkpoint(row: RunRow, elapsed: float) -> dict[str, object]:
@@ -108,7 +115,7 @@ class SQLiteExecutionStore(SQLiteTaskStore):
         if not 1 <= len(result.summary) <= 512 or not 1 <= len(result.source) <= 512 or not result.source.startswith("mock://"):
             raise ValueError("Invalid mock observation")
         async with self.transaction(write=True) as session:
-            row = await self._owned(session, lease)
+            row = await self._owned(session, lease, allow_cancelling=True)
             tool = await session.get(ToolCallRow, str(call_id))
             if tool is None or tool.run_id != row.id or tool.status != "running" or row.checkpoint.get("active_tool_call_id") != str(call_id):
                 raise LostOwnership()
@@ -124,7 +131,8 @@ class SQLiteExecutionStore(SQLiteTaskStore):
             tool.result = {"source": result.source, "summary": result.summary, "evidence": [evidence]}
             self._event(session, row, "tool.completed", {"tool_call_id": str(call_id), "status": "succeeded", "summary": result.summary, "evidence": [evidence]})
             await session.flush()
-            return replace(lease, version=row.version, elapsed_seconds=elapsed)
+            return replace(lease, version=row.version, elapsed_seconds=elapsed,
+                           completed_steps=lease.completed_steps + 1, observations=(*lease.observations, result))
 
     @storage_operation
     async def complete(self, lease: ExecutionLease, answer: str, elapsed: float) -> None:
@@ -147,7 +155,7 @@ class SQLiteExecutionStore(SQLiteTaskStore):
     @storage_operation
     async def fail(self, lease: ExecutionLease, code: str, message: str, elapsed: float, *, interrupted: bool = False) -> None:
         async with self.transaction(write=True) as session:
-            row = await self._owned(session, lease)
+            row = await self._owned(session, lease, allow_cancelling=True)
             checkpoint = self._checkpoint(row, elapsed)
             error: dict[str, object] = {"code": code, "message": message, "retryable": False}
             active = checkpoint.get("active_tool_call_id")
@@ -161,16 +169,30 @@ class SQLiteExecutionStore(SQLiteTaskStore):
                         unknown.append(active)
                     else:
                         self._event(session, row, "tool.completed", {"tool_call_id": active, "status": "failed", "summary": message, "evidence": []})
-            checkpoint.update(owner_id=None, error=error, active_tool_call_id=None)
-            row.checkpoint, row.status = checkpoint, "recovery_required" if interrupted else "failed"
+            checkpoint.update(owner_id=None, error=error, active_tool_call_id=None, unknown_tool_call_ids=unknown)
+            cancelling = row.status == "cancelling"
+            row.checkpoint, row.status = checkpoint, "recovery_required" if interrupted else ("cancelled" if cancelling else "failed")
             if interrupted:
                 self._event(session, row, "run.recovery_required", {"reason": message, "unknown_tool_call_ids": unknown})
             else:
-                self._event(session, row, "run.failed", {"error": error})
+                self._event(session, row, "run.cancelled" if cancelling else "run.failed",
+                            {"reason": "Cancelled after the in-flight tool stopped."} if cancelling else {"error": error})
                 await session.execute(update(ConversationRow).where(ConversationRow.id == row.conversation_id, ConversationRow.active_run_id == row.id).values(active_run_id=None, updated_at=row.updated_at))
 
     @storage_operation
     async def heartbeat(self, lease: ExecutionLease, elapsed: float) -> None:
         async with self.transaction(write=True) as session:
-            row = await self._owned(session, lease)
+            row = await self._owned(session, lease, allow_cancelling=True)
             row.checkpoint = self._checkpoint(row, elapsed)
+
+    @storage_operation
+    async def acknowledge_cancel(self, lease: ExecutionLease, elapsed: float) -> None:
+        async with self.transaction(write=True) as session:
+            row = await self._owned(session, lease, allow_cancelling=True)
+            if row.status != "cancelling" or row.checkpoint.get("active_tool_call_id") is not None:
+                raise LostOwnership()
+            checkpoint = self._checkpoint(row, elapsed)
+            checkpoint.update(owner_id=None)
+            row.checkpoint, row.status = checkpoint, "cancelled"
+            self._event(session, row, "run.cancelled", {"reason": "Cancelled at the next safe step boundary."})
+            await session.execute(update(ConversationRow).where(ConversationRow.id == row.conversation_id, ConversationRow.active_run_id == row.id).values(active_run_id=None, updated_at=row.updated_at))

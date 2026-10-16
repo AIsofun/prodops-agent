@@ -44,3 +44,9 @@ class TaskService:
         if run is None:
             raise ResourceNotFound()
         return run
+
+    async def cancel(self, run_id: UUID, reason: str | None) -> RunRecord:
+        return await self.store.cancel_run(run_id, reason)
+
+    async def recover(self, run_id: UUID, expected_version: int, reviewed_calls: tuple[UUID, ...], key: UUID) -> RunSubmission:
+        return await self.store.recover_run(run_id, expected_version, reviewed_calls, key)

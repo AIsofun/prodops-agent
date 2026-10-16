@@ -43,3 +43,5 @@ class ExecutionLease:
     policy: ExecutionPolicy
     tool_calls_used: int
     elapsed_seconds: float
+    completed_steps: int = 0
+    observations: tuple[Observation, ...] = ()

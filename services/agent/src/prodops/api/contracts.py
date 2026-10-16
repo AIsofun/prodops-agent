@@ -12,6 +12,7 @@ from prodops.api.models import (
     PROTOCOL_VERSION, CapabilitiesResponse, ErrorResponse, ReservedContracts,
 )
 from prodops.domain.deployment import DeploymentMode
+from prodops.domain.events import EVENT_SCHEMA_VERSION
 
 
 def capabilities_router(mode: DeploymentMode, deployment_id: Callable[[], UUID],
@@ -23,13 +24,13 @@ def capabilities_router(mode: DeploymentMode, deployment_id: Callable[[], UUID],
     async def capabilities(
         response: Response,
         protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol",
-            description="Omit for discovery; when supplied it must exactly match 1.2.")] = None,
+            description="Omit for discovery; when supplied it must exactly match 1.3.")] = None,
     ) -> CapabilitiesResponse:
         if protocol is not None and protocol != PROTOCOL_VERSION:
             raise ProtocolError()
         response.headers["Cache-Control"] = "no-store"
         enabled = business_ready()
-        return CapabilitiesResponse(protocol_version="1.2", event_schema_version="1.0",
+        return CapabilitiesResponse(protocol_version="1.3", event_schema_version=EVENT_SCHEMA_VERSION,
                                     deployment_id=deployment_id(), mode=mode,
                                     scope="development" if enabled else "service_skeleton",
                                     authentication="development_token" if enabled else "unavailable",

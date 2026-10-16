@@ -73,6 +73,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/runs/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_api_v1_runs__run_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/runs/{run_id}/recover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recover */
+        post: operations["recover_api_v1_runs__run_id__recover_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces": {
         parameters: {
             query?: never;
@@ -196,9 +230,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -228,11 +262,16 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
+        };
+        /** CancelRunRequest */
+        CancelRunRequest: {
+            /** Reason */
+            reason?: string | null;
         };
         /** CapabilitiesResponse */
         CapabilitiesResponse: {
@@ -257,7 +296,7 @@ export interface components {
              * Event Schema Version
              * @constant
              */
-            event_schema_version: "1.0";
+            event_schema_version: "1.1";
             /**
              * Event Stream
              * @default false
@@ -274,7 +313,7 @@ export interface components {
              * Protocol Version
              * @constant
              */
-            protocol_version: "1.2";
+            protocol_version: "1.3";
             /**
              * Runs
              * @default false
@@ -453,9 +492,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -489,6 +528,57 @@ export interface components {
              */
             limit: number;
         };
+        /** RecoverRunRequest */
+        RecoverRunRequest: {
+            /**
+             * Decision
+             * @constant
+             */
+            decision: "retry_mock_reads";
+            /** Expected Version */
+            expected_version: number;
+            /** Reviewed Tool Call Ids */
+            reviewed_tool_call_ids: string[];
+        };
+        /** RecoveryApprovedEvent */
+        RecoveryApprovedEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            event_type: "run.recovery_approved";
+            /**
+             * Occurred At
+             * Format: date-time
+             * @description UTC timestamp (Z or +00:00).
+             */
+            occurred_at: string;
+            payload: components["schemas"]["RecoveryApprovedPayload"];
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /**
+             * Schema Version
+             * @constant
+             */
+            schema_version: "1.1";
+            /** Seq */
+            seq: number;
+        };
+        /** RecoveryApprovedPayload */
+        RecoveryApprovedPayload: {
+            /**
+             * Decision
+             * @constant
+             */
+            decision: "retry_mock_reads";
+            /** Prior Attempt Id */
+            prior_attempt_id: string | null;
+            /** Reviewed Tool Call Ids */
+            reviewed_tool_call_ids: string[];
+        };
         /** RecoveryRequiredEvent */
         RecoveryRequiredEvent: {
             /**
@@ -510,9 +600,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -544,7 +634,7 @@ export interface components {
             conversation: components["schemas"]["Conversation"];
             conversation_page: components["schemas"]["ConversationPage"];
             /** Event */
-            event: components["schemas"]["RunCreatedEvent"] | components["schemas"]["RunStartedEvent"] | components["schemas"]["StepStartedEvent"] | components["schemas"]["ToolStartedEvent"] | components["schemas"]["ToolCompletedEvent"] | components["schemas"]["MessageDeltaEvent"] | components["schemas"]["ApprovalRequestedEvent"] | components["schemas"]["CancelRequestedEvent"] | components["schemas"]["RunCompletedEvent"] | components["schemas"]["RunFailedEvent"] | components["schemas"]["RunCancelledEvent"] | components["schemas"]["RecoveryRequiredEvent"];
+            event: components["schemas"]["RunCreatedEvent"] | components["schemas"]["RunStartedEvent"] | components["schemas"]["StepStartedEvent"] | components["schemas"]["ToolStartedEvent"] | components["schemas"]["ToolCompletedEvent"] | components["schemas"]["MessageDeltaEvent"] | components["schemas"]["ApprovalRequestedEvent"] | components["schemas"]["CancelRequestedEvent"] | components["schemas"]["RunCompletedEvent"] | components["schemas"]["RunFailedEvent"] | components["schemas"]["RunCancelledEvent"] | components["schemas"]["RecoveryRequiredEvent"] | components["schemas"]["RecoveryApprovedEvent"];
             message: components["schemas"]["Message"];
             page_query: components["schemas"]["PageQuery"];
             replay_cursor: components["schemas"]["ReplayCursor"];
@@ -578,9 +668,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -605,9 +695,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -651,9 +741,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -686,9 +776,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -733,6 +823,8 @@ export interface components {
              */
             run_id: string;
             status: components["schemas"]["RunStatus"];
+            /** Unknown Tool Call Ids */
+            unknown_tool_call_ids?: string[];
             /**
              * Updated At
              * Format: date-time
@@ -768,9 +860,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -808,9 +900,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -854,9 +946,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -898,9 +990,9 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @constant
+             * @enum {string}
              */
-            schema_version: "1.0";
+            schema_version: "1.0" | "1.1";
             /** Seq */
             seq: number;
         };
@@ -953,7 +1045,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Omit for discovery; when supplied it must exactly match 1.2. */
+                /** @description Omit for discovery; when supplied it must exactly match 1.3. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path?: never;
@@ -997,7 +1089,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.2 for business requests. */
+                /** @description Required exact protocol 1.3 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1106,7 +1198,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.2 for business requests. */
+                /** @description Required exact protocol 1.3 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1213,7 +1305,7 @@ export interface operations {
             query?: never;
             header: {
                 "Idempotency-Key": string;
-                /** @description Required exact protocol 1.2 for business requests. */
+                /** @description Required exact protocol 1.3 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1323,7 +1415,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.2 for business requests. */
+                /** @description Required exact protocol 1.3 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1425,11 +1517,232 @@ export interface operations {
             };
         };
     };
+    cancel_api_v1_runs__run_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Required exact protocol 1.3 for business requests. */
+                "X-ProdOps-Protocol"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelRunRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunSnapshot"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Content Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Upgrade Required */
+            426: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    recover_api_v1_runs__run_id__recover_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+                /** @description Required exact protocol 1.3 for business requests. */
+                "X-ProdOps-Protocol"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecoverRunRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunSnapshot"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Content Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Upgrade Required */
+            426: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     workspaces_api_v1_workspaces_get: {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.2 for business requests. */
+                /** @description Required exact protocol 1.3 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path?: never;
@@ -1536,7 +1849,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.2 for business requests. */
+                /** @description Required exact protocol 1.3 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1642,7 +1955,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.2 for business requests. */
+                /** @description Required exact protocol 1.3 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {

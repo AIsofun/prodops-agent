@@ -17,7 +17,7 @@ from prodops.bootstrap.app import create_app, create_local_app
 from prodops.bootstrap.config import ConfigurationError, ServiceSettings, load_settings
 
 TOKEN = "test-only-development-token-000000000000"
-HEADERS = {"Authorization": f"Bearer {TOKEN}", "X-ProdOps-Protocol": "1.2"}
+HEADERS = {"Authorization": f"Bearer {TOKEN}", "X-ProdOps-Protocol": "1.3"}
 
 
 def app(database: Path, mode: str = "local") -> Any:
@@ -58,7 +58,7 @@ class TaskAPITests(unittest.TestCase):
                                   ({**HEADERS, "Origin": "https://untrusted.example"}, 403),
                                   ({**HEADERS, "X-ProdOps-Protocol": "1.0"}, 426),
                                   ({"Authorization": HEADERS["Authorization"]}, 426)):
-            with TestClient(app(self.database), base_url="http://127.0.0.1") as raw:
+            with TestClient(app(self.database.with_name("unauthorized.sqlite3")), base_url="http://127.0.0.1") as raw:
                 response = raw.post(self.path, json={"title": "secret-input"}, headers=headers)
                 self.assertEqual(response.status_code, expected, response.text)
                 self.assertNotIn("secret-input", response.text)

@@ -10,9 +10,9 @@ const { validateHealth, validateCapabilities } = require("../../../packages/api-
 
 const id = "44444444-4444-4444-8444-444444444444";
 const healthy = { status: "ready", mode: "local", scope: "service_skeleton" };
-const capable = { protocol_version: "1.2", event_schema_version: "1.0", deployment_id: id,
+const capable = { protocol_version: "1.3", event_schema_version: "1.1", deployment_id: id,
   mode: "local", scope: "service_skeleton", authentication: "unavailable", conversations: false, runs: false, event_stream: false };
-const ready = { connection_id: "development", mode: "local", state: "ready", deployment_id: id, protocol_version: "1.2" };
+const ready = { connection_id: "development", mode: "local", state: "ready", deployment_id: id, protocol_version: "1.3" };
 
 async function withServer(handler, action) {
   const server = http.createServer(handler);
@@ -37,7 +37,7 @@ test("read-only requests use fixed paths and version header then return validate
   const paths = [];
   await withServer((request, response) => {
     assert.equal(request.method, "GET");
-    assert.equal(request.headers["x-prodops-protocol"], "1.2");
+    assert.equal(request.headers["x-prodops-protocol"], "1.3");
     paths.push(request.url);
     json(response, 200, request.url === "/health/ready" ? healthy : capable);
   }, async (connection) => assert.deepEqual(await getConnectionStatus(connection), ready));

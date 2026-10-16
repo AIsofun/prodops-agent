@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T04",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m2-t04-recovery.md",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P1",
+      "status": "fixed",
+      "reason": "Require exclusive canonical-path OS service lock before orphan recovery."
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Allow exact cancellation version increment when retaining an owned in-flight result."
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Resume committed observations without resetting tools or elapsed budgets."
+    },
+    {
+      "id": "R4",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Expose unresolved call IDs and cache complete original recovery receipts."
+    }
+  ]
+}

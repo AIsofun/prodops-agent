@@ -74,6 +74,7 @@ class RunRecord:
     updated_at: datetime
     evidence: tuple[EvidenceRecord, ...] = ()
     error: RunErrorRecord | None = None
+    unknown_tool_call_ids: tuple[UUID, ...] = ()
 
 
 @dataclass(frozen=True)

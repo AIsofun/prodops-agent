@@ -11,9 +11,9 @@ from pydantic import BeforeValidator, Field
 
 from prodops.api.errors import APIError, ProtocolError
 from prodops.api.models import (
-    PROTOCOL_VERSION, Conversation, ConversationCreateRequest, ConversationPage,
+    PROTOCOL_VERSION, CancelRunRequest, Conversation, ConversationCreateRequest, ConversationPage,
     ErrorResponse, Message, MessagePage, RunCreateRequest, RunPage, RunSnapshot,
-    Workspace, WorkspaceList,
+    RecoverRunRequest, Workspace, WorkspaceList,
 )
 from prodops.application.access import DevelopmentAccess
 from prodops.application.tasks import TaskService
@@ -38,7 +38,7 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
 
     async def authorize(request: Request, response: Response,
                         credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
-                        protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol", description="Required exact protocol 1.2 for business requests.")] = None) -> TaskService:
+                        protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol", description="Required exact protocol 1.3 for business requests.")] = None) -> TaskService:
         if service is None or access is None or not ready():
             raise APIError(503, "not_ready", "Development business API is not configured or ready.")
         if len(request.headers.getlist("authorization")) != 1 or credentials is None or not access.allows(credentials.credentials):
@@ -58,6 +58,11 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
 
     def snapshot(record: RunRecord) -> RunSnapshot:
         return RunSnapshot.model_validate(asdict(record))
+
+    def unique_key(request: Request, key: UUID) -> UUID:
+        if len(request.headers.getlist("idempotency-key")) != 1:
+            raise APIError(422, "invalid_request", "A single UUID Idempotency-Key header is required.")
+        return key
 
     @router.get("/workspaces", response_model=WorkspaceList)
     async def workspaces(tasks: Annotated[TaskService, Depends(authorize)]) -> WorkspaceList:
@@ -90,13 +95,7 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
     async def submit(conversation_id: UUID, body: RunCreateRequest, request: Request, response: Response,
                      tasks: Annotated[TaskService, Depends(authorize)],
                      idempotency_key: Annotated[UUID, Header(alias="Idempotency-Key")]) -> RunSnapshot:
-        keys = request.headers.getlist("idempotency-key")
-        try:
-            if len(keys) != 1:
-                raise ValueError()
-            key = idempotency_key
-        except ValueError:
-            raise APIError(422, "invalid_request", "A UUID Idempotency-Key header is required.") from None
+        key = unique_key(request, idempotency_key)
         result = await tasks.submit(conversation_id, body.content, key)
         response.headers["Idempotency-Replayed"] = str(result.replayed).lower()
         return snapshot(result.run)
@@ -104,5 +103,18 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
     @router.get("/runs/{run_id}", response_model=RunSnapshot)
     async def run(run_id: UUID, tasks: Annotated[TaskService, Depends(authorize)]) -> RunSnapshot:
         return snapshot(await tasks.snapshot(run_id))
+
+    @router.post("/runs/{run_id}/cancel", response_model=RunSnapshot)
+    async def cancel(run_id: UUID, body: CancelRunRequest,
+                     tasks: Annotated[TaskService, Depends(authorize)]) -> RunSnapshot:
+        return snapshot(await tasks.cancel(run_id, body.reason))
+
+    @router.post("/runs/{run_id}/recover", response_model=RunSnapshot, status_code=202)
+    async def recover(run_id: UUID, body: RecoverRunRequest, request: Request, response: Response,
+                      tasks: Annotated[TaskService, Depends(authorize)],
+                      idempotency_key: Annotated[UUID, Header(alias="Idempotency-Key")]) -> RunSnapshot:
+        result = await tasks.recover(run_id, body.expected_version, tuple(body.reviewed_tool_call_ids), unique_key(request, idempotency_key))
+        response.headers["Idempotency-Replayed"] = str(result.replayed).lower()
+        return snapshot(result.run)
 
     return router

@@ -20,8 +20,8 @@
 | REQ-006 | M2 | 进行中 | 8 9 13 | [证据持久化](../services/agent/src/prodops/adapters/storage/execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock来源/采集时间/最终回复与独立解决状态已验证；真实来源和授权原始结果待后续 |
 | REQ-007 | M2 | 进行中 | 13 | [业务历史API](../services/agent/src/prodops/api/business.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话/消息/任务分页及服务重开保持记录已验证；完整结果和桌面历史仍待后续 |
 | REQ-008 | M2 | 进行中 | 11 | [快照与重放 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | 事件序列、水位与游标模型已验证；SSE、持久化补发与去重仍在 M2 |
-| REQ-009 | M2 | 未开始 | 9 | - | - | 协作取消 |
-| REQ-010 | M2 | 未开始 | 9 | - | - | 中断核对 |
+| REQ-009 | M2 | 进行中 | 9 | [取消事务](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 排队/在途/步骤边界取消和结果保留已验证；桌面取消入口仍待M3 |
+| REQ-010 | M2 | 进行中 | 9 | [启动核对与恢复](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 真实进程硬退出后unknown、明确核对、新尝试与预算保留已验证；实际设备动作核对待连接器阶段 |
 | REQ-011 | M4 | 进行中 | 7 8 | [显式mock适配器](../services/agent/src/prodops/adapters/mock_tools.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock及异常不降级已验证；实际模型协议与不可用场景仍在M4 |
 | REQ-012 | M5 | 未开始 | 7 14 | - | - | 现场连接器未确定 |
 | REQ-013 | M4 | 进行中 | 6.3 13 | [固定开发连接](../apps/desktop/src/main/connection.ts)、[受限 IPC](../apps/desktop/src/main/ipc.ts) | [开发连接验证](verification/2026-10-16-m1-t05-bridge.md) | T05 固定回环连接和状态读取已验证；持久配置、切换及跨连接缓存隔离仍在 M4 |
@@ -30,7 +30,7 @@
 | REQ-016 | M5 | 未开始 | 14 | - | - | P1，开放写操作前必需 |
 | REQ-017 | M5 | 未开始 | 9 14 | - | - | P1，验证与冲突控制 |
 | REQ-018 | M3 | 未开始 | 12 16 | - | - | 用户错误状态 |
-| REQ-019 | M2 | 进行中 | 10 | [执行预算](../services/agent/src/prodops/domain/execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | SQLite队列/并发、工具次数和超时预算已验证；恢复及等待确认预算按后续切片 |
+| REQ-019 | M2 | 进行中 | 10 | [持久执行预算](../services/agent/src/prodops/adapters/storage/execution.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 队列/并发、次数/时长、取消与恢复预算保留已验证；等待确认预算按处置切片 |
 | REQ-020 | M6 | 未开始 | 13 17 | - | - | 数据及附件恢复 |
 | REQ-021 | M6 | 未开始 | 12 17 | - | - | 协议与离线升级 |
 | NFR-001 | M4 | 未开始 | 6 18 | - | - | 双模式场景集 |
@@ -50,7 +50,7 @@
 | HAR-004 | M1 | 已验证 | 5 12 | [契约检查器](../scripts/check_contracts.py)、[正式模型](../services/agent/src/prodops/api/models.py)、[生成类型](../packages/api-client/src/schema.d.ts)、[生成校验器](../packages/api-client/src/validators.cjs)、[IPC 校验](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 当前 API、事件、IPC 边界及三类生成漂移在本地和 CI 验证；后续新增契约持续遵守 |
 | HAR-005 | M1 | 已验证 | 17 | [统一入口](../scripts/check.py)、[冻结依赖流水线](../.github/workflows/quality.yml) | [产品检查](verification/2026-10-16-m1-t06-gates.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 本地默认 M1 与真实 Windows CI 通过；不代表产品发布验收 |
 | HAR-006 | M4 | 进行中 | 8 18 | [模拟执行回归](../services/agent/tests/test_execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock、歧义、异常与预算基线通过；真实模型及完整评测集仍在M4 |
-| HAR-007 | M2 | 未开始 | 9 11 | - | - | 故障注入回归待实现 |
+| HAR-007 | M2 | 进行中 | 9 18 | [隔离故障回归](../services/agent/tests/test_recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 工具异常/超时、取消、真实硬退出、unknown与事务故障通过；SSE断线/补发在下一任务 |
 | HAR-008 | M3 | 未开始 | 5 6 17 | - | - | 桌面与安装包验证待建立 |
 | HAR-009 | M1 | 进行中 | 17 | [GitHub 流水线](../.github/workflows/quality.yml) | [实际 CI 与审计](verification/2026-10-16-m1-t07-ci.md) | Windows CI 已成功运行；main 必要检查合并限制未配置，影响与退出条件见[范围记录](decisions/2026-10-16-ci-merge-enforcement.md) |
 | HAR-010 | M0 | 已实现 | 18 | [开发入口](../AGENTS.md) | - | 人工执行的变更规则，持续有效性按变更审阅 |

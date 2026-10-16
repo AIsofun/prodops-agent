@@ -13,9 +13,10 @@ from pydantic import (
 from prodops.domain.deployment import DeploymentMode
 from prodops.domain.runs import ResolutionStatus, RunStatus
 
-PROTOCOL_VERSION = "1.2"
-ProtocolVersion = Literal["1.2"]
-EventSchemaVersion = Literal["1.0"]
+PROTOCOL_VERSION = "1.3"
+ProtocolVersion = Literal["1.3"]
+EventSchemaVersion = Literal["1.0", "1.1"]
+CurrentEventSchemaVersion = Literal["1.1"]
 ShortText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=512)]
 Content = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=32000)]
 Sequence = Annotated[int, Field(strict=True, ge=0, le=9007199254740991)]
@@ -54,7 +55,7 @@ class HealthResponse(DTO):
 
 class CapabilitiesResponse(DTO):
     protocol_version: ProtocolVersion
-    event_schema_version: EventSchemaVersion
+    event_schema_version: CurrentEventSchemaVersion
     deployment_id: UUID = Field(description="Durable identity when storage is configured; otherwise ephemeral instance ID.")
     mode: DeploymentMode
     scope: Literal["service_skeleton", "development"] = "service_skeleton"
@@ -116,6 +117,16 @@ class RunCreateRequest(DTO):
     execution_mode: Literal["mock"]
 
 
+class CancelRunRequest(DTO):
+    reason: ShortText | None = None
+
+
+class RecoverRunRequest(DTO):
+    expected_version: EventSequence
+    reviewed_tool_call_ids: list[UUID] = Field(max_length=100)
+    decision: Literal["retry_mock_reads"]
+
+
 class SubmissionHeaders(DTO):
     idempotency_key: UUID = Field(description="Idempotency-Key header; scoped to deployment/workspace/caller/resource/operation.")
 
@@ -159,6 +170,7 @@ class RunSnapshot(DTO):
     updated_at: UtcTimestamp
     evidence: list[EvidenceReference]
     error: ErrorDetail | None
+    unknown_tool_call_ids: list[UUID] = Field(default_factory=list)
 
 
 class Workspace(DTO):
@@ -232,6 +244,12 @@ class RecoveryRequiredPayload(DTO):
     unknown_tool_call_ids: list[UUID]
 
 
+class RecoveryApprovedPayload(DTO):
+    prior_attempt_id: UUID | None
+    reviewed_tool_call_ids: list[UUID]
+    decision: Literal["retry_mock_reads"]
+
+
 class EventEnvelope(DTO):
     schema_version: EventSchemaVersion
     run_id: UUID
@@ -299,10 +317,16 @@ class RecoveryRequiredEvent(EventEnvelope):
     payload: RecoveryRequiredPayload
 
 
+class RecoveryApprovedEvent(EventEnvelope):
+    schema_version: Literal["1.1"]
+    event_type: Literal["run.recovery_approved"]
+    payload: RecoveryApprovedPayload
+
+
 RunEvent = Annotated[
     RunCreatedEvent | RunStartedEvent | StepStartedEvent | ToolStartedEvent |
     ToolCompletedEvent | MessageDeltaEvent | ApprovalRequestedEvent | CancelRequestedEvent |
-    RunCompletedEvent | RunFailedEvent | RunCancelledEvent | RecoveryRequiredEvent,
+    RunCompletedEvent | RunFailedEvent | RunCancelledEvent | RecoveryRequiredEvent | RecoveryApprovedEvent,
     Field(discriminator="event_type"),
 ]
 

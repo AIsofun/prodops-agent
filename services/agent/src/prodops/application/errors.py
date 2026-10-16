@@ -31,3 +31,11 @@ class LostOwnership(Exception):
 
 class ExecutionBudgetExceeded(Exception):
     pass
+
+
+class CancellationRequested(Exception):
+    pass
+
+
+class InvalidRecovery(Exception):
+    pass

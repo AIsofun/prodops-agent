@@ -19,7 +19,7 @@ export function completedResolution(event: Event): string | null {
   return null;
 }
 
-export function checkProtocol(capabilities: Capabilities): "1.2" {
+export function checkProtocol(capabilities: Capabilities): "1.3" {
   return capabilities.protocol_version;
 }
 

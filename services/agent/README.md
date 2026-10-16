@@ -63,7 +63,7 @@ M2-T01 增加独立的 [SQLite 存储适配器](src/prodops/adapters/storage/REA
 .venv\Scripts\prodops-agent.exe --mode local --database F:\prodops-data\development.sqlite3 --port 8765
 ```
 
-业务请求使用 Authorization: Bearer、X-ProdOps-Protocol: 1.2，任务提交另带 UUID Idempotency-Key；必须显式选择 execution_mode: mock。接口、分页、事务与错误定义见 [契约说明](../../contracts/README.md)。默认仅持久化 queued 任务；显式启用开发执行后运行模拟诊断，仍无 SSE 或真实模型。完整桌面诊断在 M3 接入。不要将开发令牌用于生产身份管理。
+业务请求使用 Authorization: Bearer、X-ProdOps-Protocol: 1.3，任务提交另带 UUID Idempotency-Key；必须显式选择 execution_mode: mock。接口、分页、事务与错误定义见 [契约说明](../../contracts/README.md)。默认仅持久化 queued 任务；显式启用开发执行后运行模拟诊断，仍无 SSE 或真实模型。完整桌面诊断在 M3 接入。不要将开发令牌用于生产身份管理。
 
 ## 显式模拟执行
 
@@ -82,4 +82,14 @@ M2-T01 增加独立的 [SQLite 存储适配器](src/prodops/adapters/storage/REA
 
 模拟问题为相机掉线、OCR质量下降、Kafka堆积、推理延迟。每类读取三份打包的只读模拟观测：指标、日志和建议；来源均为mock://，无网络或真实设备动作。多类歧义或无法识别的问题返回澄清回复且证据为空。完成仅表示诊断执行成功，resolution_status仍unknown。
 
-状态、检查点、工具结果、证据和事件在相应事务内提交，最终assistant消息完整保存并释放会话活跃槽。相同幂等键仍重放最初的提交回执；最新结果通过任务快照查询。存储故障撤销服务就绪状态，不自动重试未知写结果。关闭调度器先停止领取并等待收尾，超过5秒则保留待核对状态；重启扫描与用户取消在后续切片验收。本阶段仍为单进程开发服务，多副本、PostgreSQL与正式身份管理在后续阶段。
+状态、检查点、工具结果、证据和事件在相应事务内提交，最终assistant消息完整保存并释放会话活跃槽。相同幂等键仍重放最初的提交回执；最新结果通过任务快照查询。存储故障撤销服务就绪状态，不自动重试未知写结果。关闭调度器先停止领取并等待收尾，超过5秒则保留待核对状态；重启扫描与用户取消已按隔离故障场景验证。本阶段仍为单进程开发服务，多副本、PostgreSQL与正式身份管理在后续阶段。
+
+## 取消与中断核对
+
+显式配置数据库的服务先取得规范化数据库路径对应的OS服务锁，再迁移并扫描遗留running/cancelling；已有服务持锁时拒绝第二个服务启动。正常退出或异常进程结束由OS释放锁，锁文件保留，不依据文件是否存在判断占用。此锁是保证启动扫描不会误判活服务所需的服务单实例基础，完整桌面单实例和父进程管理仍在M3。
+
+失去原所有者的执行记录进入recovery_required；在途调用标unknown，尚未执行的queued保留。扫描完成才对外就绪，执行器不领取待核对任务。保留上次累计耗时，并保守计入最后心跳至恢复扫描之间的未确认区间（含停机时间），避免中断重置预算。
+
+POST /api/v1/runs/{run_id}/cancel 正文可为{}。排队任务立即取消，在途任务先cancelling，工具返回后保留其真实结果并停止后续工具；重复请求不增加事件。服务关闭先停止领取、最多等待5秒收尾，未确认的调用保留unknown与待核对状态。
+
+POST /api/v1/runs/{run_id}/recover 使用Idempotency-Key，正文为expected_version、reviewed_tool_call_ids和decision: retry_mock_reads。先读取快照核对未知调用，旧版本、不完整核对、非mock调用、已取消或耗尽预算均拒绝。原未知工具记录保留unknown和核对痕迹；新尝试从已提交步骤后继续，只在明确批准后重试未确认的模拟只读步骤。完整设备操作核对与正式身份仍按后续阶段实现。
