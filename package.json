@@ -5,7 +5,8 @@
   "type": "module",
   "engines": { "node": ">=22.18 <25" },
   "scripts": {
-    "check:tooling-types": "tsc --noEmit -p tooling/tsconfig.json"
+    "check:tooling-types": "tsc --noEmit -p tooling/tsconfig.json",
+    "contracts:types": "node node_modules/openapi-typescript/bin/cli.js contracts/openapi.json --output packages/api-client/src/schema.d.ts"
   },
   "devDependencies": {
     "@types/node": "24.10.1",

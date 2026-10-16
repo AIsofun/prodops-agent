@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T03",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-16-m1-t03-contracts.md",
+  "findings": [
+    {"id":"R1","severity":"P2","status":"fixed","reason":"Rejected numeric and numeric-string timestamps and required UTC date-time format at runtime and in schema; added invalid input regression coverage."},
+    {"id":"R2","severity":"P2","status":"fixed","reason":"Replaced instance method assignment with a typed FastAPI subclass override; strict checks cover product, exporter and tests without type ignores."}
+  ]
+}

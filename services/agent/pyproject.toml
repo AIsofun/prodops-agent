@@ -20,4 +20,4 @@ python_version = "3.12"
 strict = true
 explicit_package_bases = true
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
-files = ["services/agent/src/prodops", "services/agent/tests"]
+files = ["services/agent/src/prodops", "services/agent/tests", "services/agent/scripts"]

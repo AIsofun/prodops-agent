@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T03",
+  "environment": {"os":"Windows 11 10.0.26200","arch":"AMD64","python":"3.13.2","uv":"0.11.17","node":"24.14.1","mypy":"1.19.0","typescript":"5.9.3","openapi-typescript":"7.10.1","fastapi":"0.143.2","pydantic":"2.14.1"},
+  "source": {"revision":"2848a7c07c773b73ad0a1ebb45580f09f095c7d7","worktree":"uncommitted T03 API, contract, generated artifacts, tests and documentation changes","scope":"API/event contract slice; not task execution, desktop or production acceptance"},
+  "criteria": [
+    {"id":"M1-T03-AC01","status":"PASS","evidence":"docs/verification/2026-10-16-m1-t03-contracts.md"},
+    {"id":"M1-T03-AC02","status":"PASS","evidence":"docs/verification/2026-10-16-m1-t03-contracts.md"},
+    {"id":"M1-T03-AC03","status":"PASS","evidence":"docs/verification/2026-10-16-m1-t03-contracts.md"}
+  ]
+}

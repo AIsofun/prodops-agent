@@ -1,6 +1,6 @@
 # Python 服务骨架
 
-M1-T02 交付，关联 REQ-002、REQ-003、HAR-003。Python 3.12/3.13，Windows 优先；当前已在 Windows 运行验证。
+M1-T02 服务骨架与 M1-T03 契约切片，关联 REQ-002、REQ-003、REQ-005、REQ-008、HAR-003、HAR-004。Python 3.12/3.13，Windows 优先；当前已在 Windows 运行验证。
 
 ## 启动
 
@@ -53,4 +53,6 @@ python scripts/check.py --profile service
 
 它执行工程基础检查、服务和测试代码的严格类型检查、Python 模块边界与服务行为测试。测试覆盖两种模式的安装入口真实启动、HTTP 健康查询、生命周期、启动失败、非法配置、端口冲突和导入无连接副作用。Windows 测试中的子进程使用强制终止清理，优雅退出通过 ASGI lifespan 验证；桌面父子进程退出验收仍在 M3。
 
-本任务不包含任务执行、数据库、模型、桌面窗口、接口契约快照、安装包或 CI。后续按 [M1 任务卡](../../docs/tasks/m1/README.md) 推进。
+M1-T03 增加 `GET /api/v1/capabilities`、正式 DTO、OpenAPI 快照和生成的 TypeScript 类型，协议与生成方式见 [契约说明](../../contracts/README.md)。服务行为测试也覆盖契约校验、版本拒绝、导出无外部访问、生成漂移与 TS 消费编译。
+
+当前不包含任务执行、SSE、数据库、模型、桌面窗口、安装包或 CI。后续按 [M1 任务卡](../../docs/tasks/m1/README.md) 推进。

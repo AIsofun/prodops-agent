@@ -2,10 +2,13 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from uuid import uuid4
 
 from fastapi import FastAPI
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from prodops.api.contracts import ContractAPI, capabilities_router
+from prodops.api.errors import install_error_handlers
 from prodops.api.health import health_router
 from prodops.application.health import HealthService
 from prodops.bootstrap.config import ServiceSettings
@@ -23,10 +26,12 @@ def create_app(settings: ServiceSettings) -> FastAPI:
         finally:
             await health.stop()
 
-    app = FastAPI(title="ProdOps Agent development service", version="0.1.0",
-                  lifespan=lifespan, docs_url=None, redoc_url=None)
+    app = ContractAPI(title="ProdOps Agent development service", version="0.1.0",
+                      lifespan=lifespan, docs_url=None, redoc_url=None)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=[settings.host])
     app.include_router(health_router(health))
+    app.include_router(capabilities_router(settings.mode, uuid4()))
+    install_error_handlers(app)
     return app
 
 
