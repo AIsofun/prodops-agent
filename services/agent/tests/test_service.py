@@ -10,13 +10,16 @@ import socket
 import subprocess
 import sys
 import threading
+import tempfile
 import time
 import unittest
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Any
 from unittest.mock import AsyncMock, patch
-from urllib.request import ProxyHandler, build_opener
+from urllib.request import ProxyHandler, Request, build_opener
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
@@ -141,10 +144,10 @@ class ProcessTests(unittest.TestCase):
                               capture_output=True, text=True, timeout=20, check=False)
 
     @contextmanager
-    def running_service(self, mode: str) -> Iterator[int]:
+    def running_service(self, mode: str, extra_env: dict[str, str] | None = None) -> Iterator[int]:
         entry = Path(sys.executable).parent / ("prodops-agent.exe" if os.name == "nt" else "prodops-agent")
         process = subprocess.Popen([str(entry), "--mode", mode],
-                                   cwd=ROOT, env=clean_environment(), stdout=subprocess.PIPE,
+                                   cwd=ROOT, env={**clean_environment(), **(extra_env or {})}, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT, text=True)
         lines: queue.Queue[str] = queue.Queue()
 
@@ -198,6 +201,40 @@ class ProcessTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("mode: missing", result.stderr)
         self.assertNotIn("Uvicorn running", result.stderr)
+
+    def test_actual_http_submission_continues_after_connection_closes_in_both_modes(self) -> None:
+        opener = build_opener(ProxyHandler({}))
+        token = "isolated-cli-test-token-000000000000000"
+        headers = {"Authorization": f"Bearer {token}", "X-ProdOps-Protocol": "1.2", "Content-Type": "application/json"}
+        with tempfile.TemporaryDirectory(prefix="prodops-runtime-http-") as directory:
+            for mode in ("local", "server"):
+                environment = {"PRODOPS_DATABASE": str(Path(directory) / f"{mode}.sqlite3"),
+                               "PRODOPS_DEVELOPMENT_TOKEN": token, "PRODOPS_EXECUTION_ENABLED": "true"}
+                with self.subTest(mode=mode), self.running_service(mode, environment) as port:
+                    base = f"http://127.0.0.1:{port}"
+
+                    def request(path: str, body: dict[str, object] | None = None) -> dict[str, Any]:
+                        encoded = json.dumps(body).encode("utf-8") if body is not None else None
+                        with opener.open(Request(base + path, data=encoded,
+                                                 headers={**headers, "Idempotency-Key": str(uuid4())}), timeout=5) as response:
+                            if path.endswith("/runs") and body is not None:
+                                self.assertEqual(response.status, 202)
+                            result: dict[str, Any] = json.load(response)
+                            return result
+
+                    workspace = request("/api/v1/workspaces")["items"][0]["workspace_id"]
+                    conversation = request(f"/api/v1/workspaces/{workspace}/conversations", {"title": "Mock HTTP"})["conversation_id"]
+                    submitted = request(f"/api/v1/conversations/{conversation}/runs", {"content": "camera offline", "execution_mode": "mock"})
+                    # The submit response/socket is closed before any subsequent query.
+                    for _ in range(100):
+                        snapshot = request(f"/api/v1/runs/{submitted['run_id']}")
+                        if snapshot["status"] in ("succeeded", "failed"):
+                            break
+                        time.sleep(0.02)
+                    self.assertEqual(snapshot["status"], "succeeded")
+                    self.assertEqual(len(snapshot["evidence"]), 3)
+                    self.assertEqual(snapshot["resolution_status"], "unknown")
+                    self.assertTrue(request("/api/v1/capabilities")["execution_enabled"])
 
     def test_cli_refuses_exposure_and_production_and_sanitizes_values(self) -> None:
         cases = [(["--mode", "server", "--host", "0.0.0.0"], {}),

@@ -1,0 +1,22 @@
+{
+  "camera_offline": {
+    "metrics": "模拟 cam-02 离线，距上一帧612秒，帧率0。",
+    "logs": "模拟 camera-service 日志：RTSP连接被重置，重连5次未成功。",
+    "runbook": "模拟建议：核对供电、网线、交换机端口和RTSP认证；仅提供建议，不执行重启。"
+  },
+  "ocr_quality_drop": {
+    "metrics": "模拟 ocr-v3 成功率82%，基线98%，平均延迟110毫秒。",
+    "logs": "模拟 ocr-service 日志：输入亮度均值38，置信度0.71低于基线0.93。",
+    "runbook": "模拟建议：核对图像亮度、清晰度、相机对焦及模型版本。"
+  },
+  "kafka_backlog": {
+    "metrics": "模拟 vision.events 堆积42100条，2个消费者，6个分区，速率350条/秒。",
+    "logs": "模拟 kafka-consumer 日志：触发rebalance，lag从120升至42100。",
+    "runbook": "模拟建议：核对消费者容量、下游处理延迟与rebalance频率；不执行扩容。"
+  },
+  "inference_latency_high": {
+    "metrics": "模拟 inference-gw 平均延迟180毫秒，p99为480毫秒。",
+    "logs": "模拟 inference-gateway 日志：队列深度42，GPU利用率98%，存在请求超时。",
+    "runbook": "模拟建议：核对GPU与显存、批次大小和请求队列；不执行切流。"
+  }
+}

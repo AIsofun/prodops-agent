@@ -67,7 +67,7 @@
   {
     "id": "M2-T03",
     "title": "数据库调度与显式 mock 排查",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M2-T02"
     ],
@@ -84,9 +84,19 @@
       "M2-T03-AC02",
       "M2-T03-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "services/agent/src/prodops/runtime/scheduler.py",
+      "services/agent/src/prodops/application/execution.py",
+      "services/agent/src/prodops/domain/execution.py",
+      "services/agent/src/prodops/agent/mock.py",
+      "services/agent/src/prodops/adapters/mock_tools.py",
+      "services/agent/src/prodops/adapters/fixtures/diagnostics.json",
+      "services/agent/src/prodops/adapters/storage/execution.py",
+      "services/agent/tests/test_execution.py",
+      "services/agent/tests/test_service.py"
+    ],
+    "verification": "docs/verification/m2-t03.json",
+    "review": "docs/reviews/m2-t03.json"
   },
   {
     "id": "M2-T04",

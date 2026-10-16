@@ -13,8 +13,8 @@ from pydantic import (
 from prodops.domain.deployment import DeploymentMode
 from prodops.domain.runs import ResolutionStatus, RunStatus
 
-PROTOCOL_VERSION = "1.1"
-ProtocolVersion = Literal["1.1"]
+PROTOCOL_VERSION = "1.2"
+ProtocolVersion = Literal["1.2"]
 EventSchemaVersion = Literal["1.0"]
 ShortText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=512)]
 Content = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=32000)]
@@ -62,7 +62,7 @@ class CapabilitiesResponse(DTO):
     conversations: bool = False
     runs: bool = False
     event_stream: Literal[False] = False
-    execution_enabled: Literal[False] = False
+    execution_enabled: bool = False
 
 
 ErrorCode = Literal[

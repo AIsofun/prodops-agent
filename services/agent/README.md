@@ -63,4 +63,23 @@ M2-T01 增加独立的 [SQLite 存储适配器](src/prodops/adapters/storage/REA
 .venv\Scripts\prodops-agent.exe --mode local --database F:\prodops-data\development.sqlite3 --port 8765
 ```
 
-业务请求使用 Authorization: Bearer、X-ProdOps-Protocol: 1.1，任务提交另带 UUID Idempotency-Key；必须显式选择 execution_mode: mock。接口、分页、事务与错误定义见 [契约说明](../../contracts/README.md)。仅持久化 queued 任务，本轮没有执行器、SSE 或真实模型；完整桌面诊断在 M3 接入。不要将开发令牌用于生产身份管理。
+业务请求使用 Authorization: Bearer、X-ProdOps-Protocol: 1.2，任务提交另带 UUID Idempotency-Key；必须显式选择 execution_mode: mock。接口、分页、事务与错误定义见 [契约说明](../../contracts/README.md)。默认仅持久化 queued 任务；显式启用开发执行后运行模拟诊断，仍无 SSE 或真实模型。完整桌面诊断在 M3 接入。不要将开发令牌用于生产身份管理。
+
+## 显式模拟执行
+
+在已有数据库与环境开发令牌配置上，将 PRODOPS_EXECUTION_ENABLED 设为 true，再启动同一CLI。未启用时历史和提交仍可用，任务保持排队；启用时每个服务生命周期只有一个调度器，周期读取已提交数据库队列，任务不依赖HTTP连接存活。不支持真实模型模式，不会把真实模型失败切换为mock。
+
+| 环境变量 | 默认与限制 |
+| --- | --- |
+| PRODOPS_EXECUTION_ENABLED | false；启用须配置数据库与令牌 |
+| PRODOPS_MAX_CONCURRENT_RUNS | local为1且上限1；server默认4，可设1至4 |
+| PRODOPS_QUEUE_LIMIT | 默认100，可设1至100，满时提交429 |
+| PRODOPS_MAX_TOOL_CALLS | 每任务默认12，可设1至100 |
+| PRODOPS_RUN_TIMEOUT | 累计执行时长默认600秒，必须大于0且最多600秒 |
+| PRODOPS_TOOL_TIMEOUT | 单次工具默认30秒，必须大于0且最多600秒 |
+
+提交时将各预算写入任务检查点。后续改服务默认值不会重置已提交任务的工具次数或单任务时长预算；队列和全局并发使用当前明确配置。运行中定期保存心跳与累计耗时，工具发起前消费调用预算。排队时间不计入执行时长。
+
+模拟问题为相机掉线、OCR质量下降、Kafka堆积、推理延迟。每类读取三份打包的只读模拟观测：指标、日志和建议；来源均为mock://，无网络或真实设备动作。多类歧义或无法识别的问题返回澄清回复且证据为空。完成仅表示诊断执行成功，resolution_status仍unknown。
+
+状态、检查点、工具结果、证据和事件在相应事务内提交，最终assistant消息完整保存并释放会话活跃槽。相同幂等键仍重放最初的提交回执；最新结果通过任务快照查询。存储故障撤销服务就绪状态，不自动重试未知写结果。关闭调度器先停止领取并等待收尾，超过5秒则保留待核对状态；重启扫描与用户取消在后续切片验收。本阶段仍为单进程开发服务，多副本、PostgreSQL与正式身份管理在后续阶段。

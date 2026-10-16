@@ -2,7 +2,7 @@
 
 本计划落实 [需求文档](requirements.md) 和 [架构设计](architecture.md)，以可独立验收的功能阶段推进。首版 Windows 优先，业务服务支持本机和内网服务器两种部署。各阶段关联的需求、代码和验收状态在 [追踪表](traceability.md) 维护，开发遵循 [Harness 工程约束](engineering-constraints.md)。
 
-需求基线 1.0 已由用户确认，M0 文档设施与 M1 八项技术骨架任务已验证。M2 已完成 SQLite 存储迁移与受保护会话/任务 API，下一任务为[数据库调度与显式 mock](tasks/m2/03-runner.md)。阶段状态见 [M1](tasks/m1/README.md)与[M2](tasks/m2/README.md)。main 必要检查合并限制未配置，独立保留在 HAR-009。产品功能与工程设施状态分别记录，不因骨架或存储完成而提前计为完整产品完成。
+需求基线 1.0 已由用户确认，M0 文档设施与 M1 八项技术骨架任务已验证。M2 已完成存储、受保护 API 与显式 mock 调度，下一任务为[取消与中断核对](tasks/m2/04-recovery.md)。阶段状态见 [M1](tasks/m1/README.md)与[M2](tasks/m2/README.md)。main 必要检查合并限制未配置，独立保留在 HAR-009。产品功能与工程设施状态分别记录，不因骨架或存储完成而提前计为完整产品完成。
 
 按可运行的里程碑组织交付：
 

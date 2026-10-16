@@ -1,21 +1,24 @@
 """Atomic queued task API persistence, isolated from HTTP and model execution."""
 
 from collections.abc import Awaitable, Callable, Coroutine
+from dataclasses import asdict
 from datetime import UTC, datetime
 from functools import wraps
+from pathlib import Path
 import hashlib
 import json
 from typing import Any, Literal, ParamSpec, TypeVar, cast
 from uuid import UUID, uuid4
 
-from sqlalchemy import and_, or_, select, update
+from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.exc import SQLAlchemyError
 
 from prodops.adapters.storage.models import ConversationRow, IdempotencyRow, MessageRow, RunEventRow, RunRow, WorkspaceRow
 from prodops.adapters.storage.paging import decode_cursor, encode_cursor
 from prodops.adapters.storage.sqlite import SQLiteStore
-from prodops.application.errors import ActiveRunConflict, IdempotencyConflict, ResourceNotFound, StorageFailure
-from prodops.domain.records import ConversationRecord, MessageRecord, RecordPage, RunRecord, RunSubmission, WorkspaceRecord
+from prodops.application.errors import ActiveRunConflict, IdempotencyConflict, QueueFull, ResourceNotFound, StorageFailure
+from prodops.domain.execution import ExecutionPolicy
+from prodops.domain.records import ConversationRecord, EvidenceRecord, MessageRecord, RecordPage, RunErrorRecord, RunRecord, RunSubmission, WorkspaceRecord
 from prodops.domain.runs import ResolutionStatus, RunStatus
 
 P = ParamSpec("P")
@@ -45,6 +48,10 @@ def cached_run(value: dict[str, object]) -> RunRecord:
 
 
 class SQLiteTaskStore(SQLiteStore):
+    def __init__(self, database: Path, policy: ExecutionPolicy | None = None) -> None:
+        super().__init__(database)
+        self.policy = policy or ExecutionPolicy()
+
     @storage_operation
     async def create_conversation(self, title: str) -> ConversationRecord:
         return await super().create_conversation(title)
@@ -129,9 +136,14 @@ class SQLiteTaskStore(SQLiteStore):
                 return RunSubmission(cached_run(existing.response), True)
             if conversation.active_run_id is not None:
                 raise ActiveRunConflict()
+            queued = await session.scalar(select(func.count()).select_from(RunRow).where(RunRow.workspace_id == workspace, RunRow.status == "queued"))
+            if queued is not None and queued >= self.policy.queue_limit:
+                raise QueueFull()
             now, run_id = datetime.now(UTC), str(uuid4())
             row = RunRow(id=run_id, workspace_id=workspace, conversation_id=resource, status="queued", resolution_status="unknown",
-                         version=1, last_event_seq=1, checkpoint={"execution_mode": "mock"}, created_at=now, updated_at=now)
+                         version=1, last_event_seq=1,
+                         checkpoint={"execution_mode": "mock", "budget": asdict(self.policy), "tool_calls_used": 0, "elapsed_seconds": 0.0},
+                         created_at=now, updated_at=now)
             session.add(row)
             await session.flush()
             changed = await session.scalar(update(ConversationRow).where(ConversationRow.id == resource, ConversationRow.workspace_id == workspace, ConversationRow.active_run_id.is_(None)).values(active_run_id=run_id, updated_at=now).returning(ConversationRow.id))
@@ -145,5 +157,16 @@ class SQLiteTaskStore(SQLiteStore):
         return RunSubmission(run, False)
 
     def _run(self, row: RunRow) -> RunRecord:
+        evidence = row.checkpoint.get("evidence", [])
+        error = row.checkpoint.get("error")
+        if not isinstance(evidence, list) or (error is not None and not isinstance(error, dict)):
+            raise StorageFailure()
+        records: list[EvidenceRecord] = []
+        for item in evidence:
+            if not isinstance(item, dict):
+                raise StorageFailure()
+            records.append(EvidenceRecord(UUID(str(item["evidence_id"])), UUID(str(item["tool_call_id"])),
+                                          str(item["source"]), datetime.fromisoformat(str(item["collected_at"])), str(item["summary"])))
+        failure = RunErrorRecord(str(error["code"]), str(error["message"])) if isinstance(error, dict) else None
         return RunRecord(UUID(row.id), self.identity.deployment_id, UUID(row.workspace_id), UUID(row.conversation_id),
-                         RunStatus(row.status), ResolutionStatus(row.resolution_status), row.version, row.last_event_seq, row.created_at, row.updated_at)
+                         RunStatus(row.status), ResolutionStatus(row.resolution_status), row.version, row.last_event_seq, row.created_at, row.updated_at, tuple(records), failure)

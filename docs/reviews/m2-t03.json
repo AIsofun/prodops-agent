@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T03",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m2-t03-execution.md",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Persist elapsed execution time in in-flight heartbeats."
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Expose persisted evidence and safe failures in actual snapshots."
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Keep durable deployment identity when scheduler failure revokes readiness."
+    }
+  ]
+}

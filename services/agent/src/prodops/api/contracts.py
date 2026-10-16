@@ -15,7 +15,7 @@ from prodops.domain.deployment import DeploymentMode
 
 
 def capabilities_router(mode: DeploymentMode, deployment_id: Callable[[], UUID],
-                        business_ready: Callable[[], bool]) -> APIRouter:
+                        business_ready: Callable[[], bool], execution_ready: Callable[[], bool]) -> APIRouter:
     router = APIRouter(prefix="/api/v1", tags=["capabilities"])
 
     @router.get("/capabilities", response_model=CapabilitiesResponse,
@@ -23,17 +23,17 @@ def capabilities_router(mode: DeploymentMode, deployment_id: Callable[[], UUID],
     async def capabilities(
         response: Response,
         protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol",
-            description="Omit for discovery; when supplied it must exactly match 1.1.")] = None,
+            description="Omit for discovery; when supplied it must exactly match 1.2.")] = None,
     ) -> CapabilitiesResponse:
         if protocol is not None and protocol != PROTOCOL_VERSION:
             raise ProtocolError()
         response.headers["Cache-Control"] = "no-store"
         enabled = business_ready()
-        return CapabilitiesResponse(protocol_version="1.1", event_schema_version="1.0",
+        return CapabilitiesResponse(protocol_version="1.2", event_schema_version="1.0",
                                     deployment_id=deployment_id(), mode=mode,
                                     scope="development" if enabled else "service_skeleton",
                                     authentication="development_token" if enabled else "unavailable",
-                                    conversations=enabled, runs=enabled)
+                                    conversations=enabled, runs=enabled, execution_enabled=execution_ready())
 
     return router
 

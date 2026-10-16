@@ -211,7 +211,6 @@
             "type": "boolean"
           },
           "execution_enabled": {
-            "const": false,
             "default": false,
             "title": "Execution Enabled",
             "type": "boolean"
@@ -220,7 +219,7 @@
             "$ref": "#/components/schemas/DeploymentMode"
           },
           "protocol_version": {
-            "const": "1.1",
+            "const": "1.2",
             "title": "Protocol Version",
             "type": "string"
           },
@@ -1646,7 +1645,7 @@
         "operationId": "capabilities_api_v1_capabilities_get",
         "parameters": [
           {
-            "description": "Omit for discovery; when supplied it must exactly match 1.1.",
+            "description": "Omit for discovery; when supplied it must exactly match 1.2.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -1659,7 +1658,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Omit for discovery; when supplied it must exactly match 1.1.",
+              "description": "Omit for discovery; when supplied it must exactly match 1.2.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -1747,7 +1746,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.1 for business requests.",
+            "description": "Required exact protocol 1.2 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -1760,7 +1759,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.1 for business requests.",
+              "description": "Required exact protocol 1.2 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -1846,6 +1845,16 @@
             },
             "description": "Upgrade Required"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -1913,7 +1922,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.1 for business requests.",
+            "description": "Required exact protocol 1.2 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -1926,7 +1935,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.1 for business requests.",
+              "description": "Required exact protocol 1.2 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2012,6 +2021,16 @@
             },
             "description": "Upgrade Required"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2057,7 +2076,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.1 for business requests.",
+            "description": "Required exact protocol 1.2 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2070,7 +2089,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.1 for business requests.",
+              "description": "Required exact protocol 1.2 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2166,6 +2185,16 @@
             },
             "description": "Upgrade Required"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2203,7 +2232,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.1 for business requests.",
+            "description": "Required exact protocol 1.2 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2216,7 +2245,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.1 for business requests.",
+              "description": "Required exact protocol 1.2 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2302,6 +2331,16 @@
             },
             "description": "Upgrade Required"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2329,7 +2368,7 @@
         "operationId": "workspaces_api_v1_workspaces_get",
         "parameters": [
           {
-            "description": "Required exact protocol 1.1 for business requests.",
+            "description": "Required exact protocol 1.2 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2342,7 +2381,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.1 for business requests.",
+              "description": "Required exact protocol 1.2 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2428,6 +2467,16 @@
             },
             "description": "Upgrade Required"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2495,7 +2544,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.1 for business requests.",
+            "description": "Required exact protocol 1.2 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2508,7 +2557,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.1 for business requests.",
+              "description": "Required exact protocol 1.2 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2594,6 +2643,16 @@
             },
             "description": "Upgrade Required"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2629,7 +2688,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.1 for business requests.",
+            "description": "Required exact protocol 1.2 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2642,7 +2701,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.1 for business requests.",
+              "description": "Required exact protocol 1.2 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2738,6 +2797,16 @@
             },
             "description": "Upgrade Required"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2813,7 +2882,7 @@
       }
     }
   },
-  "x-prodops-protocol-version": "1.1",
+  "x-prodops-protocol-version": "1.2",
   "x-prodops-reserved-models": {
     "$ref": "#/components/schemas/ReservedContracts"
   }

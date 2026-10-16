@@ -16,13 +16,13 @@
 | REQ-002 | M3 | 进行中 | 6.1 | [服务装配](../services/agent/src/prodops/bootstrap/app.py)、[开发连接](../apps/desktop/src/main/connection.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 手工启动服务后的桌面读取已验证；自动启动管道、令牌和进程生命周期仍在 M3 |
 | REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 共用业务包的 server 回环开发连接已验证；正式认证、数据库和内网运行仍在 M4 |
 | REQ-004 | M3 | 进行中 | 8 16 | [会话用例](../services/agent/src/prodops/application/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话创建/分页及忙碌冲突已验证；历史上下文执行和桌面多轮交流仍待后续 |
-| REQ-005 | M2 | 进行中 | 8 11 | [任务提交](../services/agent/src/prodops/adapters/storage/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 原子202、任务ID和queued快照已验证；执行、持续进度在后续切片 |
-| REQ-006 | M2 | 未开始 | 8 9 13 | - | - | 证据和解决状态 |
+| REQ-005 | M2 | 进行中 | 8 11 | [数据库调度](../services/agent/src/prodops/runtime/scheduler.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock提交后独立执行、持久步骤与结果已验证；SSE和桌面实时展示待后续 |
+| REQ-006 | M2 | 进行中 | 8 9 13 | [证据持久化](../services/agent/src/prodops/adapters/storage/execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock来源/采集时间/最终回复与独立解决状态已验证；真实来源和授权原始结果待后续 |
 | REQ-007 | M2 | 进行中 | 13 | [业务历史API](../services/agent/src/prodops/api/business.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话/消息/任务分页及服务重开保持记录已验证；完整结果和桌面历史仍待后续 |
 | REQ-008 | M2 | 进行中 | 11 | [快照与重放 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | 事件序列、水位与游标模型已验证；SSE、持久化补发与去重仍在 M2 |
 | REQ-009 | M2 | 未开始 | 9 | - | - | 协作取消 |
 | REQ-010 | M2 | 未开始 | 9 | - | - | 中断核对 |
-| REQ-011 | M4 | 未开始 | 7 8 | - | - | mock 与真实模型分别验收 |
+| REQ-011 | M4 | 进行中 | 7 8 | [显式mock适配器](../services/agent/src/prodops/adapters/mock_tools.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock及异常不降级已验证；实际模型协议与不可用场景仍在M4 |
 | REQ-012 | M5 | 未开始 | 7 14 | - | - | 现场连接器未确定 |
 | REQ-013 | M4 | 进行中 | 6.3 13 | [固定开发连接](../apps/desktop/src/main/connection.ts)、[受限 IPC](../apps/desktop/src/main/ipc.ts) | [开发连接验证](verification/2026-10-16-m1-t05-bridge.md) | T05 固定回环连接和状态读取已验证；持久配置、切换及跨连接缓存隔离仍在 M4 |
 | REQ-014 | M4 | 进行中 | 6.2 12 14 | [开发访问控制](../services/agent/src/prodops/application/access.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 回环单身份令牌及默认工作区隔离已验证；正式多用户、登录/过期/角色与设备权限仍在M4 |
@@ -30,7 +30,7 @@
 | REQ-016 | M5 | 未开始 | 14 | - | - | P1，开放写操作前必需 |
 | REQ-017 | M5 | 未开始 | 9 14 | - | - | P1，验证与冲突控制 |
 | REQ-018 | M3 | 未开始 | 12 16 | - | - | 用户错误状态 |
-| REQ-019 | M2 | 未开始 | 10 | - | - | 预算与调度 |
+| REQ-019 | M2 | 进行中 | 10 | [执行预算](../services/agent/src/prodops/domain/execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | SQLite队列/并发、工具次数和超时预算已验证；恢复及等待确认预算按后续切片 |
 | REQ-020 | M6 | 未开始 | 13 17 | - | - | 数据及附件恢复 |
 | REQ-021 | M6 | 未开始 | 12 17 | - | - | 协议与离线升级 |
 | NFR-001 | M4 | 未开始 | 6 18 | - | - | 双模式场景集 |
@@ -49,7 +49,7 @@
 | HAR-003 | M1 | 已验证 | 7 17 | [统一产品检查](../scripts/check.py)、[缺陷注入](../scripts/verify_product_gates.py)、[桌面类型](../apps/desktop/tsconfig.json)、[Python 产品类型](../services/agent/pyproject.toml) | [产品检查验证](verification/2026-10-16-m1-t06-gates.md) | 当前实际 Python/TS 模块类型、导入边界与缺陷阻断通过；后续新增模块持续遵守 |
 | HAR-004 | M1 | 已验证 | 5 12 | [契约检查器](../scripts/check_contracts.py)、[正式模型](../services/agent/src/prodops/api/models.py)、[生成类型](../packages/api-client/src/schema.d.ts)、[生成校验器](../packages/api-client/src/validators.cjs)、[IPC 校验](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 当前 API、事件、IPC 边界及三类生成漂移在本地和 CI 验证；后续新增契约持续遵守 |
 | HAR-005 | M1 | 已验证 | 17 | [统一入口](../scripts/check.py)、[冻结依赖流水线](../.github/workflows/quality.yml) | [产品检查](verification/2026-10-16-m1-t06-gates.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 本地默认 M1 与真实 Windows CI 通过；不代表产品发布验收 |
-| HAR-006 | M4 | 未开始 | 8 18 | - | - | M2 mock，M4 真实模型评测 |
+| HAR-006 | M4 | 进行中 | 8 18 | [模拟执行回归](../services/agent/tests/test_execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock、歧义、异常与预算基线通过；真实模型及完整评测集仍在M4 |
 | HAR-007 | M2 | 未开始 | 9 11 | - | - | 故障注入回归待实现 |
 | HAR-008 | M3 | 未开始 | 5 6 17 | - | - | 桌面与安装包验证待建立 |
 | HAR-009 | M1 | 进行中 | 17 | [GitHub 流水线](../.github/workflows/quality.yml) | [实际 CI 与审计](verification/2026-10-16-m1-t07-ci.md) | Windows CI 已成功运行；main 必要检查合并限制未配置，影响与退出条件见[范围记录](decisions/2026-10-16-ci-merge-enforcement.md) |

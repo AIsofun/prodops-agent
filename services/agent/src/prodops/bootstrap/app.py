@@ -7,7 +7,9 @@ from uuid import uuid4
 from fastapi import FastAPI
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from prodops.adapters.storage.tasks import SQLiteTaskStore
+from prodops.adapters.storage.execution import SQLiteExecutionStore
+from prodops.adapters.mock_tools import MockTools
+from prodops.agent.mock import MockDiagnosticAgent
 from prodops.api.body_limit import BodyLimitMiddleware
 from prodops.api.business import business_router
 from prodops.api.contracts import ContractAPI, capabilities_router
@@ -18,24 +20,39 @@ from prodops.application.access import DevelopmentAccess
 from prodops.application.tasks import TaskService
 from prodops.bootstrap.config import ServiceSettings
 from prodops.domain.deployment import DeploymentMode
+from prodops.domain.execution import ExecutionPolicy
+from prodops.runtime.scheduler import Scheduler
 
 
 def create_app(settings: ServiceSettings) -> FastAPI:
     health = HealthService(mode=settings.mode)
-    store = SQLiteTaskStore(settings.database) if settings.database is not None else None
+    policy = ExecutionPolicy(settings.max_concurrent_runs or (1 if settings.mode == DeploymentMode.LOCAL else 4),
+                             settings.queue_limit, settings.max_tool_calls, settings.run_timeout, settings.tool_timeout)
+    store = SQLiteExecutionStore(settings.database, policy) if settings.database is not None else None
     tasks = TaskService(store) if store is not None else None
     access = DevelopmentAccess(settings.development_token.get_secret_value()) if settings.development_token is not None else None
     instance_id = uuid4()
+    deployment_id = instance_id
+    tools = MockTools()
+    scheduler = Scheduler(store, MockDiagnosticAgent(), tools, policy.concurrency,
+                          lambda: setattr(health, "ready", False)) if store is not None and settings.execution_enabled else None
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        nonlocal deployment_id
         try:
             if store is not None:
                 await store.start()
+                deployment_id = store.identity.deployment_id
+            if scheduler is not None:
+                await tools.start()
+                await scheduler.start()
             await health.start()
             yield
         finally:
             await health.stop()
+            if scheduler is not None:
+                await scheduler.stop()
             if store is not None:
                 await store.close()
 
@@ -45,8 +62,9 @@ def create_app(settings: ServiceSettings) -> FastAPI:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=[settings.host])
     app.include_router(health_router(health))
     app.include_router(capabilities_router(settings.mode,
-                       lambda: store.identity.deployment_id if store is not None and health.ready else instance_id,
-                       lambda: store is not None and health.ready))
+                       lambda: deployment_id,
+                       lambda: store is not None and health.ready,
+                       lambda: scheduler is not None and scheduler.healthy))
     app.include_router(business_router(tasks, access, lambda: health.ready))
     install_error_handlers(app)
     return app

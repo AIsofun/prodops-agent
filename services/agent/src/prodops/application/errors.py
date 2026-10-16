@@ -19,3 +19,15 @@ class InvalidCursor(Exception):
 
 class StorageFailure(Exception):
     pass
+
+
+class QueueFull(Exception):
+    pass
+
+
+class LostOwnership(Exception):
+    pass
+
+
+class ExecutionBudgetExceeded(Exception):
+    pass

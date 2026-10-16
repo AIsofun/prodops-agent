@@ -267,15 +267,14 @@ export interface components {
             /**
              * Execution Enabled
              * @default false
-             * @constant
              */
-            execution_enabled: false;
+            execution_enabled: boolean;
             mode: components["schemas"]["DeploymentMode"];
             /**
              * Protocol Version
              * @constant
              */
-            protocol_version: "1.1";
+            protocol_version: "1.2";
             /**
              * Runs
              * @default false
@@ -954,7 +953,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Omit for discovery; when supplied it must exactly match 1.1. */
+                /** @description Omit for discovery; when supplied it must exactly match 1.2. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path?: never;
@@ -998,7 +997,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.1 for business requests. */
+                /** @description Required exact protocol 1.2 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1080,6 +1079,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service Unavailable */
             503: {
                 headers: {
@@ -1098,7 +1106,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.1 for business requests. */
+                /** @description Required exact protocol 1.2 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1180,6 +1188,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service Unavailable */
             503: {
                 headers: {
@@ -1196,7 +1213,7 @@ export interface operations {
             query?: never;
             header: {
                 "Idempotency-Key": string;
-                /** @description Required exact protocol 1.1 for business requests. */
+                /** @description Required exact protocol 1.2 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1282,6 +1299,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service Unavailable */
             503: {
                 headers: {
@@ -1297,7 +1323,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.1 for business requests. */
+                /** @description Required exact protocol 1.2 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1379,6 +1405,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service Unavailable */
             503: {
                 headers: {
@@ -1394,7 +1429,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.1 for business requests. */
+                /** @description Required exact protocol 1.2 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path?: never;
@@ -1474,6 +1509,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service Unavailable */
             503: {
                 headers: {
@@ -1492,7 +1536,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.1 for business requests. */
+                /** @description Required exact protocol 1.2 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1574,6 +1618,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service Unavailable */
             503: {
                 headers: {
@@ -1589,7 +1642,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.1 for business requests. */
+                /** @description Required exact protocol 1.2 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1668,6 +1721,15 @@ export interface operations {
             };
             /** @description Upgrade Required */
             426: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };

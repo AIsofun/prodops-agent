@@ -17,7 +17,7 @@ from prodops.bootstrap.app import create_app, create_local_app
 from prodops.bootstrap.config import ConfigurationError, ServiceSettings, load_settings
 
 TOKEN = "test-only-development-token-000000000000"
-HEADERS = {"Authorization": f"Bearer {TOKEN}", "X-ProdOps-Protocol": "1.1"}
+HEADERS = {"Authorization": f"Bearer {TOKEN}", "X-ProdOps-Protocol": "1.2"}
 
 
 def app(database: Path, mode: str = "local") -> Any:
@@ -225,6 +225,20 @@ class TaskAPITests(unittest.TestCase):
 
 
 class BusinessConfigurationTests(unittest.TestCase):
+    def test_queue_capacity_is_enforced_at_actual_submission_boundary(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="prodops-queue-api-") as directory:
+            settings = ServiceSettings.model_validate({"mode": "local", "database": Path(directory) / "queue.sqlite3",
+                                                       "development_token": TOKEN, "queue_limit": 1})
+            with TestClient(create_app(settings), base_url="http://127.0.0.1", headers=HEADERS) as client:
+                workspace = client.get("/api/v1/workspaces").json()["items"][0]["workspace_id"]
+                ids = [client.post(f"/api/v1/workspaces/{workspace}/conversations", json={"title": "Queue"}).json()["conversation_id"] for _ in range(2)]
+                first_key = str(uuid4())
+                body = {"content": "camera", "execution_mode": "mock"}
+                self.assertEqual(client.post(f"/api/v1/conversations/{ids[0]}/runs", json=body, headers={"Idempotency-Key": first_key}).status_code, 202)
+                second = client.post(f"/api/v1/conversations/{ids[1]}/runs", json=body, headers={"Idempotency-Key": str(uuid4())})
+                self.assertEqual((second.status_code, second.json()["error"]["code"]), (429, "budget_exceeded"))
+                self.assertEqual(client.post(f"/api/v1/conversations/{ids[0]}/runs", json=body, headers={"Idempotency-Key": first_key}).status_code, 202)
+
     def test_database_token_pair_and_absolute_path_are_required_and_secrets_hidden(self) -> None:
         for values in ({"PRODOPS_DATABASE": "relative.sqlite3"}, {"PRODOPS_DEVELOPMENT_TOKEN": TOKEN},
                        {"PRODOPS_DATABASE": "relative.sqlite3", "PRODOPS_DEVELOPMENT_TOKEN": TOKEN},

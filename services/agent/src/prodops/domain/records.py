@@ -44,6 +44,23 @@ class MessageRecord:
 
 
 @dataclass(frozen=True)
+class EvidenceRecord:
+    evidence_id: UUID
+    tool_call_id: UUID
+    source: str
+    collected_at: datetime
+    summary: str
+    artifact_id: UUID | None = None
+
+
+@dataclass(frozen=True)
+class RunErrorRecord:
+    code: str
+    message: str
+    retryable: bool = False
+
+
+@dataclass(frozen=True)
 class RunRecord:
     run_id: UUID
     deployment_id: UUID
@@ -55,6 +72,8 @@ class RunRecord:
     last_event_seq: int
     created_at: datetime
     updated_at: datetime
+    evidence: tuple[EvidenceRecord, ...] = ()
+    error: RunErrorRecord | None = None
 
 
 @dataclass(frozen=True)

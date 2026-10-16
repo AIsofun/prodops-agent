@@ -15,6 +15,12 @@ ENV_FIELDS = {
     "PRODOPS_PORT": "port",
     "PRODOPS_DATABASE": "database",
     "PRODOPS_DEVELOPMENT_TOKEN": "development_token",
+    "PRODOPS_EXECUTION_ENABLED": "execution_enabled",
+    "PRODOPS_MAX_CONCURRENT_RUNS": "max_concurrent_runs",
+    "PRODOPS_QUEUE_LIMIT": "queue_limit",
+    "PRODOPS_MAX_TOOL_CALLS": "max_tool_calls",
+    "PRODOPS_RUN_TIMEOUT": "run_timeout",
+    "PRODOPS_TOOL_TIMEOUT": "tool_timeout",
 }
 
 
@@ -32,6 +38,12 @@ class ServiceSettings(BaseModel):
     port: int = Field(default=0, ge=0, le=65535)
     database: Path | None = None
     development_token: SecretStr | None = Field(default=None, min_length=32, max_length=256)
+    execution_enabled: bool = False
+    max_concurrent_runs: int | None = Field(default=None, ge=1, le=4)
+    queue_limit: int = Field(default=100, ge=1, le=100)
+    max_tool_calls: int = Field(default=12, ge=1, le=100)
+    run_timeout: float = Field(default=600, gt=0, le=600, allow_inf_nan=False)
+    tool_timeout: float = Field(default=30, gt=0, le=600, allow_inf_nan=False)
 
     @model_validator(mode="after")
     def validate_business_configuration(self) -> "ServiceSettings":
@@ -39,6 +51,10 @@ class ServiceSettings(BaseModel):
             raise ValueError("database and development_token must be configured together")
         if self.database is not None and not self.database.is_absolute():
             raise ValueError("database must be an absolute path")
+        if self.execution_enabled and self.database is None:
+            raise ValueError("execution requires protected storage")
+        if self.mode == DeploymentMode.LOCAL and self.max_concurrent_runs not in (None, 1):
+            raise ValueError("local concurrency is limited to one")
         return self
 
 

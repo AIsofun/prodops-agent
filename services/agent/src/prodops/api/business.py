@@ -38,7 +38,7 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
 
     async def authorize(request: Request, response: Response,
                         credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
-                        protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol", description="Required exact protocol 1.1 for business requests.")] = None) -> TaskService:
+                        protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol", description="Required exact protocol 1.2 for business requests.")] = None) -> TaskService:
         if service is None or access is None or not ready():
             raise APIError(503, "not_ready", "Development business API is not configured or ready.")
         if len(request.headers.getlist("authorization")) != 1 or credentials is None or not access.allows(credentials.credentials):
@@ -51,13 +51,13 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
         return service
 
     router = APIRouter(prefix="/api/v1", tags=["development tasks"],
-                       responses={status: {"model": ErrorResponse} for status in (401, 403, 404, 409, 413, 422, 426, 503)})
+                       responses={status: {"model": ErrorResponse} for status in (401, 403, 404, 409, 413, 422, 426, 429, 503)})
 
     def conversation(record: ConversationRecord, tasks: TaskService) -> Conversation:
         return Conversation.model_validate({**asdict(record), "deployment_id": tasks.identity.deployment_id})
 
     def snapshot(record: RunRecord) -> RunSnapshot:
-        return RunSnapshot.model_validate({**asdict(record), "evidence": [], "error": None})
+        return RunSnapshot.model_validate(asdict(record))
 
     @router.get("/workspaces", response_model=WorkspaceList)
     async def workspaces(tasks: Annotated[TaskService, Depends(authorize)]) -> WorkspaceList:

@@ -1,0 +1,10 @@
+{
+  "artifact": "prodops_agent-0.1.0-py3-none-any.whl",
+  "status": "PASS",
+  "checked_files": [
+    "prodops/adapters/fixtures/diagnostics.json",
+    "prodops/runtime/scheduler.py",
+    "prodops/adapters/storage/migrations/versions/0001_storage.py"
+  ],
+  "scope": "wheel contents only; not an installer or clean-machine installation"
+}

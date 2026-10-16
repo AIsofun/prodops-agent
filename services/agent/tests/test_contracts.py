@@ -41,13 +41,13 @@ class BoundaryTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 200)
                 body = response.json()
                 ids.add(body.pop("deployment_id"))
-                self.assertEqual(body, {"protocol_version": "1.1", "event_schema_version": "1.0",
+                self.assertEqual(body, {"protocol_version": "1.2", "event_schema_version": "1.0",
                     "mode": mode, "scope": "service_skeleton", "authentication": "unavailable",
                     "conversations": False, "runs": False, "event_stream": False, "execution_enabled": False})
                 self.assertEqual(response.headers["cache-control"], "no-store")
                 self.assertEqual(client.get("/api/v1/capabilities").json()["deployment_id"], response.json()["deployment_id"])
-                self.assertEqual(client.get("/api/v1/capabilities", headers={"X-ProdOps-Protocol": "1.1"}).status_code, 200)
-                for version in ("2.0", "1.0", "1", "", " 1.1", "secret-client-input"):
+                self.assertEqual(client.get("/api/v1/capabilities", headers={"X-ProdOps-Protocol": "1.2"}).status_code, 200)
+                for version in ("2.0", "1.1", "1.0", "1", "", " 1.2", "secret-client-input"):
                     rejected = client.get("/api/v1/capabilities", headers={"X-ProdOps-Protocol": version})
                     self.assertEqual(rejected.status_code, 426)
                     error = ErrorResponse.model_validate(rejected.json())

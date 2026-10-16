@@ -15,13 +15,13 @@
 | GET/POST /api/v1/conversations/{conversation_id}/runs | 分页任务 / 原子提交，提交返回 202 |
 | GET /api/v1/runs/{run_id} | 持久任务快照 |
 
-数据库配置后 deployment_id、workspace_id 持久化；未配置时能力发现返回实例临时 ID。配置且就绪时 authentication 为 development_token，conversations/runs 为 true。execution_enabled 和 event_stream 仍为 false：本切片仅持久排队，执行器及 SSE 在后续任务实现，不把排队解释为排查完成。
+数据库配置后 deployment_id、workspace_id 持久化；未配置时能力发现返回实例临时 ID。配置且就绪时 authentication 为 development_token，conversations/runs 为 true。execution_enabled 随显式开发执行开关与调度器健康状态变化，event_stream 仍为 false。执行器从数据库领取并保存进度，SSE 在后续任务实现。
 
 会话、消息、任务和新分页响应来自正式 DTO。ReservedContracts 继续注册未来事件、工具和提案模型，不增加虚假的路由。
 
 ## 版本、输入与错误
 
-- API 主版本仍为 /api/v1；业务协议为精确 1.1，事件 schema 独立保持 1.0。能力发现可省略 X-ProdOps-Protocol，提供时须精确匹配；业务请求必须提供 1.1，旧版 1.0 返回 426。
+- API 主版本仍为 /api/v1；业务协议为精确 1.2，事件 schema 独立保持 1.0。能力发现可省略 X-ProdOps-Protocol，提供时须精确匹配；业务请求必须提供 1.2，旧版 1.0/1.1 返回 426。
 - 业务请求要求单个 Authorization: Bearer 开发令牌，使用恒定时间比较。没有或无效令牌返回 401，重复认证头拒绝；任何 Origin 业务请求返回 403，不授予 CORS。仅使用项目启动入口的 127.0.0.1 绑定，Host 也受限。该单身份机制不代表 M4 多用户登录和角色权限完成。
 - 创建会话 title 1 至 512 字符；提交任务 content 去除首尾空白后 1 至 32000 字符，必须显式 execution_mode: mock；其他执行模式和额外字段拒绝。业务写请求体最多 256 KiB，含分块输入，超出返回 413。
 - 提交必须提供 UUID Idempotency-Key。在当前数据库部署、工作区、开发身份、会话和操作范围内绑定规范化请求摘要。同键同请求返回原始 202 快照及 Idempotency-Replayed: true；同键异请求返回 409 idempotency_conflict；不同键遇到会话已有活跃任务返回 409 conflict。
@@ -30,7 +30,7 @@
 - 错误为 {error: {code, message, retryable}, request_id}，设置 no-store 和 X-Request-ID；固定消息不回显输入、SQL、路径或令牌。未知路径和 Host 错误仍使用框架响应。
 - DTO 拒绝额外字段，标识为 UUID，时间必须是 UTC。事件 seq 为严格整数 1 至 2^53−1；快照水位允许 0，拒绝布尔、字符串及浮点，保持 TS 精度。
 
-本轮协议 1.1 是业务入口和能力扩展的技术版本；桌面状态读取同步升级，事件夹具继续使用 1.0。实际 API 证据见 [验证记录](../docs/verification/2026-10-16-m2-t02-api.md)。
+协议 1.2 扩展 execution_enabled 能力，旧1.1不支持执行能力值时明确拒绝；桌面状态读取同步升级，事件夹具继续使用1.0。实际 API 见[提交验证](../docs/verification/2026-10-16-m2-t02-api.md)，执行见[模拟排查验证](../docs/verification/2026-10-17-m2-t03-execution.md)。
 
 ## 事件与快照
 
