@@ -3,14 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": ["apps/desktop"],
   "engines": { "node": ">=22.18 <25" },
   "scripts": {
     "check:tooling-types": "tsc --noEmit -p tooling/tsconfig.json",
-    "contracts:types": "node node_modules/openapi-typescript/bin/cli.js contracts/openapi.json --output packages/api-client/src/schema.d.ts"
+    "contracts:types": "node node_modules/openapi-typescript/bin/cli.js contracts/openapi.json --output packages/api-client/src/schema.d.ts",
+    "desktop:build": "tsc -p apps/desktop/tsconfig.electron.json && vite build --config apps/desktop/vite.config.mjs",
+    "desktop:dev": "node apps/desktop/scripts/dev.mjs",
+    "desktop:start": "electron apps/desktop",
+    "desktop:smoke": "node apps/desktop/scripts/smoke.mjs"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "electron": "44.8.0",
     "openapi-typescript": "7.10.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vite": "8.3.4"
   }
 }

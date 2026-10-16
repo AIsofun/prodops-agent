@@ -13,6 +13,8 @@ npm ci --ignore-scripts --no-audit --no-fund
 
 Python 工具放在项目 `.venv`，Node 工具放在 `node_modules`，不需要全局安装 mypy 或 TypeScript。uv 缓存也保存在被忽略的项目目录，避免检查受全局缓存权限影响。`uv.lock` 与 `package-lock.json` 固定依赖。Python 使用 uv workspace：服务有自己的依赖清单，根开发组以可编辑方式安装服务及测试依赖，不安装旧 demo 的依赖。说明见 [服务运行方式](../services/agent/README.md)。
 
+桌面开发依赖通过 npm workspace 安装。因安装时禁用了脚本，需要额外运行 `node node_modules/electron/install.js` 下载锁定 Electron 运行时，再执行 `npm run desktop:dev`。实际窗口与安全探针命令见 [桌面说明](../apps/desktop/README.md)；CI 静态检查不需要该运行时下载。
+
 ## 2 四种检查范围
 
 ```text

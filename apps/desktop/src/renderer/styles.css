@@ -1,0 +1,42 @@
+:root { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; color: #22343d; background: #f5f7f9; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, textarea { font: inherit; }
+button { border: 0; border-radius: 8px; padding: 10px 16px; }
+button:disabled { cursor: not-allowed; color: #839198; background: #edf1f3; }
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar { width: 238px; flex-shrink: 0; background: #fff; border-right: 1px solid #e2e8eb; padding: 30px 22px 20px; display: flex; flex-direction: column; }
+.brand { display: flex; align-items: center; gap: 11px; font-size: 23px; letter-spacing: -.5px; }
+.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; background: #176e61; color: white; border-radius: 10px; font-size: 22px; }
+.workspace { margin-top: 42px; padding: 16px 12px; background: #f4f7f8; border-radius: 8px; }
+.workspace strong { display: block; font-size: 13px; margin-top: 8px; }
+.eyebrow, .section-label { color: #7a8c93; font-size: 11px; letter-spacing: 1px; }
+.new-chat { margin: 20px 0 32px; text-align: left; }
+.section-label { margin-left: 8px; }
+.empty-history { font-size: 13px; line-height: 2; color: #73858e; padding: 22px 8px; }
+.empty-history span { font-size: 11px; color: #98a5ab; }
+.sidebar-footer { margin-top: auto; display: flex; align-items: center; gap: 7px; font-size: 11px; color: #7b8b92; }
+.sidebar-footer span:last-child { margin-left: auto; }
+.status-dot { width: 6px; height: 6px; background: #94a8ad; border-radius: 50%; }
+main { flex: 1; min-width: 0; }
+.topbar { height: 74px; border-bottom: 1px solid #e2e8eb; display: flex; align-items: center; justify-content: space-between; padding: 0 38px; font-size: 14px; background: #ffffffaa; }
+.preview-badge { font-size: 11px; padding: 5px 10px; background: #edf3f1; color: #357667; border: 1px solid #dce9e4; border-radius: 20px; }
+.content { max-width: 910px; margin: 0 auto; padding: 55px 46px 30px; }
+.intro h1 { font-size: 30px; font-weight: 600; letter-spacing: -.8px; margin: 15px 0 12px; }
+.intro p, .connection-card p { color: #7a8a92; font-size: 13px; line-height: 1.8; margin: 0; }
+.connection-card { margin-top: 32px; background: white; border: 1px solid #dce5e8; border-radius: 12px; padding: 22px; display: flex; align-items: center; gap: 17px; }
+.connection-icon { font-size: 32px; color: #5e857d; }
+.connection-card h2 { font-size: 15px; margin: 0 0 7px; font-weight: 600; }
+.connection-card p { font-size: 12px; }
+.connection-card button { margin-left: auto; white-space: nowrap; font-size: 12px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 33px 0; }
+.steps article { padding: 2px; }
+.steps span { font-size: 11px; color: #8eaaa2; }
+.steps h3 { font-size: 14px; font-weight: 600; margin: 12px 0 8px; }
+.steps p { font-size: 12px; color: #849299; line-height: 1.9; margin: 0; }
+.composer { background: #fff; border: 1px solid #dce5e8; border-radius: 12px; padding: 17px; }
+textarea { width: 100%; height: 70px; resize: none; border: none; background: transparent; padding: 3px; color: #718087; font-size: 13px; }
+textarea::placeholder { color: #9aa6ac; }
+.composer > div { display: flex; justify-content: space-between; align-items: center; color: #9aa6ac; font-size: 11px; }
+.composer button { font-size: 18px; padding: 5px 13px; }
+.scope-note { text-align: center; font-size: 11px; color: #98a5ab; margin-top: 18px; }

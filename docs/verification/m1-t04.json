@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "task_id": "M1-T04",
+  "environment": {
+    "os": "Windows 11 10.0.26200",
+    "arch": "AMD64",
+    "node": "24.14.1",
+    "electron": "44.8.0",
+    "react": "19.3.1",
+    "vite": "8.3.4",
+    "typescript": "5.9.3"
+  },
+  "source": {
+    "revision": "d90c0a4",
+    "worktree": "uncommitted desktop skeleton and delivery records",
+    "scope": "Windows development window only"
+  },
+  "criteria": [
+    {
+      "id": "M1-T04-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t04-desktop.md"
+    },
+    {
+      "id": "M1-T04-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t04-desktop.md"
+    },
+    {
+      "id": "M1-T04-AC03",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m1-t04-desktop.md"
+    }
+  ]
+}

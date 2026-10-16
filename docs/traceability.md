@@ -12,7 +12,7 @@
 
 | 编号 | 阶段 | 状态 | 设计章节 | 实现 | 验证证据 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
-| REQ-001 | M3 | 未开始 | 5 17 | - | - | 干净 Windows 安装验证 |
+| REQ-001 | M3 | 进行中 | 5 17 | [桌面开发入口](../apps/desktop/src/main/index.ts) | [开发窗口验证](verification/2026-10-16-m1-t04-desktop.md) | T04 开发窗口已验证；干净 Windows 安装、双击与随包运行时仍在 M3 |
 | REQ-002 | M3 | 进行中 | 6.1 | [服务装配](../services/agent/src/prodops/bootstrap/app.py) | [骨架验证](verification/2026-10-16-m1-t02-service.md) | M1 开发入口已验证；桌面启动管道、令牌和进程生命周期仍在 M3 |
 | REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [骨架验证](verification/2026-10-16-m1-t02-service.md) | 共用业务包的 server 回环开发入口；正式认证、数据库和内网运行仍在 M4 |
 | REQ-004 | M3 | 未开始 | 8 16 | - | - | 会话与上下文 |

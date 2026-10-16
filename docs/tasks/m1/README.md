@@ -7,7 +7,7 @@
 | [M1-T01 工程质量基础](01-quality.md) | 无 | 已验证：统一检查入口、规则检查器、回归场景和交付格式 |
 | [M1-T02 Python 服务骨架](02-service.md) | T01 | 已验证：可启动的业务包、装配入口和健康检查 |
 | [M1-T03 API 与事件契约](03-contracts.md) | T02 | 已验证：实际 API 与正式事件模型导出、生成类型与漂移检查 |
-| [M1-T04 桌面开发骨架](04-desktop.md) | T01 | 可运行的 Electron、React 开发窗口 |
+| [M1-T04 桌面开发骨架](04-desktop.md) | T01 | 已验证：实际 Windows Electron/React 窗口、隔离与生命周期 |
 | [M1-T05 受限桥接与连接](05-bridge.md) | T03 T04 | 经受限 IPC 查询服务健康状态 |
 | [M1-T06 产品检查接入](06-gates.md) | T03 T05 | M1 产品静态检查实际通过 |
 | [M1-T07 CI 接入](07-ci.md) | T06 | 同一检查入口在 CI 执行并有真实运行记录 |
@@ -15,4 +15,4 @@
 
 按依赖顺序推进，可独立的任务不代表必须启用多个 Agent。每张卡列出可逐项验证的 AC 编号，完成后填写 [复核模板](../../templates/code-review.md) 和 [验证模板](../../templates/verification.md)。机读回执格式见 [交付格式说明](../../quality-workflow.md)。
 
-T01 工程质量基础、T02 Python 服务骨架和 T03 API 与事件契约均已验证。[契约证据](../../verification/2026-10-16-m1-t03-contracts.md) 与 [自查记录](../../reviews/2026-10-16-m1-t03-contracts.md) 已保存。下一任务为 T04 桌面开发骨架；IPC、产品检查接入和 CI 继续按依赖推进。当前服务与契约切片可以用 `python scripts/check.py --profile service` 验证；默认 M1 的契约检查通过，桌面产品缺失仍返回未就绪。
+T01 至 T04 已验证；[桌面运行证据](../../verification/2026-10-16-m1-t04-desktop.md) 与 [自查](../../reviews/2026-10-16-m1-t04-desktop.md) 已保存。默认 M1 静态检查已可通过；下一任务为 T05 受限桥接与开发连接，T06 继续验证实际产品检查的故障阻断，CI 与集成验收在后续任务。
