@@ -15,17 +15,17 @@
 | REQ-001 | M3 | 进行中 | 5 17 | [桌面开发入口](../apps/desktop/src/main/index.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 开发窗口与冻结安装链路已验证；干净 Windows 安装、双击与随包运行时仍在 M3 |
 | REQ-002 | M3 | 进行中 | 6.1 | [服务装配](../services/agent/src/prodops/bootstrap/app.py)、[开发连接](../apps/desktop/src/main/connection.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 手工启动服务后的桌面读取已验证；自动启动管道、令牌和进程生命周期仍在 M3 |
 | REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 共用业务包的 server 回环开发连接已验证；正式认证、数据库和内网运行仍在 M4 |
-| REQ-004 | M3 | 未开始 | 8 16 | - | - | 会话与上下文 |
-| REQ-005 | M2 | 进行中 | 8 11 | [任务与事件 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | M1-T03 契约已验证；创建、执行、持久化与进度推送仍在 M2 |
+| REQ-004 | M3 | 进行中 | 8 16 | [会话用例](../services/agent/src/prodops/application/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话创建/分页及忙碌冲突已验证；历史上下文执行和桌面多轮交流仍待后续 |
+| REQ-005 | M2 | 进行中 | 8 11 | [任务提交](../services/agent/src/prodops/adapters/storage/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 原子202、任务ID和queued快照已验证；执行、持续进度在后续切片 |
 | REQ-006 | M2 | 未开始 | 8 9 13 | - | - | 证据和解决状态 |
-| REQ-007 | M2 | 进行中 | 13 | [SQLite 存储](../services/agent/src/prodops/adapters/storage/sqlite.py)、[版本迁移](../services/agent/src/prodops/adapters/storage/migrations/versions/0001_storage.py) | [存储基础验证](verification/2026-10-16-m2-t01-storage.md) | 稳定身份、记录往返和数据库约束已验证；历史 API 与任务执行待后续切片 |
+| REQ-007 | M2 | 进行中 | 13 | [业务历史API](../services/agent/src/prodops/api/business.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话/消息/任务分页及服务重开保持记录已验证；完整结果和桌面历史仍待后续 |
 | REQ-008 | M2 | 进行中 | 11 | [快照与重放 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | 事件序列、水位与游标模型已验证；SSE、持久化补发与去重仍在 M2 |
 | REQ-009 | M2 | 未开始 | 9 | - | - | 协作取消 |
 | REQ-010 | M2 | 未开始 | 9 | - | - | 中断核对 |
 | REQ-011 | M4 | 未开始 | 7 8 | - | - | mock 与真实模型分别验收 |
 | REQ-012 | M5 | 未开始 | 7 14 | - | - | 现场连接器未确定 |
 | REQ-013 | M4 | 进行中 | 6.3 13 | [固定开发连接](../apps/desktop/src/main/connection.ts)、[受限 IPC](../apps/desktop/src/main/ipc.ts) | [开发连接验证](verification/2026-10-16-m1-t05-bridge.md) | T05 固定回环连接和状态读取已验证；持久配置、切换及跨连接缓存隔离仍在 M4 |
-| REQ-014 | M4 | 未开始 | 6.2 12 14 | - | - | 身份与资源权限 |
+| REQ-014 | M4 | 进行中 | 6.2 12 14 | [开发访问控制](../services/agent/src/prodops/application/access.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 回环单身份令牌及默认工作区隔离已验证；正式多用户、登录/过期/角色与设备权限仍在M4 |
 | REQ-015 | M4 | 未开始 | 12 13 | - | - | P1 附件，上限待定 |
 | REQ-016 | M5 | 未开始 | 14 | - | - | P1，开放写操作前必需 |
 | REQ-017 | M5 | 未开始 | 9 14 | - | - | P1，验证与冲突控制 |
@@ -36,7 +36,7 @@
 | NFR-001 | M4 | 未开始 | 6 18 | - | - | 双模式场景集 |
 | NFR-002 | M4 | 进行中 | 5 14 15 | [受限桥接](../apps/desktop/src/preload/index.ts)、[请求边界](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md) | 无凭据开发状态读取边界已验证；生产密钥、授权资源与导出脱敏仍在后续阶段 |
 | NFR-003 | M2 | 未开始 | 11 15 | - | - | 关联日志与错误分类 |
-| NFR-004 | M4 | 进行中 | 9 12 13 | [事务存储基础](../services/agent/src/prodops/adapters/storage/sqlite.py) | [SQLite 基础验证](verification/2026-10-16-m2-t01-storage.md) | SQLite 回滚、并发会话、外键与事件序号已验证；任务幂等/活跃槽及 PostgreSQL 仍待后续 |
+| NFR-004 | M4 | 进行中 | 9 12 13 | [事务任务存储](../services/agent/src/prodops/adapters/storage/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | SQLite原子回滚、幂等与会话并发活跃槽已验证；执行状态转换和PostgreSQL仍待后续 |
 | NFR-005 | M6 | 待定 | 10 18 | - | - | 参考环境与数值门槛待测量 |
 | NFR-006 | M0 | 已验证 | 18 | [追踪表](traceability.md)、[阶段交付校验](../scripts/check_delivery.py) | [跨阶段追踪验证](verification/2026-10-16-m2-t01-storage.md) | 当前需求/阶段/实现/AC证据映射与跨阶段依赖验证通过；后续变更持续维护 |
 

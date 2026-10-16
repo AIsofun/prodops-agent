@@ -10,9 +10,9 @@ const { validateHealth, validateCapabilities } = require("../../../packages/api-
 
 const id = "44444444-4444-4444-8444-444444444444";
 const healthy = { status: "ready", mode: "local", scope: "service_skeleton" };
-const capable = { protocol_version: "1.0", event_schema_version: "1.0", deployment_id: id,
+const capable = { protocol_version: "1.1", event_schema_version: "1.0", deployment_id: id,
   mode: "local", scope: "service_skeleton", authentication: "unavailable", conversations: false, runs: false, event_stream: false };
-const ready = { connection_id: "development", mode: "local", state: "ready", deployment_id: id, protocol_version: "1.0" };
+const ready = { connection_id: "development", mode: "local", state: "ready", deployment_id: id, protocol_version: "1.1" };
 
 async function withServer(handler, action) {
   const server = http.createServer(handler);
@@ -37,7 +37,7 @@ test("read-only requests use fixed paths and version header then return validate
   const paths = [];
   await withServer((request, response) => {
     assert.equal(request.method, "GET");
-    assert.equal(request.headers["x-prodops-protocol"], "1.0");
+    assert.equal(request.headers["x-prodops-protocol"], "1.1");
     paths.push(request.url);
     json(response, 200, request.url === "/health/ready" ? healthy : capable);
   }, async (connection) => assert.deepEqual(await getConnectionStatus(connection), ready));
@@ -61,7 +61,7 @@ test("incompatible HTTP status and explicit unsupported protocol are distinguish
 
 test("invalid service DTOs, wrong modes and secret extra fields cannot cross the boundary", async () => {
   for (const body of [{ ...capable, deployment_id: "invalid" }, { ...capable, mode: "server" },
-    { ...capable, secret: "credential-value" }, { ...capable, runs: true }, {}]) {
+    { ...capable, secret: "credential-value" }, { ...capable, runs: "true" }, {}]) {
     await withServer((request, response) => json(response, 200, request.url === "/health/ready" ? healthy : body),
       async (connection) => {
         const status = await getConnectionStatus(connection);

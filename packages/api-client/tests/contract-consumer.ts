@@ -19,9 +19,19 @@ export function completedResolution(event: Event): string | null {
   return null;
 }
 
-export function checkProtocol(capabilities: Capabilities): "1.0" {
+export function checkProtocol(capabilities: Capabilities): "1.1" {
   return capabilities.protocol_version;
 }
+
+type Submit = operations["submit_api_v1_conversations__conversation_id__runs_post"];
+export const mockSubmission: Submit["requestBody"]["content"]["application/json"] = {
+  content: "Inspect camera", execution_mode: "mock",
+};
+export function submittedRun(response: Submit["responses"][202]["content"]["application/json"]): string {
+  return response.run_id;
+}
+// @ts-expect-error Execution mode must be explicitly selected.
+export const missingMode: Submit["requestBody"]["content"]["application/json"] = { content: "Inspect" };
 
 // @ts-expect-error Sequence numbers must be numeric.
 export const invalidSequence: Event["seq"] = "1";

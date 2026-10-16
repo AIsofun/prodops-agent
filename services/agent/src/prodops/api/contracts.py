@@ -1,5 +1,6 @@
 """Actual read-only capabilities endpoint and a single-source schema registry."""
 
+from collections.abc import Callable
 from typing import Annotated, Any
 from uuid import UUID
 
@@ -13,7 +14,8 @@ from prodops.api.models import (
 from prodops.domain.deployment import DeploymentMode
 
 
-def capabilities_router(mode: DeploymentMode, deployment_id: UUID) -> APIRouter:
+def capabilities_router(mode: DeploymentMode, deployment_id: Callable[[], UUID],
+                        business_ready: Callable[[], bool]) -> APIRouter:
     router = APIRouter(prefix="/api/v1", tags=["capabilities"])
 
     @router.get("/capabilities", response_model=CapabilitiesResponse,
@@ -21,13 +23,17 @@ def capabilities_router(mode: DeploymentMode, deployment_id: UUID) -> APIRouter:
     async def capabilities(
         response: Response,
         protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol",
-            description="Omit for discovery; when supplied it must exactly match 1.0.")] = None,
+            description="Omit for discovery; when supplied it must exactly match 1.1.")] = None,
     ) -> CapabilitiesResponse:
         if protocol is not None and protocol != PROTOCOL_VERSION:
             raise ProtocolError()
         response.headers["Cache-Control"] = "no-store"
-        return CapabilitiesResponse(protocol_version="1.0", event_schema_version="1.0",
-                                    deployment_id=deployment_id, mode=mode)
+        enabled = business_ready()
+        return CapabilitiesResponse(protocol_version="1.1", event_schema_version="1.0",
+                                    deployment_id=deployment_id(), mode=mode,
+                                    scope="development" if enabled else "service_skeleton",
+                                    authentication="development_token" if enabled else "unavailable",
+                                    conversations=enabled, runs=enabled)
 
     return router
 

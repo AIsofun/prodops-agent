@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T02",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-16-m2-t02-api.md",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Separated API protocol 1.1 from persisted event schema 1.0 and updated desktop compatibility."
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Sanitized storage failures and verified whole-submission rollback with an event insertion fault."
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Bound aggregate request bytes before JSON parsing, including streamed bodies."
+    }
+  ]
+}

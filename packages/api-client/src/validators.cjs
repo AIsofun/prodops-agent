@@ -1,7 +1,7 @@
 // Generated from contracts/openapi.json. Do not edit.
 "use strict";
 exports.validateHealth = validate21;
-const schema32 = {"additionalProperties":false,"properties":{"mode":{"$ref":"#/$defs/DeploymentMode"},"scope":{"const":"service_skeleton","default":"service_skeleton","title":"Scope","type":"string"},"status":{"enum":["alive","ready","not_ready"],"title":"Status","type":"string"}},"required":["status","mode"],"title":"HealthResponse","type":"object"};
+const schema32 = {"additionalProperties":false,"properties":{"mode":{"$ref":"#/$defs/DeploymentMode"},"scope":{"default":"service_skeleton","enum":["service_skeleton","development"],"title":"Scope","type":"string"},"status":{"enum":["alive","ready","not_ready"],"title":"Status","type":"string"}},"required":["status","mode"],"title":"HealthResponse","type":"object"};
 const schema33 = {"enum":["local","server"],"title":"DeploymentMode","type":"string"};
 
 function validate21(data, {instancePath="", parentData, parentDataProperty, rootData=data, dynamicAnchors={}}={}){
@@ -55,8 +55,8 @@ if(typeof data1 !== "string"){
 validate21.errors = [{instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/type",keyword:"type",params:{type: "string"},message:"must be string"}];
 return false;
 }
-if("service_skeleton" !== data1){
-validate21.errors = [{instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/const",keyword:"const",params:{allowedValue: "service_skeleton"},message:"must be equal to constant"}];
+if(!((data1 === "service_skeleton") || (data1 === "development"))){
+validate21.errors = [{instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/enum",keyword:"enum",params:{allowedValues: schema32.properties.scope.enum},message:"must be equal to one of the allowed values"}];
 return false;
 }
 var valid0 = _errs5 === errors;
@@ -97,7 +97,7 @@ return errors === 0;
 validate21.evaluated = {"props":true,"dynamicProps":false,"dynamicItems":false};
 
 exports.validateCapabilities = validate22;
-const schema34 = {"additionalProperties":false,"properties":{"authentication":{"const":"unavailable","default":"unavailable","title":"Authentication","type":"string"},"conversations":{"const":false,"default":false,"title":"Conversations","type":"boolean"},"deployment_id":{"description":"Ephemeral service instance ID in M1; durable deployment identity in M2/M4.","format":"uuid","title":"Deployment Id","type":"string"},"event_schema_version":{"const":"1.0","title":"Event Schema Version","type":"string"},"event_stream":{"const":false,"default":false,"title":"Event Stream","type":"boolean"},"mode":{"$ref":"#/$defs/DeploymentMode"},"protocol_version":{"const":"1.0","title":"Protocol Version","type":"string"},"runs":{"const":false,"default":false,"title":"Runs","type":"boolean"},"scope":{"const":"service_skeleton","default":"service_skeleton","title":"Scope","type":"string"}},"required":["protocol_version","event_schema_version","deployment_id","mode"],"title":"CapabilitiesResponse","type":"object"};
+const schema34 = {"additionalProperties":false,"properties":{"authentication":{"default":"unavailable","enum":["unavailable","development_token"],"title":"Authentication","type":"string"},"conversations":{"default":false,"title":"Conversations","type":"boolean"},"deployment_id":{"description":"Durable identity when storage is configured; otherwise ephemeral instance ID.","format":"uuid","title":"Deployment Id","type":"string"},"event_schema_version":{"const":"1.0","title":"Event Schema Version","type":"string"},"event_stream":{"const":false,"default":false,"title":"Event Stream","type":"boolean"},"execution_enabled":{"const":false,"default":false,"title":"Execution Enabled","type":"boolean"},"mode":{"$ref":"#/$defs/DeploymentMode"},"protocol_version":{"const":"1.1","title":"Protocol Version","type":"string"},"runs":{"default":false,"title":"Runs","type":"boolean"},"scope":{"default":"service_skeleton","enum":["service_skeleton","development"],"title":"Scope","type":"string"}},"required":["protocol_version","event_schema_version","deployment_id","mode"],"title":"CapabilitiesResponse","type":"object"};
 const func1 = Object.prototype.hasOwnProperty;
 const formats0 = /^(?:urn:uuid:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 
@@ -135,8 +135,8 @@ if(typeof data0 !== "string"){
 validate22.errors = [{instancePath:instancePath+"/authentication",schemaPath:"#/properties/authentication/type",keyword:"type",params:{type: "string"},message:"must be string"}];
 return false;
 }
-if("unavailable" !== data0){
-validate22.errors = [{instancePath:instancePath+"/authentication",schemaPath:"#/properties/authentication/const",keyword:"const",params:{allowedValue: "unavailable"},message:"must be equal to constant"}];
+if(!((data0 === "unavailable") || (data0 === "development_token"))){
+validate22.errors = [{instancePath:instancePath+"/authentication",schemaPath:"#/properties/authentication/enum",keyword:"enum",params:{allowedValues: schema34.properties.authentication.enum},message:"must be equal to one of the allowed values"}];
 return false;
 }
 var valid0 = _errs2 === errors;
@@ -146,14 +146,9 @@ var valid0 = true;
 }
 if(valid0){
 if(data.conversations !== undefined){
-let data1 = data.conversations;
 const _errs4 = errors;
-if(typeof data1 !== "boolean"){
+if(typeof data.conversations !== "boolean"){
 validate22.errors = [{instancePath:instancePath+"/conversations",schemaPath:"#/properties/conversations/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"}];
-return false;
-}
-if(false !== data1){
-validate22.errors = [{instancePath:instancePath+"/conversations",schemaPath:"#/properties/conversations/const",keyword:"const",params:{allowedValue: false},message:"must be equal to constant"}];
 return false;
 }
 var valid0 = _errs4 === errors;
@@ -219,15 +214,15 @@ else {
 var valid0 = true;
 }
 if(valid0){
-if(data.mode !== undefined){
-let data5 = data.mode;
+if(data.execution_enabled !== undefined){
+let data5 = data.execution_enabled;
 const _errs12 = errors;
-if(typeof data5 !== "string"){
-validate22.errors = [{instancePath:instancePath+"/mode",schemaPath:"#/$defs/DeploymentMode/type",keyword:"type",params:{type: "string"},message:"must be string"}];
+if(typeof data5 !== "boolean"){
+validate22.errors = [{instancePath:instancePath+"/execution_enabled",schemaPath:"#/properties/execution_enabled/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"}];
 return false;
 }
-if(!((data5 === "local") || (data5 === "server"))){
-validate22.errors = [{instancePath:instancePath+"/mode",schemaPath:"#/$defs/DeploymentMode/enum",keyword:"enum",params:{allowedValues: schema33.enum},message:"must be equal to one of the allowed values"}];
+if(false !== data5){
+validate22.errors = [{instancePath:instancePath+"/execution_enabled",schemaPath:"#/properties/execution_enabled/const",keyword:"const",params:{allowedValue: false},message:"must be equal to constant"}];
 return false;
 }
 var valid0 = _errs12 === errors;
@@ -236,32 +231,32 @@ else {
 var valid0 = true;
 }
 if(valid0){
-if(data.protocol_version !== undefined){
-let data6 = data.protocol_version;
-const _errs15 = errors;
+if(data.mode !== undefined){
+let data6 = data.mode;
+const _errs14 = errors;
 if(typeof data6 !== "string"){
-validate22.errors = [{instancePath:instancePath+"/protocol_version",schemaPath:"#/properties/protocol_version/type",keyword:"type",params:{type: "string"},message:"must be string"}];
+validate22.errors = [{instancePath:instancePath+"/mode",schemaPath:"#/$defs/DeploymentMode/type",keyword:"type",params:{type: "string"},message:"must be string"}];
 return false;
 }
-if("1.0" !== data6){
-validate22.errors = [{instancePath:instancePath+"/protocol_version",schemaPath:"#/properties/protocol_version/const",keyword:"const",params:{allowedValue: "1.0"},message:"must be equal to constant"}];
+if(!((data6 === "local") || (data6 === "server"))){
+validate22.errors = [{instancePath:instancePath+"/mode",schemaPath:"#/$defs/DeploymentMode/enum",keyword:"enum",params:{allowedValues: schema33.enum},message:"must be equal to one of the allowed values"}];
 return false;
 }
-var valid0 = _errs15 === errors;
+var valid0 = _errs14 === errors;
 }
 else {
 var valid0 = true;
 }
 if(valid0){
-if(data.runs !== undefined){
-let data7 = data.runs;
+if(data.protocol_version !== undefined){
+let data7 = data.protocol_version;
 const _errs17 = errors;
-if(typeof data7 !== "boolean"){
-validate22.errors = [{instancePath:instancePath+"/runs",schemaPath:"#/properties/runs/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"}];
+if(typeof data7 !== "string"){
+validate22.errors = [{instancePath:instancePath+"/protocol_version",schemaPath:"#/properties/protocol_version/type",keyword:"type",params:{type: "string"},message:"must be string"}];
 return false;
 }
-if(false !== data7){
-validate22.errors = [{instancePath:instancePath+"/runs",schemaPath:"#/properties/runs/const",keyword:"const",params:{allowedValue: false},message:"must be equal to constant"}];
+if("1.1" !== data7){
+validate22.errors = [{instancePath:instancePath+"/protocol_version",schemaPath:"#/properties/protocol_version/const",keyword:"const",params:{allowedValue: "1.1"},message:"must be equal to constant"}];
 return false;
 }
 var valid0 = _errs17 === errors;
@@ -270,21 +265,34 @@ else {
 var valid0 = true;
 }
 if(valid0){
-if(data.scope !== undefined){
-let data8 = data.scope;
+if(data.runs !== undefined){
 const _errs19 = errors;
-if(typeof data8 !== "string"){
-validate22.errors = [{instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/type",keyword:"type",params:{type: "string"},message:"must be string"}];
-return false;
-}
-if("service_skeleton" !== data8){
-validate22.errors = [{instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/const",keyword:"const",params:{allowedValue: "service_skeleton"},message:"must be equal to constant"}];
+if(typeof data.runs !== "boolean"){
+validate22.errors = [{instancePath:instancePath+"/runs",schemaPath:"#/properties/runs/type",keyword:"type",params:{type: "boolean"},message:"must be boolean"}];
 return false;
 }
 var valid0 = _errs19 === errors;
 }
 else {
 var valid0 = true;
+}
+if(valid0){
+if(data.scope !== undefined){
+let data9 = data.scope;
+const _errs21 = errors;
+if(typeof data9 !== "string"){
+validate22.errors = [{instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/type",keyword:"type",params:{type: "string"},message:"must be string"}];
+return false;
+}
+if(!((data9 === "service_skeleton") || (data9 === "development"))){
+validate22.errors = [{instancePath:instancePath+"/scope",schemaPath:"#/properties/scope/enum",keyword:"enum",params:{allowedValues: schema34.properties.scope.enum},message:"must be equal to one of the allowed values"}];
+return false;
+}
+var valid0 = _errs21 === errors;
+}
+else {
+var valid0 = true;
+}
 }
 }
 }

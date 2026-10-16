@@ -6,11 +6,17 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from prodops.api.models import ErrorCode, ErrorDetail, ErrorResponse
+from prodops.api.models import PROTOCOL_VERSION, ErrorCode, ErrorDetail, ErrorResponse
+from prodops.application.errors import ActiveRunConflict, IdempotencyConflict, InvalidCursor, ResourceNotFound, StorageFailure
 
 
 class ProtocolError(Exception):
     pass
+
+
+class APIError(Exception):
+    def __init__(self, status: int, code: ErrorCode, message: str) -> None:
+        self.status, self.code, self.message = status, code, message
 
 
 def error_response(status_code: int, code: ErrorCode, message: str) -> JSONResponse:
@@ -22,7 +28,34 @@ def error_response(status_code: int, code: ErrorCode, message: str) -> JSONRespo
 def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(ProtocolError)
     async def incompatible_protocol(request: Request, exc: ProtocolError) -> JSONResponse:
-        return error_response(426, "incompatible_protocol", "Client and service protocol versions are incompatible. Use protocol 1.0.")
+        return error_response(426, "incompatible_protocol", f"Client and service protocol versions are incompatible. Use protocol {PROTOCOL_VERSION}.")
+
+    @app.exception_handler(APIError)
+    async def expected_error(request: Request, exc: APIError) -> JSONResponse:
+        response = error_response(exc.status, exc.code, exc.message)
+        if exc.status == 401:
+            response.headers["WWW-Authenticate"] = "Bearer"
+        return response
+
+    @app.exception_handler(ResourceNotFound)
+    async def not_found(request: Request, exc: ResourceNotFound) -> JSONResponse:
+        return error_response(404, "not_found", "Resource not found in this workspace.")
+
+    @app.exception_handler(ActiveRunConflict)
+    async def busy(request: Request, exc: ActiveRunConflict) -> JSONResponse:
+        return error_response(409, "conflict", "Conversation already has an active run.")
+
+    @app.exception_handler(IdempotencyConflict)
+    async def duplicate(request: Request, exc: IdempotencyConflict) -> JSONResponse:
+        return error_response(409, "idempotency_conflict", "Idempotency key was used for a different request.")
+
+    @app.exception_handler(InvalidCursor)
+    async def cursor(request: Request, exc: InvalidCursor) -> JSONResponse:
+        return error_response(422, "invalid_request", "Invalid pagination cursor.")
+
+    @app.exception_handler(StorageFailure)
+    async def storage(request: Request, exc: StorageFailure) -> JSONResponse:
+        return error_response(503, "not_ready", "Storage operation failed. Check service status before retrying.")
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request: Request, exc: RequestValidationError) -> JSONResponse:

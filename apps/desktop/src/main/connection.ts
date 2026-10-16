@@ -21,7 +21,7 @@ class InvalidResponse extends Error {}
 function readJson(connection: DevelopmentConnection, endpoint: "/health/ready" | "/api/v1/capabilities", timeout: number): Promise<{ status: number; body: unknown }> {
   return new Promise((resolve, reject) => {
     const request = http.get({ hostname: "127.0.0.1", port: connection.port, path: endpoint,
-      headers: { "X-ProdOps-Protocol": "1.0", Accept: "application/json" } }, (response) => {
+      headers: { "X-ProdOps-Protocol": "1.1", Accept: "application/json" } }, (response) => {
       if (!(response.headers["content-type"] ?? "").startsWith("application/json")) {
         response.resume(); reject(new InvalidResponse()); return;
       }
@@ -54,8 +54,8 @@ export async function getConnectionStatus(connection: DevelopmentConnection, tim
     const capabilities = await readJson(connection, "/api/v1/capabilities", timeout);
     if (capabilities.status === 426) return status("incompatible");
     if (capabilities.status !== 200) return status("invalid_response");
-    if (typeof capabilities.body === "object" && capabilities.body !== null && "protocol_version" in capabilities.body && capabilities.body.protocol_version !== "1.0") return status("incompatible");
+    if (typeof capabilities.body === "object" && capabilities.body !== null && "protocol_version" in capabilities.body && capabilities.body.protocol_version !== "1.1") return status("incompatible");
     if (!validateCapabilities(capabilities.body) || capabilities.body.mode !== connection.mode) return status("invalid_response");
-    return { ...status("ready"), deployment_id: capabilities.body.deployment_id, protocol_version: "1.0" };
+    return { ...status("ready"), deployment_id: capabilities.body.deployment_id, protocol_version: "1.1" };
   } catch (error) { return status(error instanceof InvalidResponse ? "invalid_response" : "offline"); }
 }

@@ -16,9 +16,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--mode", help="local or server; otherwise requires PRODOPS_MODE")
     parser.add_argument("--host", help="development skeleton permits only 127.0.0.1")
     parser.add_argument("--port", help="0 allocates an available port; overrides PRODOPS_PORT")
+    parser.add_argument("--database", help="absolute SQLite path; requires PRODOPS_DEVELOPMENT_TOKEN")
     args = parser.parse_args(argv)
     try:
-        settings = load_settings(os.environ, mode=args.mode, host=args.host, port=args.port)
+        settings = load_settings(os.environ, mode=args.mode, host=args.host, port=args.port, database=args.database)
     except ConfigurationError as exc:
         print(str(exc), file=sys.stderr)
         return 2

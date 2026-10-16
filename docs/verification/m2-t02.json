@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T02",
+  "environment": {
+    "os": "Windows 11",
+    "arch": "AMD64",
+    "python": "3.13.2",
+    "node": "24.14.1"
+  },
+  "source": {
+    "revision": "f74aa6f",
+    "worktree": "uncommitted protected API, atomic submissions, pagination, configuration and generated contracts",
+    "scope": "loopback development SQLite API; queued submissions only"
+  },
+  "criteria": [
+    {
+      "id": "M2-T02-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m2-t02-api.md"
+    },
+    {
+      "id": "M2-T02-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m2-t02-api.md"
+    },
+    {
+      "id": "M2-T02-AC03",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-16-m2-t02-api.md"
+    }
+  ]
+}

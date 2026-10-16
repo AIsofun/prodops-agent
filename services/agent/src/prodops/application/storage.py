@@ -3,7 +3,9 @@
 from typing import Protocol
 from uuid import UUID
 
-from prodops.domain.records import ConversationRecord, StorageIdentity
+from prodops.domain.records import (
+    ConversationRecord, MessageRecord, RecordPage, RunRecord, RunSubmission, StorageIdentity, WorkspaceRecord,
+)
 
 
 class ConversationStore(Protocol):
@@ -13,3 +15,17 @@ class ConversationStore(Protocol):
     async def create_conversation(self, title: str) -> ConversationRecord: ...
 
     async def get_conversation(self, conversation_id: UUID) -> ConversationRecord | None: ...
+
+
+class TaskStore(ConversationStore, Protocol):
+    async def get_workspace(self) -> WorkspaceRecord: ...
+
+    async def list_conversations(self, limit: int, cursor: str | None) -> RecordPage[ConversationRecord]: ...
+
+    async def list_messages(self, conversation_id: UUID, limit: int, cursor: str | None) -> RecordPage[MessageRecord]: ...
+
+    async def list_runs(self, conversation_id: UUID, limit: int, cursor: str | None) -> RecordPage[RunRecord]: ...
+
+    async def submit_run(self, conversation_id: UUID, content: str, actor_id: str, key: UUID) -> RunSubmission: ...
+
+    async def get_run(self, run_id: UUID) -> RunRecord | None: ...

@@ -4,22 +4,33 @@
 
 ## 当前接口与预留模型
 
-实际应用只导出三个路径：`GET /health/live`、`GET /health/ready` 和 `GET /api/v1/capabilities`。健康响应保持 T02 的格式，503 仍返回 HealthResponse；健康就绪仅指服务骨架。能力查询返回模式、协议 `1.0`、事件版本 `1.0` 及能力标记；会话、任务、事件流均为 false，authentication 为 unavailable。
+实际应用导出健康、能力发现和受保护的开发业务路由。默认工厂不读环境、不打开数据库；未显式配置数据库和开发令牌时，业务路由返回 503。健康仍表示服务骨架生命周期；业务能力以 capabilities 为准。
 
-M1 尚无部署数据库，能力中的 deployment_id 由每次应用工厂创建，实例存活期间保持不变，重启会变化，不能用作持久部署缓存键。这是当前切片的临时身份；M2/M4 实现数据库与连接隔离时改为持久部署标识，并验证迁移和缓存行为。
+| 方法与路径 | 行为 |
+| --- | --- |
+| GET /api/v1/capabilities | 无令牌发现协议、部署身份和实际能力 |
+| GET /api/v1/workspaces | 当前开发身份唯一默认工作区 |
+| GET/POST /api/v1/workspaces/{workspace_id}/conversations | 分页列表 / 创建会话，创建返回 201 |
+| GET /api/v1/conversations/{conversation_id}/messages | 分页消息 |
+| GET/POST /api/v1/conversations/{conversation_id}/runs | 分页任务 / 原子提交，提交返回 202 |
+| GET /api/v1/runs/{run_id} | 持久任务快照 |
 
-会话、消息、分页、任务提交、任务快照、重放游标、证据、工具结果、提案和事件由 ReservedContracts 注册进 `components.schemas`。`x-prodops-reserved-models` 指向注册表；它不是 HTTP 响应，也不增加虚假的业务路径。业务端点在 M2 及后续阶段实现后才进入 `paths`。当前 RunCreateRequest 只预留 content；附件、设备范围、权限和连接器专用参数随相应切片扩充校验，不接受客户端任意执行命令。
+数据库配置后 deployment_id、workspace_id 持久化；未配置时能力发现返回实例临时 ID。配置且就绪时 authentication 为 development_token，conversations/runs 为 true。execution_enabled 和 event_stream 仍为 false：本切片仅持久排队，执行器及 SSE 在后续任务实现，不把排队解释为排查完成。
+
+会话、消息、任务和新分页响应来自正式 DTO。ReservedContracts 继续注册未来事件、工具和提案模型，不增加虚假的路由。
 
 ## 版本、输入与错误
 
-- API 主版本用 `/api/v1`；协议与事件 schema 当前仅支持精确的 `1.0`。版本是本阶段设计初值，不是额外用户需求。
-- 能力发现可省略 `X-ProdOps-Protocol`；如果提供，必须精确为 `1.0`。其他值（包括空值）返回 426 incompatible_protocol，拒绝静默降级。后续业务路由必须在执行用例前实施同样的兼容校验；当前没有可提交任务的路由。
-- 错误格式为 `{error: {code, message, retryable}, request_id}`。协议错误及请求校验错误分别为 426、422，并设置 no-store 和 X-Request-ID。错误不回显原始值、字段路径、请求体或异常详情。未知路径和 Host 中间件错误仍使用框架原有响应，不宣称所有 HTTP 错误均已统一。
-- DTO 拒绝额外字段，标识使用 UUID，时间必须带 UTC 时区。事件 seq 为严格整数，范围 1 至 2^53−1；快照水位和重放游标允许 0，拒绝布尔值、字符串和浮点数，避免 TS 数值精度丢失。
-- 初始输入限制为 content 1 至 32000 字符，短文本最多 512 字符，分页 limit 1 至 100、默认 50，游标最多 512 字符。这些是可调整的接口设计初值，HTTP 总体大小限制仍需业务服务实现。
-- 分页 cursor 为不透明字符串，响应 next_cursor 为 null 表示结束。未来 Idempotency-Key 使用 UUID，在部署、工作区、身份、资源和操作范围内绑定请求摘要；相同键不同请求返回 409 idempotency_conflict。当前仅有模型，尚无数据库去重实现。
+- API 主版本仍为 /api/v1；业务协议为精确 1.1，事件 schema 独立保持 1.0。能力发现可省略 X-ProdOps-Protocol，提供时须精确匹配；业务请求必须提供 1.1，旧版 1.0 返回 426。
+- 业务请求要求单个 Authorization: Bearer 开发令牌，使用恒定时间比较。没有或无效令牌返回 401，重复认证头拒绝；任何 Origin 业务请求返回 403，不授予 CORS。仅使用项目启动入口的 127.0.0.1 绑定，Host 也受限。该单身份机制不代表 M4 多用户登录和角色权限完成。
+- 创建会话 title 1 至 512 字符；提交任务 content 去除首尾空白后 1 至 32000 字符，必须显式 execution_mode: mock；其他执行模式和额外字段拒绝。业务写请求体最多 256 KiB，含分块输入，超出返回 413。
+- 提交必须提供 UUID Idempotency-Key。在当前数据库部署、工作区、开发身份、会话和操作范围内绑定规范化请求摘要。同键同请求返回原始 202 快照及 Idempotency-Replayed: true；同键异请求返回 409 idempotency_conflict；不同键遇到会话已有活跃任务返回 409 conflict。
+- 一个 SQLite 写事务原子保存用户消息、queued 任务、seq=1 的 run.created、幂等记录和会话活跃槽。SQL 写入失败返回脱敏 503，并回滚全部变化；客户端不得盲目重试未知结果的写请求，应保留原键核对。
+- 所有查询限定当前默认工作区；不存在或归属其他工作区的资源统一返回 404。分页 limit 为十进制整数 1 至 100，默认 50；cursor 最多 512 字符。按不可变 created_at 与 UUID 降序做 keyset 分页，避免更新会话时间导致翻页重复；游标绑定资源、类别和工作区。游标是有边界的编码数据，无签名且不作为授权凭据；每次仍独立校验资源归属。next_cursor 为 null 表示结束。
+- 错误为 {error: {code, message, retryable}, request_id}，设置 no-store 和 X-Request-ID；固定消息不回显输入、SQL、路径或令牌。未知路径和 Host 错误仍使用框架响应。
+- DTO 拒绝额外字段，标识为 UUID，时间必须是 UTC。事件 seq 为严格整数 1 至 2^53−1；快照水位允许 0，拒绝布尔、字符串及浮点，保持 TS 精度。
 
-错误未提供通用 details 字典，原因是目前没有已定义的公开详情字段，避免未来把原始校验输入或第三方异常直接带给客户端。需要新增详情时定义专用模型并评审。retryable 只是展示信息，不能据此盲目重试未知结果的写请求。
+本轮协议 1.1 是业务入口和能力扩展的技术版本；桌面状态读取同步升级，事件夹具继续使用 1.0。实际 API 证据见 [验证记录](../docs/verification/2026-10-16-m2-t02-api.md)。
 
 ## 事件与快照
 
@@ -44,4 +55,4 @@ python scripts/check.py --profile service
 
 前三条是显式更新命令。导出器调用实际应用工厂与 OpenAPI 路由解析，再把正式预留模型注册进同一 schema，不读旧快照、不启动服务或访问设备、模型和数据库。依赖锁定的 openapi-typescript 7.10.1 生成 TS 类型；T05 增加 Ajv 从同一 OpenAPI 生成健康与能力响应校验器。检查在临时目录重新导出和生成，比较快照、TS 与运行时校验器，不覆盖仓库产物。桌面用生成校验器读取 HTTP，并通过独立 IPC 模型校验请求和返回值，见[桥接证据](../docs/verification/2026-10-16-m1-t05-bridge.md)。
 
-service 范围包含契约边界测试、真实生成产物漂移回归和 TS 消费编译。默认 M1 额外独立执行 product-contracts；缺少桌面产品时整体仍应 NOT_READY。CI 在 T07 接入，当前本地检查不能代表远端通过。
+service 范围包含契约边界测试、真实生成产物漂移回归和 TS 消费编译。默认 M1 额外独立执行 product-contracts；缺少桌面产品时整体仍应 NOT_READY。CI 在 T07 接入，每次任务提交触发真实 CI；本地检查与远端结果分别记录。

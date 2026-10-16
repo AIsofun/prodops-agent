@@ -33,7 +33,7 @@
   {
     "id": "M2-T02",
     "title": "受保护的会话与任务 API",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M2-T01"
     ],
@@ -50,9 +50,19 @@
       "M2-T02-AC02",
       "M2-T02-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "services/agent/src/prodops/api/business.py",
+      "services/agent/src/prodops/api/body_limit.py",
+      "services/agent/src/prodops/application/tasks.py",
+      "services/agent/src/prodops/application/access.py",
+      "services/agent/src/prodops/adapters/storage/tasks.py",
+      "services/agent/src/prodops/adapters/storage/paging.py",
+      "services/agent/src/prodops/bootstrap/config.py",
+      "services/agent/tests/test_task_api.py",
+      "contracts/openapi.json"
+    ],
+    "verification": "docs/verification/m2-t02.json",
+    "review": "docs/reviews/m2-t02.json"
   },
   {
     "id": "M2-T03",

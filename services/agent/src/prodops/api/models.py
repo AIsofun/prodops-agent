@@ -13,8 +13,9 @@ from pydantic import (
 from prodops.domain.deployment import DeploymentMode
 from prodops.domain.runs import ResolutionStatus, RunStatus
 
-PROTOCOL_VERSION = "1.0"
-ProtocolVersion = Literal["1.0"]
+PROTOCOL_VERSION = "1.1"
+ProtocolVersion = Literal["1.1"]
+EventSchemaVersion = Literal["1.0"]
 ShortText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=512)]
 Content = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=32000)]
 Sequence = Annotated[int, Field(strict=True, ge=0, le=9007199254740991)]
@@ -48,19 +49,20 @@ class DTO(BaseModel):
 class HealthResponse(DTO):
     status: Literal["alive", "ready", "not_ready"]
     mode: DeploymentMode
-    scope: Literal["service_skeleton"] = "service_skeleton"
+    scope: Literal["service_skeleton", "development"] = "service_skeleton"
 
 
 class CapabilitiesResponse(DTO):
     protocol_version: ProtocolVersion
-    event_schema_version: ProtocolVersion
-    deployment_id: UUID = Field(description="Ephemeral service instance ID in M1; durable deployment identity in M2/M4.")
+    event_schema_version: EventSchemaVersion
+    deployment_id: UUID = Field(description="Durable identity when storage is configured; otherwise ephemeral instance ID.")
     mode: DeploymentMode
-    scope: Literal["service_skeleton"] = "service_skeleton"
-    authentication: Literal["unavailable"] = "unavailable"
-    conversations: Literal[False] = False
-    runs: Literal[False] = False
+    scope: Literal["service_skeleton", "development"] = "service_skeleton"
+    authentication: Literal["unavailable", "development_token"] = "unavailable"
+    conversations: bool = False
+    runs: bool = False
     event_stream: Literal[False] = False
+    execution_enabled: Literal[False] = False
 
 
 ErrorCode = Literal[
@@ -111,10 +113,11 @@ class ConversationPage(DTO):
 
 class RunCreateRequest(DTO):
     content: Content
+    execution_mode: Literal["mock"]
 
 
 class SubmissionHeaders(DTO):
-    idempotency_key: UUID = Field(description="Future Idempotency-Key header; scoped to deployment/workspace/caller/resource/operation.")
+    idempotency_key: UUID = Field(description="Idempotency-Key header; scoped to deployment/workspace/caller/resource/operation.")
 
 
 class EvidenceReference(DTO):
@@ -156,6 +159,31 @@ class RunSnapshot(DTO):
     updated_at: UtcTimestamp
     evidence: list[EvidenceReference]
     error: ErrorDetail | None
+
+
+class Workspace(DTO):
+    workspace_id: UUID
+    deployment_id: UUID
+    name: ShortText
+    created_at: UtcTimestamp
+
+
+class WorkspaceList(DTO):
+    items: list[Workspace]
+
+
+class ConversationCreateRequest(DTO):
+    title: ShortText
+
+
+class MessagePage(DTO):
+    items: list[Message]
+    next_cursor: str | None
+
+
+class RunPage(DTO):
+    items: list[RunSnapshot]
+    next_cursor: str | None
 
 
 class ReplayCursor(DTO):
@@ -205,7 +233,7 @@ class RecoveryRequiredPayload(DTO):
 
 
 class EventEnvelope(DTO):
-    schema_version: ProtocolVersion
+    schema_version: EventSchemaVersion
     run_id: UUID
     seq: EventSequence
     occurred_at: UtcTimestamp

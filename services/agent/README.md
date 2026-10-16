@@ -1,4 +1,4 @@
-# Python 服务骨架
+# Python 开发服务
 
 M1-T02 服务骨架与 M1-T03 契约切片，关联 REQ-002、REQ-003、REQ-005、REQ-008、HAR-003、HAR-004。Python 3.12/3.13，Windows 优先；当前已在 Windows 运行验证。
 
@@ -36,10 +36,12 @@ Windows 启动本机开发入口：
 | `PRODOPS_ENVIRONMENT` | 无 | `development` | `development` |
 | `PRODOPS_HOST` | `--host` | `127.0.0.1` | `127.0.0.1` |
 | `PRODOPS_PORT` | `--port` | 0 至 65535 的整数 | `0` |
+| `PRODOPS_DATABASE` | `--database` | SQLite 文件绝对路径 | 无 |
+| `PRODOPS_DEVELOPMENT_TOKEN` | 无 | 32 至 256 字符开发令牌，仅通过环境传入 | 无 |
 
 缺少模式、非法值或未知 `PRODOPS_` 配置项返回退出码 2，只输出字段与错误类别，不回显输入值。未知字段不自动忽略，避免拼写错误导致静默采用默认配置。
 
-当前两种模式都仅供回环开发，拒绝生产环境及非回环绑定。`server` 表示装配模式，正式的认证、HTTPS 入口、PostgreSQL 和多人访问在 M4 交付。当前没有业务写接口，不提供认证能力；本机随机令牌、父进程管理和启动管道在 M3 实现。
+当前两种模式都仅供回环开发，拒绝生产环境及非回环绑定。`server` 表示装配模式，正式的认证、HTTPS 入口、PostgreSQL 和多人访问在 M4 交付。默认保持无数据库的健康骨架。显式同时配置数据库路径和开发令牌后启用受保护业务 API；缺一、相对路径或短令牌均在启动前拒绝。本机随机令牌、父进程管理和启动管道在 M3 实现。
 
 ## 代码与验证
 
@@ -55,6 +57,10 @@ python scripts/check.py --profile service
 
 M1-T03 增加 `GET /api/v1/capabilities`、正式 DTO、OpenAPI 快照和生成的 TypeScript 类型，协议与生成方式见 [契约说明](../../contracts/README.md)。服务行为测试也覆盖契约校验、版本拒绝、导出无外部访问、生成漂移与 TS 消费编译。
 
-M2-T01 增加独立的[SQLite 存储适配器](src/prodops/adapters/storage/README.md)、随包版本迁移与隔离数据库回归。当前 HTTP 工厂仍保持只读骨架，尚未装配数据库；业务路由、开发认证和任务提交按 M2-T02 接入。
+M2-T01 增加独立的 [SQLite 存储适配器](src/prodops/adapters/storage/README.md)、随包版本迁移与隔离数据库回归。M2-T02 在显式配置时装配存储，迁移和稳定身份准备完成后才就绪，关闭时释放数据库连接。令牌没有命令行选项，不写进源码、命令历史或日志；由调用方从其受控环境设置 PRODOPS_DEVELOPMENT_TOKEN。数据库位置示例：
 
-当前不包含任务执行、SSE、数据库、模型、桌面窗口、安装包或 CI。后续按 [M1 任务卡](../../docs/tasks/m1/README.md) 推进。
+```text
+.venv\Scripts\prodops-agent.exe --mode local --database F:\prodops-data\development.sqlite3 --port 8765
+```
+
+业务请求使用 Authorization: Bearer、X-ProdOps-Protocol: 1.1，任务提交另带 UUID Idempotency-Key；必须显式选择 execution_mode: mock。接口、分页、事务与错误定义见 [契约说明](../../contracts/README.md)。仅持久化 queued 任务，本轮没有执行器、SSE 或真实模型；完整桌面诊断在 M3 接入。不要将开发令牌用于生产身份管理。
