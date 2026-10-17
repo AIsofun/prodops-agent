@@ -1,0 +1,171 @@
+{
+  "observed_at": "2026-10-17T02:53:33.733189+00:00",
+  "revision": "63dd4f100317c7bc963a5d5a5f421c739a80b864",
+  "repository": "AIsofun/prodops-agent",
+  "runs_http_status": 200,
+  "branch_policy": {
+    "branch": "main",
+    "protected": false,
+    "protection_http_status": 404,
+    "protection": {
+      "message": "Branch not protected"
+    },
+    "effective_rules_http_status": 200,
+    "effective_rules": []
+  },
+  "run": {
+    "id": 38996412706,
+    "html_url": "https://github.com/AIsofun/prodops-agent/actions/runs/38996412706",
+    "head_sha": "63dd4f100317c7bc963a5d5a5f421c739a80b864",
+    "head_branch": "codex/desktop-agent-development",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "path": ".github/workflows/quality.yml",
+    "created_at": "2026-10-17T02:49:23Z",
+    "updated_at": "2026-10-17T02:53:00Z"
+  },
+  "jobs": [
+    {
+      "id": 117289857978,
+      "name": "M1 quality",
+      "status": "completed",
+      "conclusion": "success",
+      "runner_name": "GitHub Actions 1000001327",
+      "runner_group_name": "GitHub Actions",
+      "started_at": "2026-10-17T02:49:25Z",
+      "completed_at": "2026-10-17T02:52:59Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-17T02:49:25Z",
+          "completed_at": "2026-10-17T02:49:27Z"
+        },
+        {
+          "name": "Check out source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-17T02:49:27Z",
+          "completed_at": "2026-10-17T02:49:34Z"
+        },
+        {
+          "name": "Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-17T02:49:34Z",
+          "completed_at": "2026-10-17T02:50:24Z"
+        },
+        {
+          "name": "Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-17T02:50:24Z",
+          "completed_at": "2026-10-17T02:50:33Z"
+        },
+        {
+          "name": "Set up uv",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-17T02:50:33Z",
+          "completed_at": "2026-10-17T02:50:35Z"
+        },
+        {
+          "name": "Install locked Python dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-17T02:50:35Z",
+          "completed_at": "2026-10-17T02:50:38Z"
+        },
+        {
+          "name": "Install locked Node dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-17T02:50:38Z",
+          "completed_at": "2026-10-17T02:50:44Z"
+        },
+        {
+          "name": "Run unified product checks",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-17T02:50:44Z",
+          "completed_at": "2026-10-17T02:52:22Z"
+        },
+        {
+          "name": "Verify real product defect rejection",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-17T02:52:22Z",
+          "completed_at": "2026-10-17T02:52:54Z"
+        },
+        {
+          "name": "Preserve check evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-17T02:52:54Z",
+          "completed_at": "2026-10-17T02:52:55Z"
+        },
+        {
+          "name": "Post Set up uv",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-17T02:52:55Z",
+          "completed_at": "2026-10-17T02:52:55Z"
+        },
+        {
+          "name": "Post Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-17T02:52:55Z",
+          "completed_at": "2026-10-17T02:52:56Z"
+        },
+        {
+          "name": "Post Set up Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-10-17T02:52:56Z",
+          "completed_at": "2026-10-17T02:52:56Z"
+        },
+        {
+          "name": "Post Check out source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-10-17T02:52:56Z",
+          "completed_at": "2026-10-17T02:52:58Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-10-17T02:52:58Z",
+          "completed_at": "2026-10-17T02:52:58Z"
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12087049161,
+      "name": "product-quality-63dd4f100317c7bc963a5d5a5f421c739a80b864",
+      "size_in_bytes": 6768,
+      "expired": false
+    }
+  ]
+}

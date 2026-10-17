@@ -248,6 +248,72 @@ class ProcessTests(unittest.TestCase):
                 self.assertNotIn("secret-", result.stdout + result.stderr)
                 self.assertNotIn("Uvicorn running", result.stderr)
 
+    def test_complete_task_chain_and_paged_history_survive_real_restart_in_both_modes(self) -> None:
+        opener = build_opener(ProxyHandler({}))
+        token = "test-only-integration-token-000000000000000"
+        headers = {"Authorization": f"Bearer {token}", "X-ProdOps-Protocol": "1.4", "Content-Type": "application/json"}
+        with tempfile.TemporaryDirectory(prefix="prodops-task-core-") as directory:
+            for mode in ("local", "server"):
+                environment = {"PRODOPS_DATABASE": str(Path(directory) / f"{mode}.sqlite3"),
+                               "PRODOPS_DEVELOPMENT_TOKEN": token, "PRODOPS_EXECUTION_ENABLED": "true"}
+                base = ""
+
+                def request(path: str, body: dict[str, object] | None = None, key: str | None = None) -> dict[str, Any]:
+                    encoded = json.dumps(body).encode("utf-8") if body is not None else None
+                    with opener.open(Request(base + path, data=encoded,
+                                             headers={**headers, "Idempotency-Key": key or str(uuid4())}), timeout=10) as response:
+                        if path.endswith("/runs") and body is not None:
+                            self.assertEqual(response.status, 202)
+                        result: dict[str, Any] = json.load(response)
+                        return result
+
+                def events(run_id: str, after: int = 0) -> list[dict[str, Any]]:
+                    with opener.open(Request(base + f"/api/v1/runs/{run_id}/events", headers={**headers, "Last-Event-ID": str(after)}), timeout=10) as response:
+                        self.assertTrue(response.headers["Content-Type"].startswith("text/event-stream"))
+                        text = response.read(1024 * 1024 + 1).decode("utf-8")
+                        self.assertLessEqual(len(text), 1024 * 1024)
+                    return [json.loads(line[6:]) for line in text.splitlines() if line.startswith("data: ")]
+
+                with self.subTest(mode=mode), self.running_service(mode, environment) as port:
+                    base = f"http://127.0.0.1:{port}"
+                    capabilities = request("/api/v1/capabilities")
+                    workspace = request("/api/v1/workspaces")["items"][0]["workspace_id"]
+                    conversation = request(f"/api/v1/workspaces/{workspace}/conversations", {"title": "Multi-turn integration"})["conversation_id"]
+                    snapshots: list[dict[str, Any]] = []
+                    for content in ("OCR quality drop", "Kafka backlog"):
+                        key = str(uuid4())
+                        body: dict[str, object] = {"content": content, "execution_mode": "mock"}
+                        submitted = request(f"/api/v1/conversations/{conversation}/runs", body, key)
+                        timeline = events(submitted["run_id"])
+                        snapshot = request(f"/api/v1/runs/{submitted['run_id']}")
+                        self.assertEqual((snapshot["status"], snapshot["resolution_status"]), ("succeeded", "unknown"))
+                        self.assertEqual([item["seq"] for item in timeline], list(range(1, snapshot["last_event_seq"] + 1)))
+                        self.assertEqual(timeline[-1]["event_type"], "run.completed")
+                        self.assertEqual(len(snapshot["evidence"]), 3)
+                        self.assertTrue(all(item["source"].startswith("mock://") for item in snapshot["evidence"]))
+                        self.assertEqual(request(f"/api/v1/conversations/{conversation}/runs", body, key), submitted)
+                        snapshots.append(snapshot)
+                    first_page = request(f"/api/v1/conversations/{conversation}/runs?limit=1")
+                    next_page = request(f"/api/v1/conversations/{conversation}/runs?limit=1&cursor={first_page['next_cursor']}")
+                    self.assertEqual({first_page["items"][0]["run_id"], next_page["items"][0]["run_id"]}, {item["run_id"] for item in snapshots})
+                    self.assertIsNone(next_page["next_cursor"])
+                    messages = request(f"/api/v1/conversations/{conversation}/messages")
+                    self.assertEqual(len(messages["items"]), 4)
+                    self.assertEqual(sum(item["role"] == "assistant" for item in messages["items"]), 2)
+                # A new installed CLI process reopens the same database and service lock.
+                with self.running_service(mode, environment) as port:
+                    base = f"http://127.0.0.1:{port}"
+                    self.assertEqual(request("/api/v1/capabilities")["deployment_id"], capabilities["deployment_id"])
+                    self.assertEqual(request("/api/v1/workspaces")["items"][0]["workspace_id"], workspace)
+                    self.assertEqual(request(f"/api/v1/conversations/{conversation}/messages"), messages)
+                    history = request(f"/api/v1/conversations/{conversation}/runs")
+                    self.assertEqual({item["run_id"] for item in history["items"]}, {item["run_id"] for item in snapshots})
+                    for snapshot in snapshots:
+                        self.assertEqual(request(f"/api/v1/runs/{snapshot['run_id']}"), snapshot)
+                        self.assertEqual(events(snapshot["run_id"], snapshot["last_event_seq"]), [])
+                        replay = events(snapshot["run_id"], 5)
+                        self.assertEqual([item["seq"] for item in replay], list(range(6, snapshot["last_event_seq"] + 1)))
+
     def test_port_conflict_is_a_real_startup_failure(self) -> None:
         with socket.socket() as occupied:
             occupied.bind(("127.0.0.1", 0))

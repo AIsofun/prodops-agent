@@ -163,7 +163,7 @@
   {
     "id": "M2-T06",
     "title": "任务核心集成验收",
-    "state": "not_started",
+    "state": "implemented",
     "depends_on": [
       "M2-T04",
       "M2-T05"
@@ -187,8 +187,14 @@
       "M2-T06-AC02",
       "M2-T06-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "services/agent/tests/test_service.py",
+      "services/agent/tests/test_task_api.py",
+      "services/agent/tests/test_execution.py",
+      "services/agent/tests/test_recovery.py",
+      "services/agent/tests/test_events.py"
+    ],
+    "verification": "docs/verification/m2-t06.json",
+    "review": "docs/reviews/m2-t06.json"
   }
 ]

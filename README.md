@@ -2,9 +2,9 @@
 
 桌面产品依次维护 [需求文档](docs/requirements.md)、[需求追踪表](docs/traceability.md)、[架构设计](docs/architecture.md) 和 [实施计划](docs/implementation-plan.md)，开发约束见 [Harness 工程约束](docs/engineering-constraints.md) 与 [开发入口](AGENTS.md)。技术栈为 Electron、React、TypeScript 和 Python，Windows 优先，同时支持本机与工厂内网服务器部署。以下内容仍描述当前 Demo 的运行方式。
 
-开发进度见 [M1 阶段任务卡](docs/tasks/m1/README.md)，工程检查与交付格式见 [统一质量入口](docs/quality-workflow.md)。新的 [Python 服务骨架](services/agent/README.md) 已支持 local/server 开发入口、健康检查和能力查询；[API 与事件契约](contracts/README.md) 提供实际 OpenAPI 导出与生成的 TypeScript 类型。新的 workspace 环境独立于下述 Demo 运行依赖。
+开发进度见 [M1阶段任务卡](docs/tasks/m1/README.md)与[M2任务核心](docs/tasks/m2/README.md)，工程检查与交付格式见 [统一质量入口](docs/quality-workflow.md)。新的 [Python 服务骨架](services/agent/README.md) 已支持 local/server 开发入口、健康检查和能力查询；[API 与事件契约](contracts/README.md) 提供实际 OpenAPI 导出与生成的 TypeScript 类型。新的 workspace 环境独立于下述 Demo 运行依赖。
 
-M1 开发骨架已完成[集成验收](docs/verification/2026-10-16-m1-t08-acceptance.md)：[Windows 桌面开发窗口](apps/desktop/README.md)可经受限桥接读取实际服务状态，默认质量检查和真实 Windows CI 通过。当前诊断任务和安装包尚未实现，接下来进入 M2。
+M1 开发骨架已完成[集成验收](docs/verification/2026-10-16-m1-t08-acceptance.md)：[Windows 桌面开发窗口](apps/desktop/README.md)可经受限桥接读取实际服务状态，默认质量检查和真实 Windows CI 通过。Python任务核心已具备受保护会话、持久调度、显式mock证据、取消/核对恢复及SSE，正在执行[M2集成验收](docs/verification/2026-10-17-m2-t06-acceptance.md)。桌面诊断界面、自动服务管理和安装包仍在M3推进。
 
 一个"**教学型但工程化**"的最小 Agent 演示项目，真正带
 **Think → Act → Observe** 主循环、可插拔工具、可插拔 LLM 的 Agent 骨架。

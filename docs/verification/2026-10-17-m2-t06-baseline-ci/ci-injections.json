@@ -1,0 +1,157 @@
+{
+  "status": "PASS",
+  "scope": "isolated real product source copies; no demo or UI substitution",
+  "cases": [
+    {
+      "name": "baseline-product-typescript",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "D:\\a\\prodops-agent\\prodops-agent\\node_modules\\typescript\\bin\\tsc",
+        "--noEmit",
+        "-p",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb\\apps\\desktop\\tsconfig.json"
+      ],
+      "detail": ""
+    },
+    {
+      "name": "baseline-product-python",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "--config-file",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb\\services\\agent\\pyproject.toml"
+      ],
+      "detail": "Success: no issues found in 52 source files"
+    },
+    {
+      "name": "baseline-typescript-boundaries",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "D:\\a\\prodops-agent\\prodops-agent\\scripts\\check_ts_boundaries.ts",
+        "--root",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb"
+      ],
+      "detail": "PASS: TypeScript boundaries (8 files)"
+    },
+    {
+      "name": "baseline-python-boundaries",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "D:\\a\\prodops-agent\\prodops-agent\\scripts\\check_boundaries.py",
+        "--root",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb"
+      ],
+      "detail": "PASS: Python static import boundaries"
+    },
+    {
+      "name": "baseline-real-contract",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "reject-real-renderer-type-error",
+      "expected": "FAIL",
+      "actual": "FAIL",
+      "passed": true,
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "D:\\a\\prodops-agent\\prodops-agent\\node_modules\\typescript\\bin\\tsc",
+        "--noEmit",
+        "-p",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb\\apps\\desktop\\tsconfig.json"
+      ],
+      "detail": "apps/desktop/src/renderer/App.tsx(106,7): error TS2322: Type 'string' is not assignable to type 'number'."
+    },
+    {
+      "name": "reject-real-renderer-node-import",
+      "expected": "FAIL",
+      "actual": "FAIL",
+      "passed": true,
+      "command": [
+        "C:\\hostedtoolcache\\windows\\node\\24.14.1\\x64\\node.EXE",
+        "D:\\a\\prodops-agent\\prodops-agent\\scripts\\check_ts_boundaries.ts",
+        "--root",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb"
+      ],
+      "detail": "renderer\\App.tsx:106: renderer cannot import Node module node:fs"
+    },
+    {
+      "name": "reject-real-domain-type-error",
+      "expected": "FAIL",
+      "actual": "FAIL",
+      "passed": true,
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "--config-file",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb\\services\\agent\\pyproject.toml"
+      ],
+      "detail": "services\\agent\\src\\prodops\\domain\\runs.py:58: error: Incompatible types in assignment (expression has type \"str\", variable has type \"int\")  [assignment]\nFound 1 error in 1 file (checked 52 source files)"
+    },
+    {
+      "name": "reject-real-domain-framework-import",
+      "expected": "FAIL",
+      "actual": "FAIL",
+      "passed": true,
+      "command": [
+        "D:\\a\\prodops-agent\\prodops-agent\\.venv\\Scripts\\python.exe",
+        "D:\\a\\prodops-agent\\prodops-agent\\scripts\\check_boundaries.py",
+        "--root",
+        "D:\\a\\prodops-agent\\prodops-agent\\.quality-reports\\product-gates-c8hl7arb"
+      ],
+      "detail": "domain\\runs.py:58: domain cannot import external module fastapi"
+    },
+    {
+      "name": "reject-live-api-model-drift",
+      "expected_exit_code": 1,
+      "actual_exit_code": 1,
+      "passed": true,
+      "detail": [
+        "Exported OpenAPI differs from contracts/openapi.json",
+        "Generated TS types differ from packages/api-client/src/schema.d.ts",
+        "Generated runtime validators differ from packages/api-client/src/validators.cjs"
+      ]
+    },
+    {
+      "name": "reject-real-generated-types-drift",
+      "expected_exit_code": 1,
+      "actual_exit_code": 1,
+      "passed": true,
+      "detail": [
+        "Generated TS types differ from packages/api-client/src/schema.d.ts"
+      ]
+    },
+    {
+      "name": "reject-real-runtime-validator-drift",
+      "expected_exit_code": 1,
+      "actual_exit_code": 1,
+      "passed": true,
+      "detail": [
+        "Generated runtime validators differ from packages/api-client/src/validators.cjs"
+      ]
+    },
+    {
+      "name": "missing-product-config",
+      "expected": "NOT_READY",
+      "actual": "NOT_READY",
+      "passed": true,
+      "detail": "Missing prerequisites: apps\\desktop\\tsconfig.json"
+    }
+  ]
+}

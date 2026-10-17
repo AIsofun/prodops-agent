@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T06",
+  "environment": {
+    "os": "Windows 11",
+    "arch": "AMD64",
+    "python": "3.13.2",
+    "node": "24.14.1"
+  },
+  "source": {
+    "revision": "63dd4f1",
+    "worktree": "uncommitted actual dual-mode task integration and acceptance records",
+    "scope": "SQLite/mock task core; current integration CI pending"
+  },
+  "criteria": [
+    {
+      "id": "M2-T06-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t06-acceptance.md"
+    },
+    {
+      "id": "M2-T06-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t06-acceptance.md"
+    },
+    {
+      "id": "M2-T06-AC03",
+      "status": "NOT_RUN",
+      "evidence": "docs/verification/2026-10-17-m2-t06-acceptance.md"
+    }
+  ]
+}
