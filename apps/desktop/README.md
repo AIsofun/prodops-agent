@@ -23,7 +23,7 @@ npm run desktop:start
 
 主进程仅连接 127.0.0.1，开发服务端口由主进程环境变量 PRODOPS_SERVICE_PORT 选择（默认 8765），PRODOPS_SERVICE_MODE 为 local 或 server（默认 local）。界面不能更改连接或传入目标地址。请先按[服务说明](../../services/agent/README.md)手动启动对应模式与端口的服务，再打开桌面。真实服务就绪、离线、不兼容、未就绪和非法响应分别显示。连接配置保存、身份和随包服务自动启动尚未实现。
 
-HTTP 客户端只访问两个固定 GET 路径，携带协议 1.0，拒绝跳转，限制每次响应 32KiB、每请求 2.5 秒，不自动重试。响应使用正式 OpenAPI 生成的校验器；跨 IPC 只返回最小状态，不返回原始响应、异常或凭据。发送者必须为当前窗口的主帧。
+HTTP 客户端只访问两个固定 GET 路径，携带协议1.4，拒绝跳转，限制每次响应 32KiB、每请求 2.5 秒，不自动重试。响应使用正式 OpenAPI 生成的校验器；跨 IPC 只返回最小状态，不返回原始响应、异常或凭据。发送者必须为当前窗口的主帧。
 
 窗口启用 contextIsolation、sandbox、webSecurity，关闭 nodeIntegration 和 webview，拒绝新窗口、导航及权限请求。构建界面 CSP 禁止直接网络；仅 Vite 开发态允许本源模块、样式注入和回环 HMR WebSocket。开发加载地址只允许回环 HTTP 根路径，打包后拒绝开发地址。
 

@@ -33,7 +33,7 @@
 | REQ-019 | M2 | 进行中 | 10 | [持久执行预算](../services/agent/src/prodops/adapters/storage/execution.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 队列/并发、次数/时长、取消与恢复预算保留已验证；等待确认预算按处置切片 |
 | REQ-020 | M6 | 未开始 | 13 17 | - | - | 数据及附件恢复 |
 | REQ-021 | M6 | 未开始 | 12 17 | - | - | 协议与离线升级 |
-| NFR-001 | M4 | 未开始 | 6 18 | - | - | 双模式场景集 |
+| NFR-001 | M4 | 进行中 | 6 18 | [共享执行器](../services/agent/src/prodops/runtime/scheduler.py) | [双模式核心验收](verification/2026-10-17-m2-t06-acceptance.md) | local/server回环开发模式共用mock任务链路与重启历史已验证；正式内网、真实模型/权限和PostgreSQL仍在M4 |
 | NFR-002 | M4 | 进行中 | 5 14 15 | [受限桥接](../apps/desktop/src/preload/index.ts)、[请求边界](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md) | 无凭据开发状态读取边界已验证；生产密钥、授权资源与导出脱敏仍在后续阶段 |
 | NFR-003 | M2 | 进行中 | 11 15 | [流关联错误](../services/agent/src/prodops/api/stream.py) | [SSE验证](verification/2026-10-17-m2-t05-events.md) | SSE请求/运行ID与安全流错误已验证；模型/工具/身份分类日志与耗时观测仍待后续 |
 | NFR-004 | M4 | 进行中 | 9 12 13 | [事务任务存储](../services/agent/src/prodops/adapters/storage/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | SQLite原子回滚、幂等与会话并发活跃槽已验证；执行状态转换和PostgreSQL仍待后续 |
@@ -50,7 +50,7 @@
 | HAR-004 | M1 | 已验证 | 5 12 | [契约检查器](../scripts/check_contracts.py)、[正式模型](../services/agent/src/prodops/api/models.py)、[生成类型](../packages/api-client/src/schema.d.ts)、[生成校验器](../packages/api-client/src/validators.cjs)、[IPC 校验](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 当前 API、事件、IPC 边界及三类生成漂移在本地和 CI 验证；后续新增契约持续遵守 |
 | HAR-005 | M1 | 已验证 | 17 | [统一入口](../scripts/check.py)、[冻结依赖流水线](../.github/workflows/quality.yml) | [产品检查](verification/2026-10-16-m1-t06-gates.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 本地默认 M1 与真实 Windows CI 通过；不代表产品发布验收 |
 | HAR-006 | M4 | 进行中 | 8 18 | [模拟执行回归](../services/agent/tests/test_execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock、歧义、异常与预算基线通过；真实模型及完整评测集仍在M4 |
-| HAR-007 | M2 | 进行中 | 9 18 | [故障回归](../services/agent/tests/test_recovery.py)、[流回归](../services/agent/tests/test_events.py) | [SSE验证](verification/2026-10-17-m2-t05-events.md) | 重复/并发、取消、硬退出、unknown、SSE断线与过期已验证；阶段集成与真实CI在下一任务 |
+| HAR-007 | M2 | 已验证 | 9 18 | [故障回归](../services/agent/tests/test_recovery.py)、[SSE回归](../services/agent/tests/test_events.py)、[双模式集成](../services/agent/tests/test_service.py) | [任务核心验收](verification/2026-10-17-m2-t06-acceptance.md) | 当前模拟任务核心的重复/并发、断线、取消、崩溃与未知结果可复现，真实CI通过；新增功能持续补故障样例 |
 | HAR-008 | M3 | 未开始 | 5 6 17 | - | - | 桌面与安装包验证待建立 |
 | HAR-009 | M1 | 进行中 | 17 | [GitHub 流水线](../.github/workflows/quality.yml) | [实际 CI 与审计](verification/2026-10-16-m1-t07-ci.md) | Windows CI 已成功运行；main 必要检查合并限制未配置，影响与退出条件见[范围记录](decisions/2026-10-16-ci-merge-enforcement.md) |
 | HAR-010 | M0 | 已实现 | 18 | [开发入口](../AGENTS.md) | - | 人工执行的变更规则，持续有效性按变更审阅 |

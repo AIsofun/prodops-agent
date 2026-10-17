@@ -8,9 +8,9 @@
     "node": "24.14.1"
   },
   "source": {
-    "revision": "63dd4f1",
-    "worktree": "uncommitted actual dual-mode task integration and acceptance records",
-    "scope": "SQLite/mock task core; current integration CI pending"
+    "revision": "f9a625a6276cabedb6f61985a0a13d84753212b8",
+    "worktree": "documentation-only final acceptance, existing desktop protocol documentation and next-stage cards",
+    "scope": "SQLite/mock task core; actual Windows CI includes new dual-mode integration test"
   },
   "criteria": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "id": "M2-T06-AC03",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "evidence": "docs/verification/2026-10-17-m2-t06-acceptance.md"
     }
   ]

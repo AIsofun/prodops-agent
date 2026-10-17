@@ -163,7 +163,7 @@
   {
     "id": "M2-T06",
     "title": "任务核心集成验收",
-    "state": "implemented",
+    "state": "verified",
     "depends_on": [
       "M2-T04",
       "M2-T05"

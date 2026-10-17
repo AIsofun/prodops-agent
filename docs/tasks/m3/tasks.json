@@ -1,0 +1,174 @@
+[
+  {
+    "id": "M3-T01",
+    "title": "本机服务安全启动与握手",
+    "state": "not_started",
+    "depends_on": [
+      "M2-T06"
+    ],
+    "requirements": [
+      "REQ-002",
+      "REQ-014",
+      "NFR-002",
+      "HAR-004"
+    ],
+    "card": "docs/tasks/m3/01-startup.md",
+    "acceptance": [
+      "M3-T01-AC01",
+      "M3-T01-AC02",
+      "M3-T01-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M3-T02",
+    "title": "受限业务与事件桥接",
+    "state": "not_started",
+    "depends_on": [
+      "M3-T01"
+    ],
+    "requirements": [
+      "REQ-004",
+      "REQ-005",
+      "REQ-008",
+      "REQ-014",
+      "NFR-002",
+      "HAR-004"
+    ],
+    "card": "docs/tasks/m3/02-bridge.md",
+    "acceptance": [
+      "M3-T02-AC01",
+      "M3-T02-AC02",
+      "M3-T02-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M3-T03",
+    "title": "会话诊断与证据界面",
+    "state": "not_started",
+    "depends_on": [
+      "M3-T02"
+    ],
+    "requirements": [
+      "REQ-004",
+      "REQ-005",
+      "REQ-006",
+      "REQ-007",
+      "REQ-018",
+      "HAR-008"
+    ],
+    "card": "docs/tasks/m3/03-workspace.md",
+    "acceptance": [
+      "M3-T03-AC01",
+      "M3-T03-AC02",
+      "M3-T03-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M3-T04",
+    "title": "取消恢复与断线交互",
+    "state": "not_started",
+    "depends_on": [
+      "M3-T03"
+    ],
+    "requirements": [
+      "REQ-008",
+      "REQ-009",
+      "REQ-010",
+      "REQ-018",
+      "HAR-007",
+      "HAR-008"
+    ],
+    "card": "docs/tasks/m3/04-reconnect.md",
+    "acceptance": [
+      "M3-T04-AC01",
+      "M3-T04-AC02",
+      "M3-T04-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M3-T05",
+    "title": "窗口托盘与进程收尾",
+    "state": "not_started",
+    "depends_on": [
+      "M3-T04"
+    ],
+    "requirements": [
+      "REQ-002",
+      "REQ-018",
+      "NFR-002",
+      "HAR-008"
+    ],
+    "card": "docs/tasks/m3/05-lifecycle.md",
+    "acceptance": [
+      "M3-T05-AC01",
+      "M3-T05-AC02",
+      "M3-T05-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M3-T06",
+    "title": "Windows离线开发安装包",
+    "state": "not_started",
+    "depends_on": [
+      "M3-T05"
+    ],
+    "requirements": [
+      "REQ-001",
+      "REQ-002",
+      "REQ-021",
+      "HAR-005",
+      "HAR-008"
+    ],
+    "card": "docs/tasks/m3/06-package.md",
+    "acceptance": [
+      "M3-T06-AC01",
+      "M3-T06-AC02",
+      "M3-T06-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  },
+  {
+    "id": "M3-T07",
+    "title": "Windows桌面阶段集成验收",
+    "state": "not_started",
+    "depends_on": [
+      "M3-T06"
+    ],
+    "requirements": [
+      "REQ-001",
+      "REQ-002",
+      "REQ-004",
+      "REQ-008",
+      "REQ-009",
+      "REQ-010",
+      "HAR-008",
+      "HAR-010"
+    ],
+    "card": "docs/tasks/m3/07-acceptance.md",
+    "acceptance": [
+      "M3-T07-AC01",
+      "M3-T07-AC02",
+      "M3-T07-AC03"
+    ],
+    "implementation": [],
+    "verification": null,
+    "review": null
+  }
+]
