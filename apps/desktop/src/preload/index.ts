@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { STATUS_CHANNEL, parseConnectionStatus } from "../shared/connection.js";
 import type { DesktopBridge } from "../shared/desktop.js";
+import { QUIT_CHANNEL } from "../shared/desktop.js";
 import { BUSINESS_CHANNEL, EVENTS_CHANNEL, parseBusinessRequest, parseEventRequest, parseResult,
   validBusinessValue, validSubscription, validEventBatch, type BusinessRequest, type BusinessValues, type BridgeResult } from "../shared/business.js";
 
@@ -11,6 +12,12 @@ async function business<K extends keyof BusinessValues>(request: BusinessRequest
 
 const bridge: DesktopBridge = Object.freeze({
   getInfo: () => ({ name: "ProdOps", version: "0.1.0" }),
+  app: Object.freeze({ quit: async (...args: unknown[]) => {
+    if (args.length) throw new Error("Application quit takes no arguments");
+    const result: unknown = await ipcRenderer.invoke(QUIT_CHANNEL, {});
+    if (typeof result !== "object" || result === null || Object.keys(result).join(",") !== "accepted" ||
+        !("accepted" in result) || result.accepted !== true) throw new Error("Invalid application quit response");
+  } }),
   connections: Object.freeze({
     getStatus: async (...args: unknown[]) => {
       if (args.length !== 0) throw new Error("Connection status takes no arguments");

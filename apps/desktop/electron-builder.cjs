@@ -1,0 +1,21 @@
+module.exports = {
+  appId: "com.aisofun.prodops.development",
+  productName: "ProdOps Dev",
+  directories: { app: ".quality-reports/package-app", output: ".quality-reports/installers" },
+  files: ["main/**", "preload/**", "renderer/**", "package.json"],
+  extraResources: [{ from: ".quality-reports/service-dist/prodops-agent", to: "agent", filter: ["**/*"] }],
+  electronVersion: "44.8.0",
+  electronDist: "node_modules/electron/dist",
+  electronLanguages: ["zh-CN", "en-US"],
+  asar: true,
+  npmRebuild: false,
+  win: { target: [{ target: "nsis", arch: ["x64"] }], executableName: "ProdOps Dev", signAndEditExecutable: false, signExecutable: false },
+  nsis: {
+    guid: "b2a4cd7e-73c6-4ee8-8c39-9c12f534ef15",
+    artifactName: "ProdOps-Dev-${version}-windows-${arch}-setup.${ext}",
+    oneClick: false, perMachine: false, allowElevation: false, allowToChangeInstallationDirectory: true,
+    createDesktopShortcut: true, createStartMenuShortcut: true, runAfterFinish: false,
+    deleteAppDataOnUninstall: false, differentialPackage: false,
+  },
+  publish: null,
+};

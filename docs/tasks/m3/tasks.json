@@ -152,7 +152,7 @@
   {
     "id": "M3-T06",
     "title": "Windows离线开发安装包",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M3-T05"
     ],
@@ -169,9 +169,16 @@
       "M3-T06-AC02",
       "M3-T06-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "apps/desktop/electron-builder.cjs",
+      "apps/desktop/scripts/package.mjs",
+      "services/agent/packaging/prodops-agent.spec",
+      "services/agent/src/prodops/bootstrap/packaged.py",
+      "apps/desktop/scripts/verify-installed.mjs",
+      "apps/desktop/scripts/verify-isolated-install.ps1"
+    ],
+    "verification": "docs/verification/m3-t06.json",
+    "review": "docs/reviews/m3-t06.json"
   },
   {
     "id": "M3-T07",

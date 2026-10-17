@@ -1,13 +1,20 @@
 import { app, BrowserWindow, ipcMain, session } from "electron";
 import path from "node:path";
 import { developmentConnection, getConnectionStatus } from "./connection.js";
-import { createStatusHandler, createBusinessHandler, createEventsHandler } from "./ipc.js";
+import { createStatusHandler, createBusinessHandler, createEventsHandler, createQuitHandler } from "./ipc.js";
 import { STATUS_CHANNEL } from "../shared/connection.js";
 import { LocalService, serviceLaunchOptions } from "./service.js";
 import { BusinessClient } from "./business.js";
 import { EventStreams } from "./events.js";
 import { BUSINESS_CHANNEL, EVENTS_CHANNEL } from "../shared/business.js";
 import { DesktopLifecycle } from "./lifecycle.js";
+import { QUIT_CHANNEL } from "../shared/desktop.js";
+
+if (app.commandLine.hasSwitch("user-data-dir")) {
+  const directory = app.commandLine.getSwitchValue("user-data-dir");
+  if (!path.isAbsolute(directory) || directory.length > 4096 || directory.includes("\0")) throw new Error("Invalid application data directory");
+  app.setPath("userData", path.resolve(directory));
+}
 
 let localService: LocalService | null = null;
 let shutdownPending = false;
@@ -55,10 +62,11 @@ async function createWindow(): Promise<void> {
   const streams = new EventStreams(provider);
   ipcMain.handle(BUSINESS_CHANNEL, createBusinessHandler(() => window, client));
   ipcMain.handle(EVENTS_CHANNEL, createEventsHandler(() => window, streams));
+  ipcMain.handle(QUIT_CHANNEL, createQuitHandler(() => window, () => app.quit()));
   const dispose = () => { client.dispose(); streams.dispose(); };
   window.webContents.once("destroyed", dispose);
   window.webContents.on("render-process-gone", dispose);
-  window.once("closed", () => { dispose(); ipcMain.removeHandler(BUSINESS_CHANNEL); ipcMain.removeHandler(EVENTS_CHANNEL); });
+  window.once("closed", () => { dispose(); ipcMain.removeHandler(BUSINESS_CHANNEL); ipcMain.removeHandler(EVENTS_CHANNEL); ipcMain.removeHandler(QUIT_CHANNEL); });
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.webContents.on("will-attach-webview", (event) => event.preventDefault());
@@ -76,7 +84,7 @@ if (!app.requestSingleInstanceLock()) {
   app.whenReady().then(async () => {
     session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
     session.defaultSession.setPermissionCheckHandler(() => false);
-    if (process.env.PRODOPS_SERVICE_PORT === undefined) {
+    if (app.isPackaged || process.env.PRODOPS_SERVICE_PORT === undefined) {
       localService = new LocalService(serviceLaunchOptions(app.isPackaged, process.resourcesPath,
         path.resolve(__dirname, "../../../.."), app.getPath("userData")));
       await localService.start().catch(() => undefined);

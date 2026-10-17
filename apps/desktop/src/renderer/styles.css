@@ -107,4 +107,5 @@ textarea { color: #314950; height: 88px; line-height: 1.8; }
 .recovery-panel input { margin-right: 8px; accent-color: #176e61; }
 .recovery-panel code { font-size: 10px; }
 .recovery-panel button:not(:disabled) { color: white; background: #176e61; font-size: 12px; }
+.app-quit { background: transparent; color: #7b8b92; font-size: 11px; text-align: left; padding: 9px 0; }
 @media (max-width: 1050px) { .content { padding: 25px; } .sidebar { width: 218px; } .evidence-grid { grid-template-columns: 1fr; } }

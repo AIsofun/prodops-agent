@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T06",
+  "environment": {"os": "Windows 11 development machine, not clean acceptance host", "arch": "AMD64", "python": "3.13.2", "node": "24.14.1", "electron": "44.8.0"},
+  "source": {"revision": "5feaac5", "worktree": "Offline unsigned development installer and actual isolated installed runtime verification"},
+  "criteria": [
+    {"id": "M3-T06-AC01", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t06-package.md"},
+    {"id": "M3-T06-AC02", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t06-package.md"},
+    {"id": "M3-T06-AC03", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t06-package.md"}
+  ]
+}

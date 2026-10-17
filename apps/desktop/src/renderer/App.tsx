@@ -67,6 +67,7 @@ export function App() {
       </nav>
       <Pagination label="会话" earlier={state.conversationNext !== null} recent={state.conversationCursor !== null}
         onEarlier={() => void state.paginate("conversations", state.conversationNext)} onRecent={() => void state.paginate("conversations", null)} />
+      <button className="app-quit" data-action="quit-app" onClick={() => void window.prodops.app.quit()}>退出应用</button>
       <div className="sidebar-footer"><span className="status-dot" />开发预览 <span>v{info.version}</span></div>
     </aside>
     <main>

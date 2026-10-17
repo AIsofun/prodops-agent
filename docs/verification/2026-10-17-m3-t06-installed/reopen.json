@@ -1,0 +1,47 @@
+{
+  "mode": "reopen",
+  "conversation_id": "62a6355c-647d-4cf0-a79b-32a28a402551",
+  "run_id": "7335451f-a4ed-442a-b433-61cfca62a8c1",
+  "status": "succeeded",
+  "evidence_count": 3,
+  "message_count": 2,
+  "node_globals_absent": true,
+  "invalid_quit_refused": true,
+  "bridge_keys": [
+    "app",
+    "business",
+    "connections",
+    "events",
+    "getInfo"
+  ],
+  "process_exit_code": 0,
+  "owned_service_stopped": true,
+  "parent_pid": 13132,
+  "service": {
+    "ProcessId": 54048,
+    "ParentProcessId": 13132,
+    "ExecutablePath": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\application\\resources\\agent\\prodops-agent.exe"
+  },
+  "page_loaded_from_installed_asar": true,
+  "development_path_removed": true,
+  "cwd": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\empty-working-directory",
+  "profile": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\profile",
+  "source_isolation": [
+    {
+      "name": ".venv",
+      "unavailable": true
+    },
+    {
+      "name": "node_modules",
+      "unavailable": true
+    },
+    {
+      "name": "apps/desktop/src",
+      "unavailable": true
+    },
+    {
+      "name": "services/agent/src",
+      "unavailable": true
+    }
+  ]
+}

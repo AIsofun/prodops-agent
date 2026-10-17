@@ -43,6 +43,7 @@ def create_app(settings: ServiceSettings, *, on_ready: Callable[[UUID], None] | 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         nonlocal deployment_id
+        execution_started = False
         try:
             if service_lock is not None:
                 await asyncio.to_thread(service_lock.acquire)
@@ -53,6 +54,7 @@ def create_app(settings: ServiceSettings, *, on_ready: Callable[[UUID], None] | 
             if scheduler is not None:
                 await tools.start()
                 await scheduler.start()
+                execution_started = True
             await health.start()
             if on_ready is not None:
                 on_ready(deployment_id)
@@ -66,7 +68,7 @@ def create_app(settings: ServiceSettings, *, on_ready: Callable[[UUID], None] | 
                         # No worker remains and this lifespan still owns the OS
                         # lock. Reconcile any committed intent whose result could
                         # not be confirmed before shutdown, including failed owners.
-                        if store is not None:
+                        if execution_started and store is not None:
                             await store.recover_orphans()
                 finally:
                     if store is not None:

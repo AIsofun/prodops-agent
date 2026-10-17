@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "installer_sha256": "7030ef6c910e23682dd55617d2f7bd91c81884448e1f2cf2e26c95b11a374820",
+  "signature": "NotSigned",
+  "installation": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\application",
+  "executable": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\application\\ProdOps Dev.exe",
+  "contains_electron": true,
+  "contains_frozen_python": true,
+  "current_user_only": true,
+  "published": false
+}

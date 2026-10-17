@@ -3,6 +3,7 @@ import type { components } from "../../../../packages/api-client/src/schema.js";
 import type { BusinessValues, BridgeResult, EventBatch, Page } from "./business.js";
 
 type Schema = components["schemas"];
+export const QUIT_CHANNEL = "prodops:app:quit";
 
 export interface DesktopInfo {
   name: string;
@@ -11,6 +12,7 @@ export interface DesktopInfo {
 
 export interface DesktopBridge {
   getInfo(): DesktopInfo;
+  app: { quit(): Promise<void> };
   connections: { getStatus(): Promise<ConnectionStatus> };
   business: {
     workspaces(): Promise<BridgeResult<BusinessValues["workspaces"]>>;

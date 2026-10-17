@@ -22,9 +22,10 @@ from urllib.request import ProxyHandler, Request, build_opener
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from prodops.application.health import HealthService
+from prodops.adapters.storage.events import SQLiteEventStore
 from prodops.bootstrap.app import create_app, create_local_app, create_server_app
 from prodops.bootstrap.config import ConfigurationError, ServiceSettings, load_settings
 from prodops.domain.deployment import DeploymentMode
@@ -77,6 +78,18 @@ class ConfigurationTests(unittest.TestCase):
 
 
 class ApplicationTests(unittest.TestCase):
+    def test_storage_startup_error_is_preserved_with_execution_enabled(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="prodops-startup-failure-") as directory:
+            settings = ServiceSettings(mode=DeploymentMode.LOCAL,
+                                       database=Path(directory) / "failed.sqlite3", execution_enabled=True,
+                                       development_token=SecretStr("isolated-startup-test-token-000000000000"))
+            with patch.object(SQLiteEventStore, "start", new=AsyncMock(side_effect=RuntimeError("storage startup failed"))), \
+                    patch.object(SQLiteEventStore, "recover_orphans", new=AsyncMock()) as reconcile:
+                with self.assertRaisesRegex(RuntimeError, "storage startup failed"):
+                    with TestClient(create_app(settings), base_url="http://127.0.0.1"):
+                        self.fail("Failed storage must prevent serving")
+                reconcile.assert_not_awaited()
+
     def test_liveness_readiness_and_shutdown_for_both_entry_points(self) -> None:
         for mode, factory in (("local", create_local_app), ("server", create_server_app)):
             with self.subTest(mode=mode):
@@ -226,11 +239,14 @@ class ProcessTests(unittest.TestCase):
                     conversation = request(f"/api/v1/workspaces/{workspace}/conversations", {"title": "Mock HTTP"})["conversation_id"]
                     submitted = request(f"/api/v1/conversations/{conversation}/runs", {"content": "camera offline", "execution_mode": "mock"})
                     # The submit response/socket is closed before any subsequent query.
-                    for _ in range(100):
+                    # A behavioral assertion, not a two-second performance gate:
+                    # shared Windows runners may delay durable SQLite commits.
+                    deadline = time.monotonic() + 15
+                    while True:
                         snapshot = request(f"/api/v1/runs/{submitted['run_id']}")
-                        if snapshot["status"] in ("succeeded", "failed"):
+                        if snapshot["status"] in ("succeeded", "failed", "cancelled", "recovery_required") or time.monotonic() >= deadline:
                             break
-                        time.sleep(0.02)
+                        time.sleep(0.05)
                     self.assertEqual(snapshot["status"], "succeeded")
                     self.assertEqual(len(snapshot["evidence"]), 3)
                     self.assertEqual(snapshot["resolution_status"], "unknown")

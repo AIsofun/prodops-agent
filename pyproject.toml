@@ -6,6 +6,9 @@ dependencies = []
 
 [dependency-groups]
 dev = ["mypy==1.19.0", "prodops-agent", "httpx2>=2,<3"]
+packaging = [
+    "pyinstaller==6.22.3",
+]
 
 [tool.uv]
 package = false

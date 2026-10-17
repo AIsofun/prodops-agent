@@ -11,6 +11,15 @@ export function assertSender(event: IpcMainInvokeEvent, window: BrowserWindow): 
     throw new Error("Untrusted desktop request");
   }
 }
+export function createQuitHandler(getWindow: () => BrowserWindow, quit: () => void) {
+  let requested = false;
+  return (event: IpcMainInvokeEvent, request: unknown): { accepted: true } => {
+    assertSender(event, getWindow());
+    if (typeof request !== "object" || request === null || Array.isArray(request) || Object.keys(request).length) throw new Error("Invalid application quit request");
+    if (!requested) { requested = true; setTimeout(quit, 0); }
+    return { accepted: true };
+  };
+}
 
 export function createBusinessHandler(getWindow: () => BrowserWindow, client: BusinessClient) {
   return async (event: IpcMainInvokeEvent, request: unknown) => {

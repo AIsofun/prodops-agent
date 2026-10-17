@@ -23,7 +23,7 @@ npm run desktop:start
 
 未设置 PRODOPS_SERVICE_PORT 时，主进程自动启动项目虚拟环境中的本机服务，将数据库放在 Electron userData/agent/prodops.sqlite3。每次启动产生随机令牌与实例标识，仅通过继承 stdin 管道传给服务；服务绑定随机回环端口，完成迁移和恢复后通过 stdout 返回无令牌握手。主进程校验实例、进程关系、协议、健康、部署身份和认证读取后才报告就绪。启动最多等待30秒，失败不会自动重试；退出先通过私有管道收尾，超时只回收自己创建的进程树。
 
-显式设置 PRODOPS_SERVICE_PORT 时保留外部开发服务的只读状态连接，PRODOPS_SERVICE_MODE 为 local 或 server（默认 local），需按[服务说明](../../services/agent/README.md)手动启动。界面不能更改连接或传入目标地址。随包入口定位为 resources/agent/prodops-agent.exe；实际运行时打包、安装及干净 Windows 验收仍待后续任务。正式登录和连接配置保存仍在 M4。
+开发态显式设置 PRODOPS_SERVICE_PORT 时保留外部开发服务的只读状态连接，PRODOPS_SERVICE_MODE 为 local 或 server（默认 local），需按[服务说明](../../services/agent/README.md)手动启动。安装态始终自动启动 resources/agent/prodops-agent.exe。界面不能更改连接或传入目标地址。Windows开发安装包和当前开发机隔离安装已验证；干净 Windows 验收仍待M3-T07。正式登录和连接配置保存仍在 M4。
 
 状态客户端访问两个固定GET路径，限制响应32KiB和每请求2.5秒。业务客户端只使用正式API固定路由，提供工作区、会话/消息/任务分页、提交、取消与明确核对恢复；请求最多256KiB，响应最多4MiB、5秒总时限、并发最多8。全部携带协议1.4，拒绝跳转，不自动重试。参数/结果用正式OpenAPI生成校验器并核对部署及资源归属；错误只返回固定分类和关联ID，不返回底层消息、异常或凭据。发送者必须为当前窗口主帧，连接切换后旧响应拒绝交付。
 
@@ -67,3 +67,26 @@ faults集成只在测试进程替换开发入口为tests/desktop_fault_entry.py�
 lifecycle集成创建真实Windows原生Tray，记录其实际bounds，并程序触发真实菜单/双击回调；隐藏时服务完成任务，第二个Electron进程因单实例锁退出0并唤回原窗口，随后明确退出验证服务PID消失及端口关闭。另测运行中关闭私有通道的5秒调度宽限及未知结果；仅硬结束测试Electron父进程后核对无遗留，真实重开才将未确认记录转为待核对。这里不承诺操作系统强制终止时仍能执行优雅退出。开发托盘图标取当前可执行文件图标，正式视觉与签名不由此卡交付。
 
 实现依据：[Electron 安全建议](https://www.electronjs.org/docs/latest/tutorial/security)、[Vite 开发与构建](https://vite.dev/guide/)。
+
+## Windows开发安装包
+
+仅构建Windows AMD64。先在仓库根目录安装锁定的打包工具：
+
+```text
+uv sync --frozen --group dev --group packaging --cache-dir .quality-reports/uv-cache --link-mode copy
+npm ci --ignore-scripts --no-audit --no-fund --cache .quality-reports/npm-cache
+node node_modules/electron/install.js
+npm run desktop:package
+```
+
+输出`.quality-reports/installers/ProdOps-Dev-0.1.0-windows-x64-setup.exe`、同名sha256及build-manifest.json。构建环境需要联网准备依赖；安装包包含Electron和独立Python服务，运行只使用明确mock，无需开发Node/Python、源码或模型权重。当前为未签名、未发布的开发版本，安装身份ProdOps Dev；当前用户安装、卸载保留历史。正式签名、升级与生产使用仍待后续阶段。
+
+实际开发机验收命令：
+
+```text
+node apps/desktop/scripts/verify-installed.mjs docs/verification/2026-10-17-m3-t06-installed install
+& apps/desktop/scripts/verify-isolated-install.ps1
+node apps/desktop/scripts/verify-installed.mjs docs/verification/2026-10-17-m3-t06-installed uninstall
+```
+
+仅操作专用隔离安装与资料目录，拒绝已有安装身份。隔离脚本暂时移动四个开发目录并finally还原；运行前应结束开发进程。验证通过正式React界面完成mock与重开，截图及CIM进程身份见[交付证据](../../docs/verification/2026-10-17-m3-t06-package.md)。这不是干净电脑验收。界面“退出应用”及托盘退出均完成服务收尾，关窗口保持托盘运行。主进程支持绝对路径的标准`--user-data-dir`启动参数隔离资料，renderer没有任意文件路径能力。

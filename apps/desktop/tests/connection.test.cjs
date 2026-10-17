@@ -4,7 +4,7 @@ const http = require("node:http");
 const path = require("node:path");
 const build = process.env.PRODOPS_TEST_BUILD ?? path.resolve(__dirname, "../dist");
 const { developmentConnection, getConnectionStatus } = require(path.join(build, "main/connection.js"));
-const { createStatusHandler } = require(path.join(build, "main/ipc.js"));
+const { createStatusHandler, createQuitHandler } = require(path.join(build, "main/ipc.js"));
 const { parseConnectionStatus, validateStatusRequest } = require(path.join(build, "shared/connection.js"));
 const { validateHealth, validateCapabilities } = require("../../../packages/api-client/src/validators.cjs");
 
@@ -31,6 +31,21 @@ test("main-only configuration cannot contain a URL, credentials or invalid port"
     assert.throws(() => developmentConnection({ PRODOPS_SERVICE_PORT: port }), /Invalid development connection/);
   }
   assert.throws(() => developmentConnection({ PRODOPS_SERVICE_MODE: "secret-value" }), /Invalid development connection/);
+});
+
+test("explicit app quit accepts only the owning main frame and an empty request, once", async () => {
+  let quits = 0;
+  const contents = { mainFrame: { url: "file:///app/index.html" }, getURL: () => "file:///app/index.html" };
+  const window = { isDestroyed: () => false, webContents: contents };
+  const event = { sender: contents, senderFrame: contents.mainFrame };
+  const handler = createQuitHandler(() => window, () => { quits++; });
+  assert.throws(() => handler({ ...event, sender: {} }, {}), /Untrusted/);
+  assert.throws(() => handler(event, { url: "http://attacker.example" }), /Invalid/);
+  assert.throws(() => handler(event, []), /Invalid/);
+  assert.deepEqual(handler(event, {}), { accepted: true });
+  assert.deepEqual(handler(event, {}), { accepted: true });
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(quits, 1);
 });
 
 test("read-only requests use fixed paths and version header then return validated ready data", async () => {

@@ -31,7 +31,7 @@ app.once("browser-window-created", (_event, window) => {
       if (process.env.PRODOPS_SMOKE_WORKSPACE !== "reopen" && process.env.PRODOPS_SMOKE_FAULT !== "recover") assert.equal(result.heading, "从异常描述开始排查");
       assert.equal(result.node, "undefined");
       assert.equal(result.process, "undefined");
-      assert.deepEqual(result.bridgeKeys.sort(), ["business", "connections", "events", "getInfo"]);
+      assert.deepEqual(result.bridgeKeys.sort(), ["app", "business", "connections", "events", "getInfo"]);
       assert.equal(result.info.name, "ProdOps");
       assert.ok(result.csp.includes("script-src 'self'"));
       assert.ok(!result.csp.includes("unsafe-eval"));

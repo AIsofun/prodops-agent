@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "asar_entries": [
+    "\\main",
+    "\\main\\index.js",
+    "\\package.json",
+    "\\preload",
+    "\\preload\\index.js",
+    "\\renderer",
+    "\\renderer\\assets",
+    "\\renderer\\assets\\index-BRmYKAOT.js",
+    "\\renderer\\assets\\index-Cbf3avOa.css",
+    "\\renderer\\index.html"
+  ],
+  "service_data_allowlist": [
+    "prodops/adapters/fixtures/diagnostics.json",
+    "prodops/adapters/storage/migrations/env.py",
+    "prodops/adapters/storage/migrations/versions/0001_storage.py"
+  ],
+  "source_config": "services/agent/packaging/prodops-agent.spec",
+  "includes_user_database": false,
+  "includes_model_weights": false,
+  "includes_credentials": false
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T06",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m3-t06-package.md",
+  "findings": [
+    {"id": "R1", "severity": "P1", "status": "fixed", "reason": "Frozen service includes the dynamically imported SQLite async driver and runs independently."},
+    {"id": "R2", "severity": "P2", "status": "fixed", "reason": "Actual installed runtime works with development sources and dependencies unavailable."},
+    {"id": "R3", "severity": "P2", "status": "fixed", "reason": "Finite trusted quit capability preserves existing owned service shutdown."},
+    {"id": "R4", "severity": "P2", "status": "fixed", "reason": "Isolated installation refuses existing identity and reversible source isolation restores directories."},
+    {"id": "R5", "severity": "P2", "status": "fixed", "reason": "Unsigned unpublished installer has recorded signature and checksum."},
+    {"id": "R6", "severity": "P2", "status": "fixed", "reason": "Startup failure does not reconcile an unstarted store or mask the original error."},
+    {"id": "R7", "severity": "P2", "status": "fixed", "reason": "Durable task behavior waits within a bounded deadline instead of asserting a two-second performance target."}
+  ]
+}

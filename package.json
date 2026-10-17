@@ -16,6 +16,7 @@
     "desktop:dev": "node apps/desktop/scripts/dev.mjs",
     "desktop:start": "electron apps/desktop",
     "desktop:smoke": "node apps/desktop/scripts/smoke.mjs",
+    "desktop:package": "node apps/desktop/scripts/package.mjs",
     "contracts:validators": "node packages/api-client/scripts/generate-validators.mjs",
     "desktop:test": "node --test apps/desktop/tests/connection.test.cjs apps/desktop/tests/service.test.cjs apps/desktop/tests/business.test.cjs apps/desktop/tests/progress.test.cjs"
   },
@@ -26,6 +27,7 @@
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "electron": "44.8.0",
+    "electron-builder": "26.15.3",
     "openapi-typescript": "7.10.1",
     "typescript": "5.9.3",
     "vite": "8.3.4"
