@@ -114,6 +114,7 @@ export function App() {
           <div><span>{busy ? "当前任务尚未结束，草稿会保留" : "只查询模拟数据，不执行设备处置"}</span><button type="submit" disabled={!state.workspaceId || busy || state.loading || state.submitting || !state.draft.trim()} aria-label="提交排查">{state.submitting ? "提交中…" : "发送 ↑"}</button></div>
         </form>
         <p className="scope-note">模拟结果不代表现场事实。任务完成与故障恢复分别记录。</p>
+        <p className="scope-note">关闭窗口后在托盘继续运行；从托盘退出时等待当前查询收尾，未确认结果留待核对。</p>
       </div>
     </main>
   </div>;

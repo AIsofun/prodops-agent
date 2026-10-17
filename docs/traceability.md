@@ -13,7 +13,7 @@
 | 编号 | 阶段 | 状态 | 设计章节 | 实现 | 验证证据 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
 | REQ-001 | M3 | 进行中 | 5 17 | [桌面开发入口](../apps/desktop/src/main/index.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 开发窗口与冻结安装链路已验证；干净 Windows 安装、双击与随包运行时仍在 M3 |
-| REQ-002 | M3 | 进行中 | 6.1 | [私有服务入口](../services/agent/src/prodops/bootstrap/desktop.py)、[主进程管理器](../apps/desktop/src/main/service.ts) | [本机启动验证](verification/2026-10-17-m3-t01-startup.md) | 开发环境随机端口/令牌、私有握手、认证及正常退出已验证；随包运行时、托盘与单实例待后续M3 |
+| REQ-002 | M3 | 进行中 | 6.1 | [私有服务入口](../services/agent/src/prodops/bootstrap/desktop.py)、[主进程管理器](../apps/desktop/src/main/service.ts) | [本机启动](verification/2026-10-17-m3-t01-startup.md)、[生命周期](verification/2026-10-17-m3-t05-lifecycle.md) | 开发环境私有握手、单实例、真实托盘/隐藏继续/明确退出及父异常无遗留已验证；随包运行时待后续M3 |
 | REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 共用业务包的 server 回环开发连接已验证；正式认证、数据库和内网运行仍在 M4 |
 | REQ-004 | M3 | 进行中 | 8 16 | [会话用例](../services/agent/src/prodops/application/tasks.py) | [桌面会话验证](verification/2026-10-17-m3-t03-workspace.md) | 真实Electron会话/分页、多轮mock上下文、忙碌草稿和新会话隔离已验证；真实模型上下文待M4 |
 | REQ-005 | M2 | 进行中 | 8 11 | [数据库调度](../services/agent/src/prodops/runtime/scheduler.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock独立执行、持久SSE步骤与真实桌面进度/最终结果已验证；真实模型待M4 |

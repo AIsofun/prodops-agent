@@ -7,10 +7,12 @@ import { LocalService, serviceLaunchOptions } from "./service.js";
 import { BusinessClient } from "./business.js";
 import { EventStreams } from "./events.js";
 import { BUSINESS_CHANNEL, EVENTS_CHANNEL } from "../shared/business.js";
+import { DesktopLifecycle } from "./lifecycle.js";
 
 let localService: LocalService | null = null;
 let shutdownPending = false;
 let quitPermitted = false;
+let lifecycle: DesktopLifecycle | null = null;
 
 function rendererAddress(): string | null {
   const value = process.env.PRODOPS_RENDERER_URL;
@@ -61,37 +63,48 @@ async function createWindow(): Promise<void> {
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.webContents.on("will-attach-webview", (event) => event.preventDefault());
   window.once("ready-to-show", () => window.show());
+  lifecycle = new DesktopLifecycle(window, () => shutdownPending || quitPermitted);
+  await lifecycle.install();
   if (address) await window.loadURL(address);
   else await window.loadFile(path.join(__dirname, "../renderer/index.html"));
 }
 
-app.whenReady().then(async () => {
-  session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
-  session.defaultSession.setPermissionCheckHandler(() => false);
-  if (process.env.PRODOPS_SERVICE_PORT === undefined) {
-    localService = new LocalService(serviceLaunchOptions(app.isPackaged, process.resourcesPath,
-      path.resolve(__dirname, "../../../.."), app.getPath("userData")));
-    await localService.start().catch(() => undefined);
-  }
-  await createWindow();
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow().catch(() => app.exit(1));
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on("second-instance", () => lifecycle?.show());
+  app.whenReady().then(async () => {
+    session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
+    session.defaultSession.setPermissionCheckHandler(() => false);
+    if (process.env.PRODOPS_SERVICE_PORT === undefined) {
+      localService = new LocalService(serviceLaunchOptions(app.isPackaged, process.resourcesPath,
+        path.resolve(__dirname, "../../../.."), app.getPath("userData")));
+      await localService.start().catch(() => undefined);
     }
+    await createWindow();
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length > 0) lifecycle?.show();
+      else {
+        createWindow().catch(() => app.exit(1));
+      }
+    });
+  }).catch(() => {
+    console.error("Desktop failed to start. Check the development build and configuration.");
+    app.exit(1);
   });
-}).catch(() => {
-  console.error("Desktop failed to start. Check the development build and configuration.");
-  app.exit(1);
-});
 
-app.on("before-quit", (event) => {
-  if (quitPermitted || localService === null) return;
-  event.preventDefault();
-  if (shutdownPending) return;
-  shutdownPending = true;
-  void localService.stop().then(() => { quitPermitted = true; app.quit(); }, () => { quitPermitted = true; app.exit(1); });
-});
+  app.on("before-quit", (event) => {
+    if (quitPermitted) return;
+    if (localService === null) { quitPermitted = true; return; }
+    event.preventDefault();
+    if (shutdownPending) return;
+    shutdownPending = true;
+    for (const window of BrowserWindow.getAllWindows()) window.setTitle("ProdOps · 正在等待当前查询收尾");
+    void localService.stop().then(() => { quitPermitted = true; app.quit(); }, () => { quitPermitted = true; app.exit(1); });
+  });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
-});
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") app.quit();
+  });
+  app.on("will-quit", () => lifecycle?.dispose());
+}

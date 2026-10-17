@@ -63,6 +63,11 @@ def create_app(settings: ServiceSettings, *, on_ready: Callable[[UUID], None] | 
                 try:
                     if scheduler is not None:
                         await scheduler.stop()
+                        # No worker remains and this lifespan still owns the OS
+                        # lock. Reconcile any committed intent whose result could
+                        # not be confirmed before shutdown, including failed owners.
+                        if store is not None:
+                            await store.recover_orphans()
                 finally:
                     if store is not None:
                         await store.close()

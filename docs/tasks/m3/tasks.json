@@ -123,7 +123,7 @@
   {
     "id": "M3-T05",
     "title": "窗口托盘与进程收尾",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M3-T04"
     ],
@@ -139,9 +139,15 @@
       "M3-T05-AC02",
       "M3-T05-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "apps/desktop/src/main/lifecycle.ts",
+      "apps/desktop/src/main/index.ts",
+      "services/agent/src/prodops/bootstrap/app.py",
+      "apps/desktop/scripts/verify-lifecycle.mjs",
+      "apps/desktop/tests/lifecycle.cjs"
+    ],
+    "verification": "docs/verification/m3-t05.json",
+    "review": "docs/reviews/m3-t05.json"
   },
   {
     "id": "M3-T06",

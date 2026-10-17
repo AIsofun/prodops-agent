@@ -1,0 +1,96 @@
+{
+  "status": "PASS",
+  "records": [
+    {
+      "phase": "tray",
+      "run_id": "38fd65f3-7255-46b6-ae66-7703afb29343",
+      "conversation_id": "317c5015-0f64-4b61-9621-189e89fefbb2",
+      "parent_pid": 56668,
+      "service_pid": 57776,
+      "service_port": 56454,
+      "instance_id": "ddef1625-3bf3-4f53-95a3-e28f565d65d8",
+      "deployment_id": "b5f11d4c-83e4-42f3-93c0-1f63897ea16e",
+      "native_tray_created": true,
+      "tray_bounds": {
+        "x": 843,
+        "y": 684,
+        "width": 30,
+        "height": 45
+      },
+      "status": "PASS",
+      "hidden_task_succeeded": true,
+      "second_instance_exit": 0,
+      "same_service_instance": true,
+      "original_conversation_restored": true,
+      "draft_preserved": true,
+      "menu_restore": true,
+      "tray_double_click_restore": true,
+      "tray_destroyed": true,
+      "service_exit_code": 0
+    },
+    {
+      "phase": "pipe",
+      "run_id": "150c110f-28a4-4d37-96a3-510873d9def5",
+      "conversation_id": "ac84be3a-5f11-4161-b146-7ea799fa38fb",
+      "parent_pid": 48496,
+      "service_pid": 51992,
+      "service_port": 56460,
+      "instance_id": "eb4d154b-2009-405e-a2ad-c49dba84f780",
+      "deployment_id": "d402972e-97bf-4ad4-907c-697065f9dcbd",
+      "native_tray_created": true,
+      "tray_bounds": {
+        "x": 843,
+        "y": 684,
+        "width": 30,
+        "height": 45
+      },
+      "status": "PASS",
+      "private_pipe_closed": true,
+      "service_exit_code": 0,
+      "tray_destroyed": true,
+      "stored": {
+        "status": "recovery_required",
+        "unknown_calls": 1,
+        "evidence_count": 0,
+        "error_code": "internal_error",
+        "last_seq": 5
+      }
+    },
+    {
+      "phase": "parent",
+      "run_id": "63757615-cfa9-44a0-8b51-68c40d630b1e",
+      "conversation_id": "de7f7d64-0e5f-4944-ad9a-4ee39e4d798d",
+      "parent_pid": 57504,
+      "service_pid": 37788,
+      "service_port": 54243,
+      "instance_id": "8365cfe3-b80a-4513-be2b-0f08b37fb460",
+      "deployment_id": "e886062c-ddd5-43f2-909f-4f5b54d3af46",
+      "native_tray_created": true,
+      "tray_bounds": {
+        "x": 843,
+        "y": 684,
+        "width": 30,
+        "height": 45
+      },
+      "status": "PASS",
+      "parent_hard_exit": true,
+      "owned_service_exited": true,
+      "service_port_closed": true,
+      "elapsed_ms": 999,
+      "stored": {
+        "status": "running",
+        "unknown_calls": 0,
+        "evidence_count": 0,
+        "error_code": null,
+        "last_seq": 4
+      },
+      "review_after_real_restart": {
+        "run_id": "63757615-cfa9-44a0-8b51-68c40d630b1e",
+        "unknown_calls": 1,
+        "status": "succeeded",
+        "evidence_count": 3,
+        "explicit_review_required": true
+      }
+    }
+  ]
+}

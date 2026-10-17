@@ -93,6 +93,7 @@ app.once("browser-window-created", (_event, window) => {
       completed = true;
       clearTimeout(timer);
       window.close();
+      app.quit(); // Window close now hides to the real tray; this probe explicitly exits.
     } catch (error) {
       console.error(error);
       app.exit(1);

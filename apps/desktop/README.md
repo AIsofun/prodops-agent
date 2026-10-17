@@ -12,7 +12,7 @@ npm run desktop:dev
 
 Electron 安装步骤下载锁定版本的官方运行时。可将 ELECTRON_CACHE 环境变量设为仓库内 .quality-reports/electron-cache。安装开发环境需要联网；这不代表未来离线产品安装已完成。
 
-开发命令编译 main/preload/shared，启动仅监听 127.0.0.1 的随机端口 Vite，再打开桌面窗口；关闭 Windows 窗口后 Electron 退出并关闭 Vite。界面文件支持 Vite 热更新；修改 main/preload 后重新启动命令。构建文件可独立启动：
+开发命令编译 main/preload/shared，启动仅监听 127.0.0.1 的随机端口 Vite，再打开桌面窗口；关闭Windows窗口会隐藏至托盘，明确从托盘退出后Electron与Vite才关闭。再次启动同一用户数据目录只唤回原窗口，保留原会话/草稿与同一个服务。界面文件支持 Vite 热更新；修改 main/preload 后重新启动命令。构建文件可独立启动：
 
 ```text
 npm run desktop:build
@@ -53,6 +53,7 @@ node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-inte
 node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-dev --dev
 node apps/desktop/scripts/verify-workspace.mjs .quality-reports/workspace-integration
 node apps/desktop/scripts/verify-faults.mjs .quality-reports/desktop-faults
+node apps/desktop/scripts/verify-lifecycle.mjs .quality-reports/lifecycle-integration
 ```
 
 smoke 测试在真实 Electron 内导入正式主入口，探测渲染、权限设置和桥接范围，保存 desktop.png 与 runtime.json，并验证关闭窗口后进程正常退出。每次使用隔离 userData，结束后清理；--managed 强制走自动服务入口，--business通过正式沙箱preload执行隔离模拟任务、事件和历史检查，尚不等同业务界面按钮验收。测试需要桌面会话与允许启动 Electron 的环境，不能用浏览器截图替代。Windows 故障测试需要允许回收测试创建的进程树。构建验证不包含随包 Python、托盘或安装包。
@@ -62,5 +63,7 @@ smoke 测试在真实 Electron 内导入正式主入口，探测渲染、权限�
 workspace集成在真实Electron里操作正式React表单与按钮，先验证模拟诊断、忙碌草稿、追问和会话隔离，再用正式受保护API准备超过一页的隔离历史，点击三种分页入口；完整退出Electron与本机服务后，以同一隔离userData再次启动，验证消息和证据。保存create/reopen运行记录与实际截图，结束清理隔离数据，不复用用户数据库。
 
 faults集成只在测试进程替换开发入口为tests/desktop_fault_entry.py，以文件门控暂停模拟查询、明确注入一次410或丢失一帧；网络断开作用于测试自身真实SSE请求，硬中断只终止该桌面创建的服务进程树。生产入口不读取这些测试开关。验证取消保留在途证据、重连水位、缺口快照及硬退出后人工核对；不是生产设备测试。
+
+lifecycle集成创建真实Windows原生Tray，记录其实际bounds，并程序触发真实菜单/双击回调；隐藏时服务完成任务，第二个Electron进程因单实例锁退出0并唤回原窗口，随后明确退出验证服务PID消失及端口关闭。另测运行中关闭私有通道的5秒调度宽限及未知结果；仅硬结束测试Electron父进程后核对无遗留，真实重开才将未确认记录转为待核对。这里不承诺操作系统强制终止时仍能执行优雅退出。开发托盘图标取当前可执行文件图标，正式视觉与签名不由此卡交付。
 
 实现依据：[Electron 安全建议](https://www.electronjs.org/docs/latest/tutorial/security)、[Vite 开发与构建](https://vite.dev/guide/)。

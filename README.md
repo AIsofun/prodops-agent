@@ -4,7 +4,7 @@
 
 开发进度见 [M1阶段任务卡](docs/tasks/m1/README.md)与[M2任务核心](docs/tasks/m2/README.md)，工程检查与交付格式见 [统一质量入口](docs/quality-workflow.md)。新的 [Python 服务骨架](services/agent/README.md) 已支持 local/server 开发入口、健康检查和能力查询；[API 与事件契约](contracts/README.md) 提供实际 OpenAPI 导出与生成的 TypeScript 类型。新的 workspace 环境独立于下述 Demo 运行依赖。
 
-M1 开发骨架已完成[集成验收](docs/verification/2026-10-16-m1-t08-acceptance.md)：[Windows 桌面开发窗口](apps/desktop/README.md)可经受限桥接读取实际服务状态，默认质量检查和真实 Windows CI 通过。Python任务核心已具备受保护会话、持久调度、显式mock证据、取消/核对恢复及SSE，已完成[M2集成验收](docs/verification/2026-10-17-m2-t06-acceptance.md)。M3已接入私有服务启动、有限桥接和真实会话界面，支持有界上下文、进度/证据、重开历史、取消/核对恢复及断线补发；托盘、单实例和安装包继续按[M3任务卡](docs/tasks/m3/README.md)推进。
+M1 开发骨架已完成[集成验收](docs/verification/2026-10-16-m1-t08-acceptance.md)：[Windows 桌面开发窗口](apps/desktop/README.md)可经受限桥接读取实际服务状态，默认质量检查和真实 Windows CI 通过。Python任务核心已具备受保护会话、持久调度、显式mock证据、取消/核对恢复及SSE，已完成[M2集成验收](docs/verification/2026-10-17-m2-t06-acceptance.md)。M3已接入私有服务启动、有限桥接和真实会话界面，支持有界上下文、进度/证据、重开历史、取消/核对恢复及断线补发；托盘/单实例及自有服务收尾已验证，安装包继续按[M3任务卡](docs/tasks/m3/README.md)推进。
 
 一个"**教学型但工程化**"的最小 Agent 演示项目，真正带
 **Think → Act → Observe** 主循环、可插拔工具、可插拔 LLM 的 Agent 骨架。

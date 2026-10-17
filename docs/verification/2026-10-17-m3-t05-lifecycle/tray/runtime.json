@@ -1,0 +1,27 @@
+{
+  "phase": "tray",
+  "run_id": "38fd65f3-7255-46b6-ae66-7703afb29343",
+  "conversation_id": "317c5015-0f64-4b61-9621-189e89fefbb2",
+  "parent_pid": 56668,
+  "service_pid": 57776,
+  "service_port": 56454,
+  "instance_id": "ddef1625-3bf3-4f53-95a3-e28f565d65d8",
+  "deployment_id": "b5f11d4c-83e4-42f3-93c0-1f63897ea16e",
+  "native_tray_created": true,
+  "tray_bounds": {
+    "x": 843,
+    "y": 684,
+    "width": 30,
+    "height": 45
+  },
+  "status": "PASS",
+  "hidden_task_succeeded": true,
+  "second_instance_exit": 0,
+  "same_service_instance": true,
+  "original_conversation_restored": true,
+  "draft_preserved": true,
+  "menu_restore": true,
+  "tray_double_click_restore": true,
+  "tray_destroyed": true,
+  "service_exit_code": 0
+}

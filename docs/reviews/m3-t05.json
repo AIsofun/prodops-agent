@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T05",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m3-t05-lifecycle.md",
+  "findings": [
+    {"id": "R1", "severity": "P2", "status": "fixed", "reason": "Single instance precedes service startup and only restores the original window."},
+    {"id": "R2", "severity": "P2", "status": "fixed", "reason": "Hide and explicit quit have distinct paths; service ownership and bounded cleanup remain in main."},
+    {"id": "R3", "severity": "P2", "status": "fixed", "reason": "Separate channel EOF evidence from hard parent death and require real restart reconciliation."},
+    {"id": "R4", "severity": "P1", "status": "fixed", "reason": "Reconcile committed unconfirmed intents after workers stop while the service OS lock remains held."},
+    {"id": "R5", "severity": "P2", "status": "fixed", "reason": "Test receipt freshness and owned-process cleanup precede isolated directory deletion."}
+  ]
+}

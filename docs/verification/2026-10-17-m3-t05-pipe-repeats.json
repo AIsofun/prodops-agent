@@ -1,0 +1,90 @@
+{
+  "status": "PASS",
+  "scope": "three isolated private-channel EOF runs before final shutdown reconciliation hardening",
+  "records": [
+    {
+      "phase": "pipe",
+      "run_id": "13873dfb-7977-419c-9f0e-d34d76e57dac",
+      "conversation_id": "cc07d204-3ac4-48d2-acc7-223c73c4468a",
+      "parent_pid": 15100,
+      "service_pid": 13892,
+      "service_port": 61489,
+      "instance_id": "8ecc67d4-5bbd-4e3d-9f44-f28e47948b35",
+      "deployment_id": "8d3d0c24-c9c5-460e-99f7-1303f812bef8",
+      "native_tray_created": true,
+      "tray_bounds": {
+        "x": 843,
+        "y": 684,
+        "width": 30,
+        "height": 45
+      },
+      "status": "PASS",
+      "private_pipe_closed": true,
+      "service_exit_code": 0,
+      "tray_destroyed": true,
+      "stored": {
+        "status": "recovery_required",
+        "unknown_calls": 1,
+        "evidence_count": 0,
+        "error_code": "internal_error",
+        "last_seq": 5
+      }
+    },
+    {
+      "phase": "pipe",
+      "run_id": "8166d3d2-c96a-46a3-98b3-ca6a1c575fec",
+      "conversation_id": "0a632e20-cde6-4480-a44c-45263bc9ed48",
+      "parent_pid": 40652,
+      "service_pid": 51616,
+      "service_port": 63417,
+      "instance_id": "d7615502-ff6c-4573-bd7b-a137783e0dd7",
+      "deployment_id": "b481216f-6ad7-4d11-bae2-3a076c4dde9b",
+      "native_tray_created": true,
+      "tray_bounds": {
+        "x": 843,
+        "y": 684,
+        "width": 30,
+        "height": 45
+      },
+      "status": "PASS",
+      "private_pipe_closed": true,
+      "service_exit_code": 0,
+      "tray_destroyed": true,
+      "stored": {
+        "status": "recovery_required",
+        "unknown_calls": 1,
+        "evidence_count": 0,
+        "error_code": "internal_error",
+        "last_seq": 5
+      }
+    },
+    {
+      "phase": "pipe",
+      "run_id": "66662008-ee8b-4943-9ada-6c38440b9e9b",
+      "conversation_id": "e2ec4c6d-120e-4080-b002-3fe7c646277a",
+      "parent_pid": 46836,
+      "service_pid": 46768,
+      "service_port": 63435,
+      "instance_id": "dcbb9997-6619-477c-bcac-c14331482035",
+      "deployment_id": "5de558ee-a6c5-4125-8a1f-80388795abd2",
+      "native_tray_created": true,
+      "tray_bounds": {
+        "x": 843,
+        "y": 684,
+        "width": 30,
+        "height": 45
+      },
+      "status": "PASS",
+      "private_pipe_closed": true,
+      "service_exit_code": 0,
+      "tray_destroyed": true,
+      "stored": {
+        "status": "recovery_required",
+        "unknown_calls": 1,
+        "evidence_count": 0,
+        "error_code": "internal_error",
+        "last_seq": 5
+      }
+    }
+  ]
+}

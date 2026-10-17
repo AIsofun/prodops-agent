@@ -1,0 +1,28 @@
+{
+  "phase": "pipe",
+  "run_id": "150c110f-28a4-4d37-96a3-510873d9def5",
+  "conversation_id": "ac84be3a-5f11-4161-b146-7ea799fa38fb",
+  "parent_pid": 48496,
+  "service_pid": 51992,
+  "service_port": 56460,
+  "instance_id": "eb4d154b-2009-405e-a2ad-c49dba84f780",
+  "deployment_id": "d402972e-97bf-4ad4-907c-697065f9dcbd",
+  "native_tray_created": true,
+  "tray_bounds": {
+    "x": 843,
+    "y": 684,
+    "width": 30,
+    "height": 45
+  },
+  "status": "PASS",
+  "private_pipe_closed": true,
+  "service_exit_code": 0,
+  "tray_destroyed": true,
+  "stored": {
+    "status": "recovery_required",
+    "unknown_calls": 1,
+    "evidence_count": 0,
+    "error_code": "internal_error",
+    "last_seq": 5
+  }
+}

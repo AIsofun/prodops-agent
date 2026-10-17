@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T05",
+  "environment": {"os": "Windows 11", "arch": "AMD64", "python": "3.13.2", "node": "24.14.1", "electron": "44.8.0"},
+  "source": {"revision": "f6ed407", "worktree": "Windows single instance, native tray and owned process shutdown"},
+  "criteria": [
+    {"id": "M3-T05-AC01", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t05-lifecycle.md"},
+    {"id": "M3-T05-AC02", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t05-lifecycle.md"},
+    {"id": "M3-T05-AC03", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t05-lifecycle.md"}
+  ]
+}

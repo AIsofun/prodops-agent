@@ -11,6 +11,7 @@ import tempfile
 import time
 from typing import Any
 import unittest
+from unittest.mock import patch
 from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
@@ -21,6 +22,7 @@ from prodops.adapters.storage.lock import DatabaseServiceLock
 from prodops.adapters.storage.models import RunEventRow, RunRow, ToolCallRow
 from prodops.adapters.storage.recovery import SQLiteRecoveryStore
 from prodops.adapters.storage.sqlite import StorageInitializationError
+from prodops.adapters.mock_tools import MockTools
 from prodops.agent.mock import MockDiagnosticAgent
 from prodops.api.models import RunEvent
 from prodops.application.errors import CancellationRequested, IdempotencyConflict, InvalidRecovery, StorageFailure
@@ -134,6 +136,61 @@ class RecoveryTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(tool.status, "unknown")
             self.assertEqual(row.checkpoint["tool_calls_used"], 1)
             self.assertGreaterEqual(float(str(row.checkpoint["elapsed_seconds"])), 5)
+
+    async def test_shutdown_cancels_worker_once_and_awaits_durable_unknown_result(self) -> None:
+        run_id, tools = await self.submit(), GateTools()
+        scheduler = await self.schedule(tools)
+        await asyncio.wait_for(tools.started.wait(), 2)
+        # Wait until the stop path is gathering workers, then delay the durable
+        # interruption write. A second cancellation would discard this result.
+        original = self.store.fail
+        writes = 0
+
+        async def delayed(*args: Any, **kwargs: Any) -> None:
+            nonlocal writes
+            writes += 1
+            await asyncio.sleep(0.1)
+            await original(*args, **kwargs)
+
+        with patch.object(self.store, "fail", side_effect=delayed):
+            await scheduler.stop()
+        run = await self.store.get_run(run_id)
+        assert run is not None
+        self.assertEqual(run.status, "recovery_required")
+        self.assertEqual(len(run.unknown_tool_call_ids), 1)
+        self.assertEqual(writes, 1)
+
+    async def test_lifespan_shutdown_reconciles_unconfirmed_intent_after_execution_owner_failure(self) -> None:
+        class FailedOwnerTools(MockTools):
+            async def execute(self, request: ToolRequest) -> Observation:
+                raise StorageFailure()
+
+        database = Path(self.directory.name) / "failed-owner.sqlite3"
+        token = "isolated-shutdown-owner-token-000000000000"
+        settings = ServiceSettings.model_validate({"mode": "local", "database": database, "development_token": token, "execution_enabled": True})
+        headers = {"Authorization": f"Bearer {token}", "X-ProdOps-Protocol": "1.4"}
+        with patch("prodops.bootstrap.app.MockTools", FailedOwnerTools), TestClient(create_app(settings), base_url="http://127.0.0.1") as client:
+            workspace = client.get("/api/v1/workspaces", headers=headers).json()["items"][0]["workspace_id"]
+            conversation = client.post(f"/api/v1/workspaces/{workspace}/conversations", headers=headers, json={"title": "Owner failure"}).json()["conversation_id"]
+            submitted = client.post(f"/api/v1/conversations/{conversation}/runs", headers={**headers, "Idempotency-Key": str(uuid4())}, json={"content": "camera", "execution_mode": "mock"})
+            self.assertEqual(submitted.status_code, 202)
+            run_id = UUID(submitted.json()["run_id"])
+            for _ in range(100):
+                if client.get("/health/ready").status_code == 503:
+                    break
+                time.sleep(0.02)
+            else:
+                self.fail("Execution owner failure did not revoke readiness")
+        reopened = SQLiteRecoveryStore(database)
+        await reopened.start()
+        try:
+            run = await reopened.get_run(run_id)
+            assert run is not None
+            self.assertEqual(run.status, "recovery_required")
+            self.assertEqual(len(run.unknown_tool_call_ids), 1)
+            self.assertEqual(run.evidence, ())
+        finally:
+            await reopened.close()
 
     async def test_cancel_between_steps_and_after_terminal_does_not_rewrite_results(self) -> None:
         run_id = await self.submit()
