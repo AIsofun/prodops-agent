@@ -1,52 +1,104 @@
-import { useEffect, useState } from "react";
-import type { ConnectionStatus } from "../shared/connection.js";
+import { busyRun, useWorkspace, type Snapshot } from "./useWorkspace.js";
+import type { RunEvent } from "../shared/business.js";
 
 const labels = {
-  ready: ["服务已就绪", "已连接当前服务。诊断界面正在接入。"],
+  ready: ["服务已就绪", "当前使用模拟诊断，不连接真实设备或模型。"],
   offline: ["服务离线", "请重新打开应用；若仍失败，请检查服务配置。"],
   incompatible: ["协议不兼容", "请使用与桌面版本兼容的服务，再重新连接。"],
   not_ready: ["服务尚未就绪", "服务正在准备，请稍后再次检查。"],
-  invalid_response: ["服务响应异常", "请核对开发服务版本与配置，然后重新检查。"],
+  invalid_response: ["服务响应异常", "请核对服务版本与配置，然后重新检查。"],
 };
+const statuses: Record<Snapshot["status"], string> = {
+  queued: "排队中", running: "正在排查", awaiting_approval: "等待确认", cancelling: "正在取消",
+  recovery_required: "中断后待核对", succeeded: "诊断完成", failed: "诊断失败", cancelled: "已取消",
+};
+const toolNames: Record<string, string> = { "mock.read_metrics": "读取模拟指标", "mock.read_logs": "读取模拟日志", "mock.read_runbook": "查阅模拟操作手册" };
+function eventText(event: RunEvent): string {
+  switch (event.event_type) {
+    case "run.created": return "任务已提交，等待执行";
+    case "run.started": return "开始模拟诊断";
+    case "step.started": return toolNames[event.payload.label] ?? "开始排查步骤";
+    case "tool.started": return toolNames[event.payload.tool_name] ?? "开始只读查询";
+    case "tool.completed": return event.payload.status === "succeeded" ? "查询完成，证据已保存" : "查询未能完成";
+    case "message.delta": return "诊断回复已保存";
+    case "approval.requested": return "操作需要明确确认";
+    case "run.completed": return "只读诊断完成，故障恢复情况仍需核验";
+    case "run.failed": return "诊断失败，请查看任务状态";
+    case "run.cancelled": return "任务已取消，已有结果保留";
+    case "run.cancel_requested": return "已请求取消，等待当前步骤收尾";
+    case "run.recovery_required": return "执行中断，需要核对未确认结果";
+    case "run.recovery_approved": return "已确认继续执行模拟查询";
+  }
+}
+const time = (value: string) => new Date(value).toLocaleString("zh-CN", { hour12: false });
+function Pagination({ earlier, recent, onEarlier, onRecent, label }: { earlier: boolean; recent: boolean; onEarlier(): void; onRecent(): void; label: string }) {
+  if (!earlier && !recent) return null;
+  return <div className="pagination">{recent && <button onClick={onRecent}>最近{label}</button>}{earlier && <button onClick={onEarlier}>更早{label}</button>}</div>;
+}
 
 export function App() {
   const info = window.prodops.getInfo();
-  const [connection, setConnection] = useState<ConnectionStatus | null>(null);
-  const [checking, setChecking] = useState(true);
-  async function checkConnection() {
-    setChecking(true);
-    try { setConnection(await window.prodops.connections.getStatus()); }
-    catch { setConnection({ connection_id: "development", mode: "local", state: "invalid_response", deployment_id: null, protocol_version: null }); }
-    finally { setChecking(false); }
-  }
-  useEffect(() => { void checkConnection(); }, []);
-  const text = checking ? ["正在检查服务", "正在连接已配置的开发服务。"] : connection ? labels[connection.state] : ["服务响应异常", "请重新检查连接。"];
-  return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand"><span className="brand-mark">P</span><strong>{info.name}</strong></div>
-        <div className="workspace"><span className="eyebrow">当前连接</span><strong>{connection?.mode === "server" ? "服务器开发环境" : "本机开发环境"}</strong></div>
-        <button className="new-chat" disabled>＋ 新建排查</button>
-        <div className="section-label">排查记录</div>
-        <div className="empty-history">暂无会话记录<br /><span>完成的排查将在这里保留</span></div>
-        <div className="sidebar-footer"><span className="status-dot" />开发预览 <span>v{info.version}</span></div>
-      </aside>
-      <main>
-        <header className="topbar"><span>设备异常排查</span><span className="preview-badge">开发预览</span></header>
-        <div className="content">
-          <div className="intro"><div className="eyebrow">PRODUCTION OPERATIONS</div><h1>从异常描述开始排查</h1><p>连接服务后，结合设备状态、日志和操作手册，逐步核对问题。</p></div>
-          <section className="connection-card" aria-label="服务连接" data-connection-state={checking ? "checking" : connection?.state}>
-            <div className="connection-icon">◎</div><div aria-live="polite"><h2>{text[0]}</h2><p>{text[1]}</p></div><button disabled={checking} onClick={() => void checkConnection()}>检查连接</button>
-          </section>
-          <section className="steps" aria-label="排查流程">
-            <article><span>01</span><h3>描述异常</h3><p>说明设备、发生时间和观察到的现象。</p></article>
-            <article><span>02</span><h3>核对证据</h3><p>查看每一步进度，以及查询结果的来源。</p></article>
-            <article><span>03</span><h3>确认下一步</h3><p>结合诊断与现场情况，决定后续处理。</p></article>
-          </section>
-          <div className="composer"><textarea aria-label="异常描述" disabled placeholder="诊断功能准备中，连接服务后即可开始。" /><div><span>仅在授权范围内查询设备和数据</span><button disabled aria-label="提交排查">↑</button></div></div>
-          <p className="scope-note">当前版本提供基础窗口，诊断任务与历史记录尚未开放。</p>
-        </div>
-      </main>
-    </div>
-  );
+  const state = useWorkspace();
+  const busy = busyRun(state.run);
+  const text = state.checking ? ["正在检查服务", "正在连接当前服务。"] : state.connection ? labels[state.connection.state] : ["服务响应异常", "请重新检查连接。"];
+  return <div className="app-shell">
+    <aside className="sidebar">
+      <div className="brand"><span className="brand-mark">P</span><strong>{info.name}</strong></div>
+      <div className="workspace"><span className="eyebrow">当前连接</span><strong>{state.connection?.mode === "server" ? "服务器开发环境" : "本机开发环境"}</strong><span className="mock-tag">模拟诊断</span></div>
+      <button className="new-chat" data-action="new-conversation" disabled={!state.workspaceId || state.submitting || state.loading} onClick={() => void state.createConversation()}>＋ 新建排查</button>
+      <div className="section-label">排查记录</div>
+      <nav className="conversation-list" aria-label="会话列表">
+        {state.conversations.map((item) => <button key={item.conversation_id} data-conversation-id={item.conversation_id} aria-current={item.conversation_id === state.selected?.conversation_id ? "page" : undefined}
+          disabled={state.submitting} onClick={() => void state.selectConversation(item)}><strong>{item.title}</strong><span>{time(item.created_at)}</span></button>)}
+        {state.conversations.length === 0 && <div className="empty-history">暂无会话记录<br /><span>从右侧描述一个问题开始</span></div>}
+      </nav>
+      <Pagination label="会话" earlier={state.conversationNext !== null} recent={state.conversationCursor !== null}
+        onEarlier={() => void state.paginate("conversations", state.conversationNext)} onRecent={() => void state.paginate("conversations", null)} />
+      <div className="sidebar-footer"><span className="status-dot" />开发预览 <span>v{info.version}</span></div>
+    </aside>
+    <main>
+      <header className="topbar"><span>设备异常排查</span><span className="preview-badge">模拟环境 · 只读</span></header>
+      <div className="content">
+        <div className={`intro ${state.selected ? "compact" : ""}`}><div className="eyebrow">PRODUCTION OPERATIONS</div><h1>{state.selected?.title ?? "从异常描述开始排查"}</h1>
+          {!state.selected && <p>描述问题，逐步核对指标、日志和操作手册，查看带来源的建议。</p>}</div>
+        <section className="connection-card" aria-label="服务连接" data-connection-state={state.checking ? "checking" : state.connection?.state}>
+          <div className="connection-icon">◎</div><div aria-live="polite"><h2>{text[0]}</h2><p>{text[1]}</p></div><button disabled={state.checking || state.submitting} onClick={() => void state.checkConnection()}>检查连接</button>
+        </section>
+        {state.problem && <section className="problem" role="alert"><p>{state.problem.text}</p>{state.problem.requestId && <small>关联记录：{state.problem.requestId}</small>}
+          <button disabled={state.loading || state.submitting} onClick={() => void (state.selected ? state.selectConversation(state.selected) : state.checkConnection())}>刷新当前记录</button></section>}
+        {state.loading && <p role="status">正在读取会话记录…</p>}
+        <section className="message-list" aria-label="会话消息" data-conversation={state.selected?.conversation_id ?? ""}>
+          <Pagination label="消息" earlier={state.messageNext !== null} recent={state.messageCursor !== null}
+            onEarlier={() => void state.paginate("messages", state.messageNext)} onRecent={() => void state.paginate("messages", null)} />
+          {[...state.messages].reverse().map((message) => <article className={`message ${message.role}`} key={message.message_id} data-message-id={message.message_id} data-role={message.role}>
+            <header><strong>{message.role === "user" ? "你" : "模拟诊断"}</strong><time>{time(message.created_at)}</time></header><p>{message.content}</p></article>)}
+          {state.selected && !state.loading && state.messages.length === 0 && <p className="empty-view">这是一个新会话。可输入相机掉线、OCR质量下降、Kafka堆积或推理延迟。</p>}
+        </section>
+        {state.run && <section className="run-card" aria-label="任务状态" data-run-id={state.run.run_id} data-run-status={state.run.status}>
+          <div className="run-heading"><h2>{statuses[state.run.status]}</h2><span className="mock-tag">显式模拟</span></div>
+          <p className="run-reference">任务 {state.run.run_id}</p>
+          <p className="resolution" data-resolution={state.run.resolution_status}>故障是否恢复：{({ unknown: "尚未核验", unresolved: "未恢复", resolved: "已核验恢复" })[state.run.resolution_status]}</p>
+          {state.run.error && <p className="problem">本次排查未完成（{state.run.error.code}）。已有证据保留；请核对问题与执行预算后再发起新排查。</p>}
+          {state.run.status === "recovery_required" && <p>上次执行中断，请保留当前记录并核对未知结果。恢复操作将在后续交互中接入。</p>}
+          <details className="progress" open><summary>排查进度 <span>{state.events.length} 条已保存事件</span></summary>
+            <ol>{state.events.map((event) => <li key={event.seq} data-event-seq={event.seq}><span>{eventText(event)}</span><time>{new Date(event.occurred_at).toLocaleTimeString("zh-CN", { hour12: false })}</time></li>)}</ol>
+            {state.stream === "open" && <p className="stream-status">正在接收进度…</p>}
+          </details>
+          <div className="evidence-grid" aria-label="诊断证据">
+            {state.run.evidence.map((item) => <article className="evidence" key={item.evidence_id} data-evidence-id={item.evidence_id}><h3>模拟证据</h3><p>{item.summary}</p><code>{item.source}</code><time>采集：{time(item.collected_at)}</time>
+              <details><summary>查看证据记录</summary><pre>{JSON.stringify(item, null, 2)}</pre></details></article>)}
+          </div>
+        </section>}
+        {state.runs.length > 0 && <section className="run-history" aria-label="历史任务"><h2>本会话任务</h2><div>{state.runs.map((item) => <button key={item.run_id} disabled={busy || state.submitting} data-history-run={item.run_id}
+          aria-pressed={item.run_id === state.run?.run_id} onClick={() => state.selectRun(item)}>{statuses[item.status]} · {time(item.created_at)}</button>)}</div>
+          <Pagination label="任务" earlier={state.runNext !== null} recent={state.runCursor !== null} onEarlier={() => void state.paginate("runs", state.runNext)} onRecent={() => void state.paginate("runs", null)} /></section>}
+        <form className="composer" onSubmit={(event) => { event.preventDefault(); void state.submit(); }}>
+          <label className="sr-only" htmlFor="diagnostic-input">异常描述</label><textarea id="diagnostic-input" aria-label="异常描述" value={state.draft} maxLength={32000} disabled={!state.workspaceId || state.loading}
+            onChange={(event) => state.setDraft(event.target.value)} placeholder={busy ? "可继续编辑草稿，当前任务结束后再发送。" : state.selected ? "继续描述问题，或输入“继续排查”…" : "例如：2号相机掉线了，最近五分钟没有图像。"} />
+          <div><span>{busy ? "当前任务尚未结束，草稿会保留" : "只查询模拟数据，不执行设备处置"}</span><button type="submit" disabled={!state.workspaceId || busy || state.loading || state.submitting || !state.draft.trim()} aria-label="提交排查">{state.submitting ? "提交中…" : "发送 ↑"}</button></div>
+        </form>
+        <p className="scope-note">模拟结果不代表现场事实。任务完成与故障恢复分别记录。</p>
+      </div>
+    </main>
+  </div>;
 }

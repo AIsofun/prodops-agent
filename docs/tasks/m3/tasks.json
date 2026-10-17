@@ -61,7 +61,7 @@
   {
     "id": "M3-T03",
     "title": "会话诊断与证据界面",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M3-T02"
     ],
@@ -79,9 +79,15 @@
       "M3-T03-AC02",
       "M3-T03-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "apps/desktop/src/renderer/App.tsx",
+      "apps/desktop/src/renderer/useWorkspace.ts",
+      "services/agent/src/prodops/adapters/storage/execution.py",
+      "apps/desktop/scripts/verify-workspace.mjs",
+      "apps/desktop/tests/workspace-probe.cjs"
+    ],
+    "verification": "docs/verification/m3-t03.json",
+    "review": "docs/reviews/m3-t03.json"
   },
   {
     "id": "M3-T04",

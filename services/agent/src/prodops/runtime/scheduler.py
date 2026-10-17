@@ -108,7 +108,7 @@ class Scheduler:
 
             remaining()
             observations: list[Observation] = list(lease.observations)
-            for request in self.agent.plan(lease.content)[lease.completed_steps:]:
+            for request in self.agent.plan(lease.content, lease.context)[lease.completed_steps:]:
                 remaining()
                 # A task budget must never cancel an in-flight state commit: the
                 # returned lease version is needed to persist its final outcome.

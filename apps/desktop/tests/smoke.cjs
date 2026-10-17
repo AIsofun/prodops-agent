@@ -7,7 +7,7 @@ const output = path.resolve(process.env.PRODOPS_SMOKE_OUTPUT);
 fs.mkdirSync(output, { recursive: true });
 if (!path.isAbsolute(process.env.PRODOPS_SMOKE_USER_DATA ?? "")) throw new Error("Isolated desktop data directory required");
 app.setPath("userData", process.env.PRODOPS_SMOKE_USER_DATA);
-const timer = setTimeout(() => { console.error("Desktop smoke test timed out"); app.exit(1); }, 30000);
+const timer = setTimeout(() => { console.error("Desktop smoke test timed out"); app.exit(1); }, process.env.PRODOPS_SMOKE_WORKSPACE ? 90000 : 30000);
 let completed = false;
 app.once("browser-window-created", (_event, window) => {
   window.webContents.once("did-finish-load", async () => {
@@ -27,7 +27,7 @@ app.once("browser-window-created", (_event, window) => {
             csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]').content });
         } probe();
       })`);
-      assert.equal(result.heading, "从异常描述开始排查");
+      if (process.env.PRODOPS_SMOKE_WORKSPACE !== "reopen") assert.equal(result.heading, "从异常描述开始排查");
       assert.equal(result.node, "undefined");
       assert.equal(result.process, "undefined");
       assert.deepEqual(result.bridgeKeys.sort(), ["business", "connections", "events", "getInfo"]);
@@ -81,6 +81,7 @@ app.once("browser-window-created", (_event, window) => {
         })()`);
         assert.equal(result.business.status, "succeeded");
       }
+      if (process.env.PRODOPS_SMOKE_WORKSPACE) result.workspace = await require("./workspace-probe.cjs")(window, output, process.env.PRODOPS_SMOKE_WORKSPACE);
       await new Promise((resolve) => setTimeout(resolve, 350));
       fs.writeFileSync(path.join(output, "desktop.png"), (await window.webContents.capturePage()).toPNG());
       fs.writeFileSync(path.join(output, "runtime.json"), JSON.stringify({ status: "PASS", versions: process.versions, preferences: { contextIsolation: prefs.contextIsolation, sandbox: prefs.sandbox, nodeIntegration: prefs.nodeIntegration, webSecurity: prefs.webSecurity, webviewTag: prefs.webviewTag }, renderer: result, checks: ["React rendered", "renderer has no Node globals", "restricted bridge", "window closes and app exits"] }, null, 2) + "\n");

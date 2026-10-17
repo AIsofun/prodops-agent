@@ -5,13 +5,13 @@ from datetime import UTC, datetime
 import math
 from uuid import UUID, uuid4
 
-from sqlalchemy import func, select, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from prodops.adapters.storage.models import ConversationRow, MessageRow, RunEventRow, RunRow, ToolCallRow
 from prodops.adapters.storage.tasks import SQLiteTaskStore, storage_operation
 from prodops.application.errors import CancellationRequested, ExecutionBudgetExceeded, LostOwnership, StorageFailure
-from prodops.domain.execution import ExecutionLease, ExecutionPolicy, Observation, ToolRequest
+from prodops.domain.execution import ConversationTurn, ExecutionLease, ExecutionPolicy, Observation, ToolRequest
 from prodops.domain.events import EVENT_SCHEMA_VERSION
 
 
@@ -40,7 +40,7 @@ class SQLiteExecutionStore(SQLiteTaskStore):
             if row is None:
                 return None
             conversation = await session.get(ConversationRow, row.conversation_id)
-            if conversation is None or conversation.active_run_id != row.id or row.checkpoint.get("execution_mode") != "mock":
+            if conversation is None or conversation.workspace_id != workspace or conversation.active_run_id != row.id or row.checkpoint.get("execution_mode") != "mock":
                 raise StorageFailure()
             content = await session.scalar(select(MessageRow.content).where(MessageRow.run_id == row.id, MessageRow.role == "user"))
             if content is None:
@@ -60,7 +60,21 @@ class SQLiteExecutionStore(SQLiteTaskStore):
             await session.flush()
             evidence = self._run(row).evidence
             observations = tuple(Observation(item.source, item.summary) for item in evidence)
-            return ExecutionLease(UUID(row.id), owner_id, row.version, content, policy, used, float(elapsed), len(evidence), observations)
+            history = list(await session.scalars(select(MessageRow).where(
+                MessageRow.conversation_id == conversation.id,
+                or_(MessageRow.run_id.is_(None), MessageRow.run_id != row.id),
+            ).order_by(MessageRow.created_at.desc(), MessageRow.id.desc()).limit(8)))
+            turns: list[ConversationTurn] = []
+            remaining = 8000
+            for message in history:
+                if remaining == 0:
+                    break
+                if message.role not in ("user", "assistant"):
+                    raise StorageFailure()
+                text = message.content[:min(2000, remaining)]
+                turns.append(ConversationTurn("user" if message.role == "user" else "assistant", text))
+                remaining -= len(text)
+            return ExecutionLease(UUID(row.id), owner_id, row.version, content, policy, used, float(elapsed), len(evidence), observations, tuple(reversed(turns)))
 
     async def _owned(self, session: AsyncSession, lease: ExecutionLease, *, allow_cancelling: bool = False) -> RunRow:
         row = await session.get(RunRow, str(lease.run_id))

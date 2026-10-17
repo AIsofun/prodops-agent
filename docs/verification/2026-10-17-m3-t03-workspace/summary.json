@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "created": {
+    "phase": "create",
+    "conversation_id": "3de8cc91-f621-4d70-ac97-56f824fe9512",
+    "second_conversation_id": "f7ca5b22-9f74-4286-8125-dad2aede33c1",
+    "completed_messages": 4,
+    "evidence_count": 3,
+    "busy_draft_preserved": true,
+    "followup_context": true,
+    "new_conversation_isolated": true,
+    "conversation_pagination": true,
+    "message_pagination": true,
+    "run_pagination": true,
+    "draft_scope_isolated": true
+  },
+  "reopened": {
+    "phase": "reopen",
+    "conversation_id": "3de8cc91-f621-4d70-ac97-56f824fe9512",
+    "reopened_messages": 4,
+    "evidence_count": 3,
+    "history_persisted": true
+  }
+}

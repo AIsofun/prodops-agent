@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T03",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m3-t03-workspace.md",
+  "findings": [
+    {"id": "R1", "severity": "P2", "status": "fixed", "reason": "Move pending first-conversation drafts and clear only unchanged submitted text."},
+    {"id": "R2", "severity": "P2", "status": "fixed", "reason": "Page/query guards prevent live completion refresh from replacing older messages."},
+    {"id": "R3", "severity": "P2", "status": "fixed", "reason": "Conversation/watch generations isolate stale network results and subscriptions."},
+    {"id": "R4", "severity": "P2", "status": "fixed", "reason": "Server-owned scoped and bounded history is verified across followups and new conversations."}
+  ]
+}

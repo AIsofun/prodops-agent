@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 import math
+from typing import Literal
 from uuid import UUID
 
 
@@ -35,6 +36,12 @@ class Observation:
 
 
 @dataclass(frozen=True)
+class ConversationTurn:
+    role: Literal["user", "assistant"]
+    content: str
+
+
+@dataclass(frozen=True)
 class ExecutionLease:
     run_id: UUID
     owner_id: UUID
@@ -45,3 +52,4 @@ class ExecutionLease:
     elapsed_seconds: float
     completed_steps: int = 0
     observations: tuple[Observation, ...] = ()
+    context: tuple[ConversationTurn, ...] = ()

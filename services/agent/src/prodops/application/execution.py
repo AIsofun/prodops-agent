@@ -3,11 +3,11 @@
 from typing import Protocol
 from uuid import UUID
 
-from prodops.domain.execution import ExecutionLease, Observation, ToolRequest
+from prodops.domain.execution import ConversationTurn, ExecutionLease, Observation, ToolRequest
 
 
 class DiagnosticAgent(Protocol):
-    def plan(self, content: str) -> tuple[ToolRequest, ...]: ...
+    def plan(self, content: str, context: tuple[ConversationTurn, ...] = ()) -> tuple[ToolRequest, ...]: ...
     def answer(self, observations: tuple[Observation, ...]) -> str: ...
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import replace
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 import tempfile
 from typing import Any
@@ -16,7 +17,7 @@ from sqlalchemy import select
 
 from prodops.adapters.mock_tools import MockTools
 from prodops.adapters.storage.execution import SQLiteExecutionStore
-from prodops.adapters.storage.models import ConversationRow, RunEventRow, RunRow, ToolCallRow
+from prodops.adapters.storage.models import ConversationRow, MessageRow, RunEventRow, RunRow, ToolCallRow
 from prodops.agent.mock import MockDiagnosticAgent
 from prodops.api.models import RunEvent
 from prodops.application.errors import LostOwnership, QueueFull, StorageFailure
@@ -121,6 +122,45 @@ class ExecutionTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(run.status, "succeeded")
             self.assertEqual(run.evidence, ())
         self.assertEqual(tools.calls, 0)
+
+    async def test_followup_uses_only_its_conversation_and_explicit_new_topic_wins(self) -> None:
+        tools = MockTools()
+        await tools.start()
+        first = await self.submit("相机掉线")
+        await self.scheduler(tools)
+        original = await self.terminal(first)
+        follow = await self.store.submit_run(original.conversation_id, "继续排查", "development", uuid4())
+        continued = await self.terminal(follow.run.run_id)
+        self.assertEqual(len(continued.evidence), 3)
+        self.assertTrue(all("camera_offline" in item.source for item in continued.evidence))
+        fresh = await self.terminal(await self.submit("继续排查"))
+        self.assertEqual(fresh.evidence, ())
+        changed = await self.store.submit_run(original.conversation_id, "Kafka堆积", "development", uuid4())
+        self.assertTrue(all("kafka_backlog" in item.source for item in (await self.terminal(changed.run.run_id)).evidence))
+
+    async def test_claim_context_is_bounded_and_excludes_current_and_foreign_messages(self) -> None:
+        current = await self.store.create_conversation("Current")
+        foreign = await self.store.create_conversation("Foreign")
+        async with self.store.transaction(write=True) as session:
+            for index in range(12):
+                session.add(MessageRow(id=str(uuid4()), conversation_id=str(current.conversation_id), run_id=None,
+                                       role="user", content=f"turn-{index}:" + "x" * 5000,
+                                       created_at=datetime.now(UTC) + timedelta(microseconds=index)))
+            session.add(MessageRow(id=str(uuid4()), conversation_id=str(foreign.conversation_id), run_id=None,
+                                   role="user", content="foreign-private-message", created_at=datetime.now(UTC)))
+        submitted = await self.store.submit_run(current.conversation_id, "current-user-input", "development", uuid4())
+        lease = await self.store.claim(uuid4())
+        assert lease is not None
+        self.assertEqual(lease.run_id, submitted.run.run_id)
+        self.assertGreater(len(lease.context), 0)
+        self.assertLessEqual(len(lease.context), 8)
+        self.assertLessEqual(sum(len(turn.content) for turn in lease.context), 8000)
+        self.assertTrue(all(len(turn.content) <= 2000 for turn in lease.context))
+        combined = "".join(turn.content for turn in lease.context)
+        self.assertNotIn("foreign-private-message", combined)
+        self.assertNotIn("current-user-input", combined)
+        self.assertNotIn("turn-0:", combined)
+        self.assertIn("turn-11:", combined)
 
     async def test_tool_count_budget_is_consumed_before_call_and_stops_later_steps(self) -> None:
         self.store.policy = ExecutionPolicy(max_tool_calls=1)
