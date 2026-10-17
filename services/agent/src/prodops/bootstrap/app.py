@@ -1,9 +1,9 @@
 """Local/server composition roots share the same HTTP and application code."""
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 import asyncio
 from contextlib import asynccontextmanager
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import FastAPI
 from starlette.middleware.trustedhost import TrustedHostMiddleware
@@ -26,7 +26,7 @@ from prodops.domain.execution import ExecutionPolicy
 from prodops.runtime.scheduler import Scheduler
 
 
-def create_app(settings: ServiceSettings) -> FastAPI:
+def create_app(settings: ServiceSettings, *, on_ready: Callable[[UUID], None] | None = None) -> FastAPI:
     health = HealthService(mode=settings.mode)
     policy = ExecutionPolicy(settings.max_concurrent_runs or (1 if settings.mode == DeploymentMode.LOCAL else 4),
                              settings.queue_limit, settings.max_tool_calls, settings.run_timeout, settings.tool_timeout)
@@ -54,6 +54,8 @@ def create_app(settings: ServiceSettings) -> FastAPI:
                 await tools.start()
                 await scheduler.start()
             await health.start()
+            if on_ready is not None:
+                on_ready(deployment_id)
             yield
         finally:
             try:

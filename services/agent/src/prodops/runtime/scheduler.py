@@ -100,22 +100,33 @@ class Scheduler:
                 await self.store.fail(lease, code, message, elapsed(), interrupted=interrupted)
 
         try:
-            remaining = lease.policy.run_timeout - prior_elapsed
-            if remaining <= 0:
-                raise ExecutionBudgetExceeded()
-            async with asyncio.timeout(remaining):
-                observations: list[Observation] = list(lease.observations)
-                for request in self.agent.plan(lease.content)[lease.completed_steps:]:
-                    lease, call_id = await self.store.begin_tool(lease, request, elapsed())
-                    try:
-                        async with asyncio.timeout(lease.policy.tool_timeout):
-                            observation = await self._observe(lease, request, elapsed)
-                    except TimeoutError:
-                        await fail("tool_failed", "Mock tool timed out. No further tools were scheduled.")
-                        return
-                    lease = await self.store.finish_tool(lease, call_id, observation, elapsed())
-                    observations.append(observation)
-                await self.store.complete(lease, self.agent.answer(tuple(observations)), elapsed())
+            def remaining() -> float:
+                budget = lease.policy.run_timeout - elapsed()
+                if budget <= 0:
+                    raise ExecutionBudgetExceeded()
+                return budget
+
+            remaining()
+            observations: list[Observation] = list(lease.observations)
+            for request in self.agent.plan(lease.content)[lease.completed_steps:]:
+                remaining()
+                # A task budget must never cancel an in-flight state commit: the
+                # returned lease version is needed to persist its final outcome.
+                lease, call_id = await self.store.begin_tool(lease, request, elapsed())
+                available = remaining()
+                total_limited = available <= lease.policy.tool_timeout
+                try:
+                    async with asyncio.timeout(min(available, lease.policy.tool_timeout)):
+                        observation = await self._observe(lease, request, elapsed)
+                except TimeoutError:
+                    if total_limited:
+                        raise ExecutionBudgetExceeded() from None
+                    await fail("tool_failed", "Mock tool timed out. No further tools were scheduled.")
+                    return
+                lease = await self.store.finish_tool(lease, call_id, observation, elapsed())
+                observations.append(observation)
+            remaining()
+            await self.store.complete(lease, self.agent.answer(tuple(observations)), elapsed())
         except CancellationRequested:
             with suppress(LostOwnership):
                 await self.store.acknowledge_cancel(lease, elapsed())

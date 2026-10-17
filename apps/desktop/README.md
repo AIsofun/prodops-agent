@@ -21,7 +21,9 @@ npm run desktop:start
 
 源码目录分别是 main、preload、renderer、shared。根 tsconfig 覆盖全部实际 TS 源码，renderer 的独立配置排除 Node 类型。主进程编译为 CommonJS；preload 打包 shared 校验代码，保留 electron 为唯一外部模块以兼容沙箱。桥接只暴露 getInfo 和无参数的 connections.getStatus，不提供通用 IPC、URL、文件或 shell 方法。
 
-主进程仅连接 127.0.0.1，开发服务端口由主进程环境变量 PRODOPS_SERVICE_PORT 选择（默认 8765），PRODOPS_SERVICE_MODE 为 local 或 server（默认 local）。界面不能更改连接或传入目标地址。请先按[服务说明](../../services/agent/README.md)手动启动对应模式与端口的服务，再打开桌面。真实服务就绪、离线、不兼容、未就绪和非法响应分别显示。连接配置保存、身份和随包服务自动启动尚未实现。
+未设置 PRODOPS_SERVICE_PORT 时，主进程自动启动项目虚拟环境中的本机服务，将数据库放在 Electron userData/agent/prodops.sqlite3。每次启动产生随机令牌与实例标识，仅通过继承 stdin 管道传给服务；服务绑定随机回环端口，完成迁移和恢复后通过 stdout 返回无令牌握手。主进程校验实例、进程关系、协议、健康、部署身份和认证读取后才报告就绪。启动最多等待30秒，失败不会自动重试；退出先通过私有管道收尾，超时只回收自己创建的进程树。
+
+显式设置 PRODOPS_SERVICE_PORT 时保留外部开发服务的只读状态连接，PRODOPS_SERVICE_MODE 为 local 或 server（默认 local），需按[服务说明](../../services/agent/README.md)手动启动。界面不能更改连接或传入目标地址。随包入口定位为 resources/agent/prodops-agent.exe；实际运行时打包、安装及干净 Windows 验收仍待后续任务。正式登录和连接配置保存仍在 M4。
 
 HTTP 客户端只访问两个固定 GET 路径，携带协议1.4，拒绝跳转，限制每次响应 32KiB、每请求 2.5 秒，不自动重试。响应使用正式 OpenAPI 生成的校验器；跨 IPC 只返回最小状态，不返回原始响应、异常或凭据。发送者必须为当前窗口的主帧。
 
@@ -35,13 +37,14 @@ node node_modules/typescript/bin/tsc --noEmit -p apps/desktop/tsconfig.renderer.
 node scripts/check_ts_boundaries.ts
 npm run desktop:test
 npm run desktop:smoke -- .quality-reports/desktop-built
+npm run desktop:smoke -- .quality-reports/desktop-managed --managed
 npm run desktop:smoke -- .quality-reports/desktop-dev --dev
 python scripts/check.py
 node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-integration
 node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-dev --dev
 ```
 
-smoke 测试在真实 Electron 内导入正式主入口，探测渲染、权限设置和桥接范围，保存 screenshot 与 runtime.json，并验证关闭窗口后进程正常退出。测试需要桌面会话与允许启动 Electron 的环境，不能用浏览器截图替代。构建验证不包含随包 Python、自动服务启动、托盘、诊断任务、安装包或 CI。
+smoke 测试在真实 Electron 内导入正式主入口，探测渲染、权限设置和桥接范围，保存 desktop.png 与 runtime.json，并验证关闭窗口后进程正常退出。每次使用隔离 userData，结束后清理；--managed 强制走自动服务入口。测试需要桌面会话与允许启动 Electron 的环境，不能用浏览器截图替代。Windows 故障测试需要允许回收测试创建的进程树。构建验证不包含随包 Python、托盘、诊断任务或安装包。
 
 连接集成脚本启动隔离 Python local/server 开发进程，分别验证就绪与离线，并使用明确的 426 夹具验证不兼容界面。脚本会终止自己启动的 Python 进程，不代表生产退出策略验收。HTTP 运行时校验器更新使用 `npm run contracts:validators`；契约检查也会拒绝生成器漂移。生成方式依据 [Ajv standalone](https://ajv.js.org/standalone)。
 

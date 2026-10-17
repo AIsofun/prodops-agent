@@ -391,6 +391,106 @@ export interface components {
          * @enum {string}
          */
         DeploymentMode: "local" | "server";
+        /** DesktopStartupFailure */
+        DesktopStartupFailure: {
+            /**
+             * Code
+             * @default startup_failed
+             * @constant
+             */
+            code: "startup_failed";
+            /** Instance Id */
+            instance_id: string | null;
+            /**
+             * Type
+             * @default error
+             * @constant
+             */
+            type: "error";
+        };
+        /** DesktopStartupReady */
+        DesktopStartupReady: {
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /**
+             * Event Schema Version
+             * @constant
+             */
+            event_schema_version: "1.1";
+            /**
+             * Host
+             * @default 127.0.0.1
+             * @constant
+             */
+            host: "127.0.0.1";
+            /**
+             * Instance Id
+             * Format: uuid
+             */
+            instance_id: string;
+            /**
+             * Mode
+             * @default local
+             * @constant
+             */
+            mode: "local";
+            /** Parent Process Id */
+            parent_process_id: number;
+            /** Port */
+            port: number;
+            /** Process Id */
+            process_id: number;
+            /**
+             * Protocol Version
+             * @constant
+             */
+            protocol_version: "1.4";
+            /**
+             * Startup Version
+             * @default 1.0
+             * @constant
+             */
+            startup_version: "1.0";
+            /**
+             * Type
+             * @default ready
+             * @constant
+             */
+            type: "ready";
+        };
+        /** DesktopStartupRequest */
+        DesktopStartupRequest: {
+            /** Database Path */
+            database_path: string;
+            /**
+             * Instance Id
+             * Format: uuid
+             */
+            instance_id: string;
+            /**
+             * Startup Version
+             * @constant
+             */
+            startup_version: "1.0";
+            /** Token */
+            token: string;
+        };
+        /** DesktopStopRequest */
+        DesktopStopRequest: {
+            /**
+             * Instance Id
+             * Format: uuid
+             */
+            instance_id: string;
+            /**
+             * Type
+             * @constant
+             */
+            type: "stop";
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /**
@@ -649,6 +749,10 @@ export interface components {
         ReservedContracts: {
             conversation: components["schemas"]["Conversation"];
             conversation_page: components["schemas"]["ConversationPage"];
+            desktop_startup_failure: components["schemas"]["DesktopStartupFailure"];
+            desktop_startup_ready: components["schemas"]["DesktopStartupReady"];
+            desktop_startup_request: components["schemas"]["DesktopStartupRequest"];
+            desktop_stop_request: components["schemas"]["DesktopStopRequest"];
             /** Event */
             event: components["schemas"]["RunCreatedEvent"] | components["schemas"]["RunStartedEvent"] | components["schemas"]["StepStartedEvent"] | components["schemas"]["ToolStartedEvent"] | components["schemas"]["ToolCompletedEvent"] | components["schemas"]["MessageDeltaEvent"] | components["schemas"]["ApprovalRequestedEvent"] | components["schemas"]["CancelRequestedEvent"] | components["schemas"]["RunCompletedEvent"] | components["schemas"]["RunFailedEvent"] | components["schemas"]["RunCancelledEvent"] | components["schemas"]["RecoveryRequiredEvent"] | components["schemas"]["RecoveryApprovedEvent"];
             message: components["schemas"]["Message"];

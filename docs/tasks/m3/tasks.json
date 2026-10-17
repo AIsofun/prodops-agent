@@ -2,7 +2,7 @@
   {
     "id": "M3-T01",
     "title": "本机服务安全启动与握手",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M2-T06"
     ],
@@ -18,9 +18,14 @@
       "M3-T01-AC02",
       "M3-T01-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "apps/desktop/src/main/service.ts",
+      "services/agent/src/prodops/bootstrap/desktop.py",
+      "apps/desktop/tests/service.test.cjs",
+      "services/agent/tests/test_desktop_bootstrap.py"
+    ],
+    "verification": "docs/verification/m3-t01.json",
+    "review": "docs/reviews/m3-t01.json"
   },
   {
     "id": "M3-T02",

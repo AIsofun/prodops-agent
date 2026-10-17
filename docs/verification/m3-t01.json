@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T01",
+  "environment": {"os": "Windows 11", "arch": "AMD64", "python": "3.13.2", "node": "24.14.1", "electron": "44.8.0"},
+  "source": {"revision": "dec70be", "worktree": "private pipe startup and managed desktop connection"},
+  "criteria": [
+    {"id": "M3-T01-AC01", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t01-startup.md"},
+    {"id": "M3-T01-AC02", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t01-startup.md"},
+    {"id": "M3-T01-AC03", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t01-startup.md"}
+  ]
+}

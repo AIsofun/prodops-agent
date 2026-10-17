@@ -13,7 +13,7 @@
 | 编号 | 阶段 | 状态 | 设计章节 | 实现 | 验证证据 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
 | REQ-001 | M3 | 进行中 | 5 17 | [桌面开发入口](../apps/desktop/src/main/index.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 开发窗口与冻结安装链路已验证；干净 Windows 安装、双击与随包运行时仍在 M3 |
-| REQ-002 | M3 | 进行中 | 6.1 | [服务装配](../services/agent/src/prodops/bootstrap/app.py)、[开发连接](../apps/desktop/src/main/connection.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 手工启动服务后的桌面读取已验证；自动启动管道、令牌和进程生命周期仍在 M3 |
+| REQ-002 | M3 | 进行中 | 6.1 | [私有服务入口](../services/agent/src/prodops/bootstrap/desktop.py)、[主进程管理器](../apps/desktop/src/main/service.ts) | [本机启动验证](verification/2026-10-17-m3-t01-startup.md) | 开发环境随机端口/令牌、私有握手、认证及正常退出已验证；随包运行时、托盘与单实例待后续M3 |
 | REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 共用业务包的 server 回环开发连接已验证；正式认证、数据库和内网运行仍在 M4 |
 | REQ-004 | M3 | 进行中 | 8 16 | [会话用例](../services/agent/src/prodops/application/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话创建/分页及忙碌冲突已验证；历史上下文执行和桌面多轮交流仍待后续 |
 | REQ-005 | M2 | 进行中 | 8 11 | [数据库调度](../services/agent/src/prodops/runtime/scheduler.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock提交后独立执行、持久步骤与结果已验证；SSE和桌面实时展示待后续 |
@@ -34,7 +34,7 @@
 | REQ-020 | M6 | 未开始 | 13 17 | - | - | 数据及附件恢复 |
 | REQ-021 | M6 | 未开始 | 12 17 | - | - | 协议与离线升级 |
 | NFR-001 | M4 | 进行中 | 6 18 | [共享执行器](../services/agent/src/prodops/runtime/scheduler.py) | [双模式核心验收](verification/2026-10-17-m2-t06-acceptance.md) | local/server回环开发模式共用mock任务链路与重启历史已验证；正式内网、真实模型/权限和PostgreSQL仍在M4 |
-| NFR-002 | M4 | 进行中 | 5 14 15 | [受限桥接](../apps/desktop/src/preload/index.ts)、[请求边界](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md) | 无凭据开发状态读取边界已验证；生产密钥、授权资源与导出脱敏仍在后续阶段 |
+| NFR-002 | M4 | 进行中 | 5 14 15 | [受限桥接](../apps/desktop/src/preload/index.ts)、[请求边界](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md) | 最小状态桥接及本机随机令牌私有管道已验证；生产密钥、授权资源与导出脱敏仍在后续阶段 |
 | NFR-003 | M2 | 进行中 | 11 15 | [流关联错误](../services/agent/src/prodops/api/stream.py) | [SSE验证](verification/2026-10-17-m2-t05-events.md) | SSE请求/运行ID与安全流错误已验证；模型/工具/身份分类日志与耗时观测仍待后续 |
 | NFR-004 | M4 | 进行中 | 9 12 13 | [事务任务存储](../services/agent/src/prodops/adapters/storage/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | SQLite原子回滚、幂等与会话并发活跃槽已验证；执行状态转换和PostgreSQL仍待后续 |
 | NFR-005 | M6 | 待定 | 10 18 | - | - | 参考环境与数值门槛待测量 |

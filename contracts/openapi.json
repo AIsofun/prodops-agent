@@ -375,6 +375,176 @@
         "title": "DeploymentMode",
         "type": "string"
       },
+      "DesktopStartupFailure": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "const": "startup_failed",
+            "default": "startup_failed",
+            "title": "Code",
+            "type": "string"
+          },
+          "instance_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instance Id"
+          },
+          "type": {
+            "const": "error",
+            "default": "error",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "instance_id"
+        ],
+        "title": "DesktopStartupFailure",
+        "type": "object"
+      },
+      "DesktopStartupReady": {
+        "additionalProperties": false,
+        "properties": {
+          "deployment_id": {
+            "format": "uuid",
+            "title": "Deployment Id",
+            "type": "string"
+          },
+          "event_schema_version": {
+            "const": "1.1",
+            "title": "Event Schema Version",
+            "type": "string"
+          },
+          "host": {
+            "const": "127.0.0.1",
+            "default": "127.0.0.1",
+            "title": "Host",
+            "type": "string"
+          },
+          "instance_id": {
+            "format": "uuid",
+            "title": "Instance Id",
+            "type": "string"
+          },
+          "mode": {
+            "const": "local",
+            "default": "local",
+            "title": "Mode",
+            "type": "string"
+          },
+          "parent_process_id": {
+            "maximum": 4294967295,
+            "minimum": 1,
+            "title": "Parent Process Id",
+            "type": "integer"
+          },
+          "port": {
+            "maximum": 65535,
+            "minimum": 1,
+            "title": "Port",
+            "type": "integer"
+          },
+          "process_id": {
+            "maximum": 4294967295,
+            "minimum": 1,
+            "title": "Process Id",
+            "type": "integer"
+          },
+          "protocol_version": {
+            "const": "1.4",
+            "title": "Protocol Version",
+            "type": "string"
+          },
+          "startup_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Startup Version",
+            "type": "string"
+          },
+          "type": {
+            "const": "ready",
+            "default": "ready",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "instance_id",
+          "process_id",
+          "parent_process_id",
+          "port",
+          "deployment_id",
+          "protocol_version",
+          "event_schema_version"
+        ],
+        "title": "DesktopStartupReady",
+        "type": "object"
+      },
+      "DesktopStartupRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "database_path": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Database Path",
+            "type": "string"
+          },
+          "instance_id": {
+            "format": "uuid",
+            "title": "Instance Id",
+            "type": "string"
+          },
+          "startup_version": {
+            "const": "1.0",
+            "title": "Startup Version",
+            "type": "string"
+          },
+          "token": {
+            "maxLength": 256,
+            "minLength": 32,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Token",
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "startup_version",
+          "instance_id",
+          "token",
+          "database_path"
+        ],
+        "title": "DesktopStartupRequest",
+        "type": "object"
+      },
+      "DesktopStopRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "instance_id": {
+            "format": "uuid",
+            "title": "Instance Id",
+            "type": "string"
+          },
+          "type": {
+            "const": "stop",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "instance_id"
+        ],
+        "title": "DesktopStopRequest",
+        "type": "object"
+      },
       "ErrorDetail": {
         "additionalProperties": false,
         "properties": {
@@ -934,6 +1104,18 @@
           "conversation_page": {
             "$ref": "#/components/schemas/ConversationPage"
           },
+          "desktop_startup_failure": {
+            "$ref": "#/components/schemas/DesktopStartupFailure"
+          },
+          "desktop_startup_ready": {
+            "$ref": "#/components/schemas/DesktopStartupReady"
+          },
+          "desktop_startup_request": {
+            "$ref": "#/components/schemas/DesktopStartupRequest"
+          },
+          "desktop_stop_request": {
+            "$ref": "#/components/schemas/DesktopStopRequest"
+          },
           "event": {
             "discriminator": {
               "mapping": {
@@ -1024,7 +1206,11 @@
           "submission_headers",
           "run_snapshot",
           "replay_cursor",
-          "event"
+          "event",
+          "desktop_startup_request",
+          "desktop_startup_ready",
+          "desktop_startup_failure",
+          "desktop_stop_request"
         ],
         "title": "ReservedContracts",
         "type": "object"

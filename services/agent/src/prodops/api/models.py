@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 import re
-from typing import Annotated, Literal
+from typing import Annotated, Final, Literal
 from uuid import UUID
 
 from pydantic import (
@@ -13,7 +13,7 @@ from pydantic import (
 from prodops.domain.deployment import DeploymentMode
 from prodops.domain.runs import ResolutionStatus, RunStatus
 
-PROTOCOL_VERSION = "1.4"
+PROTOCOL_VERSION: Final = "1.4"
 ProtocolVersion = Literal["1.4"]
 EventSchemaVersion = Literal["1.0", "1.1"]
 CurrentEventSchemaVersion = Literal["1.1"]
@@ -45,6 +45,38 @@ UtcTimestamp = Annotated[AwareDatetime, BeforeValidator(require_timestamp_type),
 
 class DTO(BaseModel):
     model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
+
+
+class DesktopStartupRequest(DTO):
+    startup_version: Literal["1.0"]
+    instance_id: UUID
+    token: Annotated[str, StringConstraints(min_length=32, max_length=256, pattern=r"^[A-Za-z0-9_-]+$")] = Field(repr=False, json_schema_extra={"writeOnly": True})
+    database_path: Annotated[str, StringConstraints(min_length=1, max_length=4096)]
+
+
+class DesktopStartupReady(DTO):
+    type: Literal["ready"] = "ready"
+    startup_version: Literal["1.0"] = "1.0"
+    instance_id: UUID
+    process_id: Annotated[int, Field(strict=True, ge=1, le=4294967295)]
+    parent_process_id: Annotated[int, Field(strict=True, ge=1, le=4294967295)]
+    host: Literal["127.0.0.1"] = "127.0.0.1"
+    port: Annotated[int, Field(strict=True, ge=1, le=65535)]
+    deployment_id: UUID
+    protocol_version: ProtocolVersion
+    event_schema_version: CurrentEventSchemaVersion
+    mode: Literal["local"] = "local"
+
+
+class DesktopStartupFailure(DTO):
+    type: Literal["error"] = "error"
+    code: Literal["startup_failed"] = "startup_failed"
+    instance_id: UUID | None
+
+
+class DesktopStopRequest(DTO):
+    type: Literal["stop"]
+    instance_id: UUID
 
 
 class HealthResponse(DTO):
@@ -343,3 +375,7 @@ class ReservedContracts(DTO):
     run_snapshot: RunSnapshot
     replay_cursor: ReplayCursor
     event: RunEvent
+    desktop_startup_request: DesktopStartupRequest
+    desktop_startup_ready: DesktopStartupReady
+    desktop_startup_failure: DesktopStartupFailure
+    desktop_stop_request: DesktopStopRequest

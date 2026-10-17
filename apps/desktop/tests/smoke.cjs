@@ -5,6 +5,8 @@ const path = require("node:path");
 
 const output = path.resolve(process.env.PRODOPS_SMOKE_OUTPUT);
 fs.mkdirSync(output, { recursive: true });
+if (!path.isAbsolute(process.env.PRODOPS_SMOKE_USER_DATA ?? "")) throw new Error("Isolated desktop data directory required");
+app.setPath("userData", process.env.PRODOPS_SMOKE_USER_DATA);
 const timer = setTimeout(() => { console.error("Desktop smoke test timed out"); app.exit(1); }, 30000);
 let completed = false;
 app.once("browser-window-created", (_event, window) => {
@@ -32,7 +34,7 @@ app.once("browser-window-created", (_event, window) => {
       assert.equal(result.info.name, "ProdOps");
       assert.ok(result.csp.includes("script-src 'self'"));
       assert.ok(!result.csp.includes("unsafe-eval"));
-      const expected = process.env.PRODOPS_EXPECT_CONNECTION ?? "offline";
+      const expected = process.env.PRODOPS_EXPECT_CONNECTION ?? (process.env.PRODOPS_SERVICE_PORT === undefined ? "ready" : "offline");
       const state = await window.webContents.executeJavaScript(`new Promise((resolve) => {
         function probe() {
           const element = document.querySelector('[data-connection-state]');

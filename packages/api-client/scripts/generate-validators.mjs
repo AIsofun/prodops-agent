@@ -30,6 +30,11 @@ const code = "// Generated from contracts/openapi.json. Do not edit.\n" + standa
   validateHealth: "prodops-contracts#/$defs/HealthResponse",
   validateCapabilities: "prodops-contracts#/$defs/CapabilitiesResponse",
   validateRunEvent: "prodops-contracts#/$defs/ReservedContracts/properties/event",
+  validateDesktopStartupRequest: "prodops-contracts#/$defs/DesktopStartupRequest",
+  validateDesktopStartupReady: "prodops-contracts#/$defs/DesktopStartupReady",
+  validateDesktopStartupFailure: "prodops-contracts#/$defs/DesktopStartupFailure",
+  validateDesktopStopRequest: "prodops-contracts#/$defs/DesktopStopRequest",
+  validateWorkspaceList: "prodops-contracts#/$defs/WorkspaceList",
 });
 const target = path.resolve(root, output);
 fs.mkdirSync(path.dirname(target), { recursive: true });

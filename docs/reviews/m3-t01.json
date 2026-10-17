@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T01",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m3-t01-startup.md",
+  "findings": [
+    {"id": "R1", "severity": "P2", "status": "fixed", "reason": "Explicit Windows launcher relationship plus private instance and authenticated deployment validation."},
+    {"id": "R2", "severity": "P2", "status": "fixed", "reason": "Failed startups await bounded owned-process cleanup without automatic retries."},
+    {"id": "R3", "severity": "P2", "status": "fixed", "reason": "Actual desktop probes use isolated userData outside tracked artifacts and validate cleanup scope."},
+    {"id": "R4", "severity": "P1", "status": "fixed", "reason": "Budget timeouts cannot interrupt durable lease handoff; deterministic begin/finish commit-delay regressions preserve terminal state and evidence."}
+  ]
+}

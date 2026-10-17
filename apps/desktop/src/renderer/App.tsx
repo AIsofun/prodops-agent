@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import type { ConnectionStatus } from "../shared/connection.js";
 
 const labels = {
-  ready: ["服务已就绪", "已连接开发服务。诊断任务功能尚未开放。"],
-  offline: ["服务离线", "请手动启动本机开发服务，再检查连接。"],
+  ready: ["服务已就绪", "已连接当前服务。诊断界面正在接入。"],
+  offline: ["服务离线", "请重新打开应用；若仍失败，请检查服务配置。"],
   incompatible: ["协议不兼容", "请使用与桌面版本兼容的服务，再重新连接。"],
   not_ready: ["服务尚未就绪", "服务正在准备，请稍后再次检查。"],
   invalid_response: ["服务响应异常", "请核对开发服务版本与配置，然后重新检查。"],

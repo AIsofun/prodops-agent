@@ -152,8 +152,8 @@ class ExecutionTests(unittest.IsolatedAsyncioTestCase):
             await scheduler.stop()
 
     async def test_total_timeout_records_budget_failure_and_retains_consumption(self) -> None:
-        self.store.policy = ExecutionPolicy(run_timeout=0.05, tool_timeout=1)
-        run_id, tools = await self.submit(), ControlledTools(delay=1)
+        self.store.policy = ExecutionPolicy(run_timeout=0.3, tool_timeout=1)
+        run_id, tools = await self.submit(), ControlledTools(delay=2)
         await self.scheduler(tools)
         run = await self.terminal(run_id)
         self.assertEqual((run.status, run.error.code, tools.calls), ("failed", "budget_exceeded", 1))
@@ -161,7 +161,35 @@ class ExecutionTests(unittest.IsolatedAsyncioTestCase):
             row = await session.get(RunRow, str(run_id))
             assert row is not None
             self.assertEqual(row.checkpoint["tool_calls_used"], 1)
-            self.assertGreaterEqual(float(str(row.checkpoint["elapsed_seconds"])), 0.05)
+            self.assertGreaterEqual(float(str(row.checkpoint["elapsed_seconds"])), 0.3)
+
+    async def test_budget_expiring_after_state_commit_keeps_lease_and_terminal_outcome(self) -> None:
+        # Reproduce the exact commit/lease handoff race without relying on a
+        # particular Windows disk speed. A completed write must not be cancelled.
+        for operation, expected_calls, expected_evidence in (("begin_tool", 0, 0), ("finish_tool", 1, 1)):
+            self.store.policy = ExecutionPolicy(run_timeout=0.3, tool_timeout=1)
+            run_id, tools = await self.submit(), ControlledTools()
+            original = getattr(self.store, operation)
+
+            async def committed_then_delayed(*args: Any, **kwargs: Any) -> Any:
+                result = await original(*args, **kwargs)
+                await asyncio.sleep(0.35)
+                return result
+
+            with patch.object(self.store, operation, side_effect=committed_then_delayed):
+                scheduler = await self.scheduler(tools)
+                run = await self.terminal(run_id)
+                self.assertEqual((run.status, run.error.code), ("failed", "budget_exceeded"))
+                self.assertEqual((tools.calls, len(run.evidence)), (expected_calls, expected_evidence))
+                self.assertFalse(self.failed)
+                async with self.store.transaction() as session:
+                    row = await session.get(RunRow, str(run_id))
+                    conversation = await session.get(ConversationRow, str(run.conversation_id))
+                    assert row is not None and conversation is not None
+                    self.assertEqual(row.checkpoint["tool_calls_used"], 1)
+                    self.assertIsNone(row.checkpoint["owner_id"])
+                    self.assertIsNone(conversation.active_run_id)
+                await scheduler.stop()
 
     async def test_queue_limit_and_database_claim_ownership_are_atomic(self) -> None:
         self.store.policy = ExecutionPolicy(queue_limit=1)
