@@ -8,7 +8,7 @@ from uuid import uuid4
 from fastapi import FastAPI
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from prodops.adapters.storage.recovery import SQLiteRecoveryStore
+from prodops.adapters.storage.events import SQLiteEventStore
 from prodops.adapters.storage.lock import DatabaseServiceLock
 from prodops.adapters.mock_tools import MockTools
 from prodops.agent.mock import MockDiagnosticAgent
@@ -30,7 +30,7 @@ def create_app(settings: ServiceSettings) -> FastAPI:
     health = HealthService(mode=settings.mode)
     policy = ExecutionPolicy(settings.max_concurrent_runs or (1 if settings.mode == DeploymentMode.LOCAL else 4),
                              settings.queue_limit, settings.max_tool_calls, settings.run_timeout, settings.tool_timeout)
-    store = SQLiteRecoveryStore(settings.database, policy) if settings.database is not None else None
+    store = SQLiteEventStore(settings.database, policy) if settings.database is not None else None
     service_lock = DatabaseServiceLock(settings.database) if settings.database is not None else None
     tasks = TaskService(store) if store is not None else None
     access = DevelopmentAccess(settings.development_token.get_secret_value()) if settings.development_token is not None else None

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T05",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m2-t05-events.md",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Use committed database pages for replay and live events without holding transactions over network sends."
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Validate initial frames before headers and keep post-header failures safe, cursorless and correlated."
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "status": "fixed",
+      "reason": "Validate generated RunEvent data at runtime and maintain only a bounded per-run deduplication watermark."
+    }
+  ]
+}

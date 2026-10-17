@@ -30,7 +30,7 @@ python scripts/check.py
 | --- | --- | --- |
 | docs | 需求文档检查、任务依赖和交付回执检查 | 文档及引用结构一致 |
 | harness | 环境、docs、Python/TS 工具代码类型检查、检查器回归场景 | 工程设施在当前环境可以工作 |
-| service | harness，再检查服务、导出器及测试的 Python 类型、跨层导入、服务和契约行为、TS 契约消费编译 | 当前服务及契约切片通过，不代表任务执行、完整业务服务或 M1 完成 |
+| service | harness，再检查服务、导出器及测试的 Python 类型、跨层导入、服务和契约行为、TS 契约消费编译及事件消费行为 | 当前服务及契约切片通过，不代表任务执行、完整业务服务或 M1 完成 |
 | m1 默认 | service，再检查实际产品与独立 renderer TS 类型、跨层导入、API/生成类型/运行时校验器漂移、桌面连接与IPC行为 | M1 静态检查和骨架行为通过，真实窗口运行和 CI 仍需另验收 |
 
 结果只有 PASS、FAIL、NOT_READY，进程退出码分别为 0、1、2。有失败时整体 FAIL；没有失败但存在未就绪项时整体 NOT_READY。外部工具的任何非零退出都按失败处理，只有本项目明确约定的就绪检查才把 2 解释为 NOT_READY。
@@ -64,3 +64,5 @@ M1-T03 的真实应用导出器、预留事件模型及类型生成方式见 [�
 GitHub Windows CI 已实际运行，同一本地入口和真实产品故障注入会保存两个质量 JSON。[CI 说明](ci.md)和[远端证据](verification/2026-10-16-m1-t07-ci.md)区分运行通过与合并限制：main 当前没有必要检查保护，不能宣称平台已阻止失败代码合并。
 
 实现依据：[uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) 支持成员独立依赖与共同锁文件；服务用 [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/) 管理生命周期，测试遵循 [上下文管理器用法](https://fastapi.tiangolo.com/advanced/testing-events/)。当前锁定的 Starlette 测试客户端使用 [httpx2](https://starlette.dev/testclient/)。
+
+M2-T05增加product-event-consumer：Node执行正式RunEvent生成校验器与逐任务水位消费回归，service及默认范围均运行。客户端只缓存水位，校验未知帧、事件归属/序号、去重及缺口；运行时JSON校验与OpenAPI继续同源，漂移检查同时覆盖新增事件校验器。当前报告scope改为实际产品检查范围，profile名称m1不代表只覆盖骨架或自动完成新阶段。

@@ -6,7 +6,7 @@ export interface ConnectionStatus {
   mode: "local" | "server";
   state: ConnectionState;
   deployment_id: string | null;
-  protocol_version: "1.3" | null;
+  protocol_version: "1.4" | null;
 }
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -26,7 +26,7 @@ export function parseConnectionStatus(value: unknown): ConnectionStatus {
     throw new Error("Invalid connection response");
   }
   if (value.state === "ready") {
-    if (typeof value.deployment_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value.deployment_id) || value.protocol_version !== "1.3") {
+    if (typeof value.deployment_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value.deployment_id) || value.protocol_version !== "1.4") {
       throw new Error("Invalid connection response");
     }
   } else if (value.deployment_id !== null || value.protocol_version !== null) throw new Error("Invalid connection response");

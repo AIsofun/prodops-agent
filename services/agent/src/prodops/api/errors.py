@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from prodops.api.models import PROTOCOL_VERSION, ErrorCode, ErrorDetail, ErrorResponse
-from prodops.application.errors import ActiveRunConflict, IdempotencyConflict, InvalidCursor, InvalidRecovery, QueueFull, ResourceNotFound, StorageFailure
+from prodops.application.errors import ActiveRunConflict, CursorExpired, IdempotencyConflict, InvalidCursor, InvalidRecovery, QueueFull, ResourceNotFound, StorageFailure
 
 
 class ProtocolError(Exception):
@@ -26,6 +26,10 @@ def error_response(status_code: int, code: ErrorCode, message: str) -> JSONRespo
 
 
 def install_error_handlers(app: FastAPI) -> None:
+    @app.exception_handler(CursorExpired)
+    async def expired_cursor(request: Request, exc: CursorExpired) -> JSONResponse:
+        return error_response(410, "cursor_expired", "Event history is no longer available at this cursor. Reload the task snapshot.")
+
     @app.exception_handler(InvalidRecovery)
     async def invalid_recovery(request: Request, exc: InvalidRecovery) -> JSONResponse:
         return error_response(409, "conflict", "Task state, review confirmation or remaining budget does not permit recovery.")

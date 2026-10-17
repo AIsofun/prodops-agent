@@ -132,6 +132,8 @@ def run(root: Path, profile: str) -> list[Result]:
     results.append(execute("product-python-boundaries", [sys.executable, "-m", "scripts.check_boundaries"], root, unready_exit=True))
     results.append(execute("product-python-behavior", [str(python), "-m", "unittest", "discover", "-s", "services/agent/tests", "-v"], root,
                            [python, backend / "tests/test_service.py"]))
+    results.append(execute("product-event-consumer", [node, "--test", "packages/api-client/tests/events.test.mjs"], root,
+                           [root / "packages/api-client/tests/events.test.mjs", root / "packages/api-client/src/events.ts"]))
     if profile == "service":
         return results
     results.append(execute("product-typescript-types", [node, str(tsc), "--noEmit", "-p", str(desktop / "tsconfig.json")], root,
@@ -166,7 +168,7 @@ def main() -> int:
     output.write_text(json.dumps({
         "schema_version": 1, "profile": profile, "status": status,
         "exit_code": exit_code, "created_at": datetime.now(UTC).isoformat(),
-        "scope": "harness only; not product acceptance" if profile == "harness" else "M1 static gates and service skeleton behavior; desktop runtime, packaging and CI acceptance separate" if profile == "m1" else "Python service skeleton types, boundaries and behavior; not full M1 acceptance" if profile == "service" else profile,
+        "scope": "harness only; not product acceptance" if profile == "harness" else "Current product static checks and available service/contract/client behavior; GUI, packaging, remote CI and milestone acceptance separate" if profile == "m1" else "Current service types, boundaries and service/contract/event-consumer behavior; not complete product acceptance" if profile == "service" else profile,
         "checks": [asdict(result) for result in results],
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     for result in results:

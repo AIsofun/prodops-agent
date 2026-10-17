@@ -87,3 +87,20 @@ class RecordPage(Generic[T]):
 class RunSubmission:
     run: RunRecord
     replayed: bool
+
+
+@dataclass(frozen=True)
+class EventRecord:
+    run_id: UUID
+    seq: int
+    schema_version: str
+    event_type: str
+    occurred_at: datetime
+    payload: dict[str, object]
+
+
+@dataclass(frozen=True)
+class EventPage:
+    items: tuple[EventRecord, ...]
+    last_event_seq: int
+    status: RunStatus

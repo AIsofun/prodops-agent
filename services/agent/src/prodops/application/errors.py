@@ -39,3 +39,7 @@ class CancellationRequested(Exception):
 
 class InvalidRecovery(Exception):
     pass
+
+
+class CursorExpired(Exception):
+    pass

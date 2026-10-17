@@ -305,7 +305,7 @@ asyncio.run(run())
             self.assertIn("模拟", observed)
             token = "test-only-crash-token-000000000000000"
             settings = ServiceSettings.model_validate({"mode": "local", "database": database, "development_token": token})
-            headers = {"Authorization": f"Bearer {token}", "X-ProdOps-Protocol": "1.3"}
+            headers = {"Authorization": f"Bearer {token}", "X-ProdOps-Protocol": "1.4"}
             with TestClient(create_app(settings.model_copy(update={"execution_enabled": True})), base_url="http://127.0.0.1", headers=headers) as active:
                 self.assertTrue(active.get("/api/v1/capabilities").json()["execution_enabled"])
                 for _ in range(3):

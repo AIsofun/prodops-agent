@@ -17,7 +17,7 @@ from prodops.bootstrap.app import create_app, create_local_app
 from prodops.bootstrap.config import ConfigurationError, ServiceSettings, load_settings
 
 TOKEN = "test-only-development-token-000000000000"
-HEADERS = {"Authorization": f"Bearer {TOKEN}", "X-ProdOps-Protocol": "1.3"}
+HEADERS = {"Authorization": f"Bearer {TOKEN}", "X-ProdOps-Protocol": "1.4"}
 
 
 def app(database: Path, mode: str = "local") -> Any:

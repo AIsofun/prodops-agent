@@ -63,7 +63,7 @@ M2-T01 增加独立的 [SQLite 存储适配器](src/prodops/adapters/storage/REA
 .venv\Scripts\prodops-agent.exe --mode local --database F:\prodops-data\development.sqlite3 --port 8765
 ```
 
-业务请求使用 Authorization: Bearer、X-ProdOps-Protocol: 1.3，任务提交另带 UUID Idempotency-Key；必须显式选择 execution_mode: mock。接口、分页、事务与错误定义见 [契约说明](../../contracts/README.md)。默认仅持久化 queued 任务；显式启用开发执行后运行模拟诊断，仍无 SSE 或真实模型。完整桌面诊断在 M3 接入。不要将开发令牌用于生产身份管理。
+业务请求使用 Authorization: Bearer、X-ProdOps-Protocol: 1.4，任务提交另带 UUID Idempotency-Key；必须显式选择 execution_mode: mock。接口、分页、事务与错误定义见 [契约说明](../../contracts/README.md)。默认仅持久化 queued 任务；显式启用开发执行后运行模拟诊断，可读取SSE进度，仍无真实模型。完整桌面诊断在 M3 接入。不要将开发令牌用于生产身份管理。
 
 ## 显式模拟执行
 
@@ -93,3 +93,9 @@ M2-T01 增加独立的 [SQLite 存储适配器](src/prodops/adapters/storage/REA
 POST /api/v1/runs/{run_id}/cancel 正文可为{}。排队任务立即取消，在途任务先cancelling，工具返回后保留其真实结果并停止后续工具；重复请求不增加事件。服务关闭先停止领取、最多等待5秒收尾，未确认的调用保留unknown与待核对状态。
 
 POST /api/v1/runs/{run_id}/recover 使用Idempotency-Key，正文为expected_version、reviewed_tool_call_ids和decision: retry_mock_reads。先读取快照核对未知调用，旧版本、不完整核对、非mock调用、已取消或耗尽预算均拒绝。原未知工具记录保留unknown和核对痕迹；新尝试从已提交步骤后继续，只在明确批准后重试未确认的模拟只读步骤。完整设备操作核对与正式身份仍按后续阶段实现。
+
+## 持久事件订阅
+
+GET /api/v1/runs/{run_id}/events 使用相同Bearer与协议1.4请求头，可带Last-Event-ID续接。只读已提交数据库事件，id即任务内seq；首次可用快照last_event_seq作为起点。每批32条并在发送前释放事务，默认15秒注释心跳，无事件保留策略的默认删除操作。终态事件送达后关闭。
+
+HTTP410表示起点已不在保留范围，应重新读取快照；422表示非法/未来水位；401/403/404仍是认证/范围错误。200之后的异常通过无id的stream.error通知，再关闭连接，错误request_id与响应头一致。订阅断开不改变任务状态；客户端应保存最后已校验序号，重连补发并按运行ID/序号去重。正式桌面网络订阅与界面在M3实现。

@@ -4,7 +4,7 @@ from typing import Protocol
 from uuid import UUID
 
 from prodops.domain.records import (
-    ConversationRecord, MessageRecord, RecordPage, RunRecord, RunSubmission, StorageIdentity, WorkspaceRecord,
+    ConversationRecord, EventPage, MessageRecord, RecordPage, RunRecord, RunSubmission, StorageIdentity, WorkspaceRecord,
 )
 
 
@@ -33,3 +33,5 @@ class TaskStore(ConversationStore, Protocol):
     async def cancel_run(self, run_id: UUID, reason: str | None) -> RunRecord: ...
 
     async def recover_run(self, run_id: UUID, expected_version: int, reviewed_calls: tuple[UUID, ...], key: UUID) -> RunSubmission: ...
+
+    async def read_events(self, run_id: UUID, after_seq: int, limit: int) -> EventPage: ...

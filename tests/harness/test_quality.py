@@ -87,6 +87,7 @@ raise SystemExit(check.main())
         self.assertIn("product-python-types", names)
         self.assertIn("product-python-boundaries", names)
         self.assertIn("product-python-behavior", names)
+        self.assertIn("product-event-consumer", names)
         self.assertNotIn("product-typescript-types", names)
         self.assertNotIn("product-contracts", names)
 

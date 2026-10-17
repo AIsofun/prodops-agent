@@ -54,7 +54,7 @@ class ConfigurationTests(unittest.TestCase):
 
     def test_configuration_rejects_unsafe_and_invalid_values_without_echoing_them(self) -> None:
         invalid = [
-            {"PRODOPS_HOST": host} for host in ("0.0.0.0", "::", "localhost", "192.168.1.3")
+            {"PRODOPS_HOST": host} for host in ("0.0.0.0", "::", "localhost", "192.168.1.4")
         ] + [
             {"PRODOPS_PORT": value} for value in ("-1", "65536", "1.5", "", "secret-port-value")
         ] + [{"PRODOPS_ENVIRONMENT": "production"}, {"PRODOPS_MODE": "secret-mode-value"}]
@@ -205,7 +205,7 @@ class ProcessTests(unittest.TestCase):
     def test_actual_http_submission_continues_after_connection_closes_in_both_modes(self) -> None:
         opener = build_opener(ProxyHandler({}))
         token = "isolated-cli-test-token-000000000000000"
-        headers = {"Authorization": f"Bearer {token}", "X-ProdOps-Protocol": "1.3", "Content-Type": "application/json"}
+        headers = {"Authorization": f"Bearer {token}", "X-ProdOps-Protocol": "1.4", "Content-Type": "application/json"}
         with tempfile.TemporaryDirectory(prefix="prodops-runtime-http-") as directory:
             for mode in ("local", "server"):
                 environment = {"PRODOPS_DATABASE": str(Path(directory) / f"{mode}.sqlite3"),

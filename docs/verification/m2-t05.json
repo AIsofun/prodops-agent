@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "task_id": "M2-T05",
+  "environment": {
+    "os": "Windows 11",
+    "arch": "AMD64",
+    "python": "3.13.2",
+    "node": "24.14.1"
+  },
+  "source": {
+    "revision": "6bbc0f1",
+    "worktree": "uncommitted persistent SSE replay, bounded event consumer and protocol 1.4",
+    "scope": "isolated SQLite/mock SSE and loopback HTTP replay"
+  },
+  "criteria": [
+    {
+      "id": "M2-T05-AC01",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t05-events.md"
+    },
+    {
+      "id": "M2-T05-AC02",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t05-events.md"
+    },
+    {
+      "id": "M2-T05-AC03",
+      "status": "PASS",
+      "evidence": "docs/verification/2026-10-17-m2-t05-events.md"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from prodops.application.errors import ResourceNotFound
 from prodops.application.storage import TaskStore
-from prodops.domain.records import ConversationRecord, MessageRecord, RecordPage, RunRecord, RunSubmission, StorageIdentity, WorkspaceRecord
+from prodops.domain.records import ConversationRecord, EventPage, MessageRecord, RecordPage, RunRecord, RunSubmission, StorageIdentity, WorkspaceRecord
 
 
 class TaskService:
@@ -50,3 +50,6 @@ class TaskService:
 
     async def recover(self, run_id: UUID, expected_version: int, reviewed_calls: tuple[UUID, ...], key: UUID) -> RunSubmission:
         return await self.store.recover_run(run_id, expected_version, reviewed_calls, key)
+
+    async def events(self, run_id: UUID, after_seq: int, limit: int = 32) -> EventPage:
+        return await self.store.read_events(run_id, after_seq, limit)

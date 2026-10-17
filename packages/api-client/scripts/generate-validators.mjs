@@ -29,6 +29,7 @@ ajv.addSchema({ $id: "prodops-contracts", $defs: convert(openapi.components.sche
 const code = "// Generated from contracts/openapi.json. Do not edit.\n" + standalone(ajv, {
   validateHealth: "prodops-contracts#/$defs/HealthResponse",
   validateCapabilities: "prodops-contracts#/$defs/CapabilitiesResponse",
+  validateRunEvent: "prodops-contracts#/$defs/ReservedContracts/properties/event",
 });
 const target = path.resolve(root, output);
 fs.mkdirSync(path.dirname(target), { recursive: true });

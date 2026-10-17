@@ -4,12 +4,15 @@ from collections.abc import Callable
 from dataclasses import asdict
 from typing import Annotated
 from uuid import UUID
+import re
 
 from fastapi import APIRouter, Depends, Header, Query, Request, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BeforeValidator, Field
+from fastapi.responses import StreamingResponse
 
 from prodops.api.errors import APIError, ProtocolError
+from prodops.api.stream import event_stream
 from prodops.api.models import (
     PROTOCOL_VERSION, CancelRunRequest, Conversation, ConversationCreateRequest, ConversationPage,
     ErrorResponse, Message, MessagePage, RunCreateRequest, RunPage, RunSnapshot,
@@ -38,7 +41,7 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
 
     async def authorize(request: Request, response: Response,
                         credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
-                        protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol", description="Required exact protocol 1.3 for business requests.")] = None) -> TaskService:
+                        protocol: Annotated[str | None, Header(alias="X-ProdOps-Protocol", description="Required exact protocol 1.4 for business requests.")] = None) -> TaskService:
         if service is None or access is None or not ready():
             raise APIError(503, "not_ready", "Development business API is not configured or ready.")
         if len(request.headers.getlist("authorization")) != 1 or credentials is None or not access.allows(credentials.credentials):
@@ -108,6 +111,20 @@ def business_router(service: TaskService | None, access: DevelopmentAccess | Non
     async def cancel(run_id: UUID, body: CancelRunRequest,
                      tasks: Annotated[TaskService, Depends(authorize)]) -> RunSnapshot:
         return snapshot(await tasks.cancel(run_id, body.reason))
+
+    @router.get("/runs/{run_id}/events", response_class=StreamingResponse,
+                responses={200: {"content": {"text/event-stream": {"schema": {"type": "string", "description": "SSE RunEvent JSON; stream.error uses ErrorResponse without an id; heartbeat comments."}}}}, 410: {"model": ErrorResponse}},
+                openapi_extra={"x-prodops-event-schema": {"$ref": "#/components/schemas/ReservedContracts/properties/event"},
+                               "x-prodops-stream-error-schema": {"$ref": "#/components/schemas/ErrorResponse"}})
+    async def events(run_id: UUID, request: Request, tasks: Annotated[TaskService, Depends(authorize)],
+                     last_event_id: Annotated[str | None, Header(alias="Last-Event-ID")] = None) -> StreamingResponse:
+        values = request.headers.getlist("last-event-id")
+        if len(values) > 1 or (last_event_id is not None and (len(last_event_id) > 16 or re.fullmatch(r"[0-9]+", last_event_id) is None)):
+            raise APIError(422, "invalid_request", "Last-Event-ID must be one nonnegative safe integer.")
+        after = int(last_event_id) if last_event_id is not None else 0
+        if after > 9007199254740991:
+            raise APIError(422, "invalid_request", "Last-Event-ID exceeds the supported sequence range.")
+        return await event_stream(tasks, run_id, after, request, ready)
 
     @router.post("/runs/{run_id}/recover", response_model=RunSnapshot, status_code=202)
     async def recover(run_id: UUID, body: RecoverRunRequest, request: Request, response: Response,

@@ -231,7 +231,6 @@
             "type": "string"
           },
           "event_stream": {
-            "const": false,
             "default": false,
             "title": "Event Stream",
             "type": "boolean"
@@ -245,7 +244,7 @@
             "$ref": "#/components/schemas/DeploymentMode"
           },
           "protocol_version": {
-            "const": "1.3",
+            "const": "1.4",
             "title": "Protocol Version",
             "type": "string"
           },
@@ -1828,7 +1827,7 @@
         "operationId": "capabilities_api_v1_capabilities_get",
         "parameters": [
           {
-            "description": "Omit for discovery; when supplied it must exactly match 1.3.",
+            "description": "Omit for discovery; when supplied it must exactly match 1.4.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -1841,7 +1840,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Omit for discovery; when supplied it must exactly match 1.3.",
+              "description": "Omit for discovery; when supplied it must exactly match 1.4.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -1929,7 +1928,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -1942,7 +1941,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2105,7 +2104,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2118,7 +2117,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2259,7 +2258,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2272,7 +2271,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2415,7 +2414,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2428,7 +2427,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2561,7 +2560,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2574,7 +2573,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2702,6 +2701,185 @@
         ]
       }
     },
+    "/api/v1/runs/{run_id}/events": {
+      "get": {
+        "operationId": "events_api_v1_runs__run_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Last-Event-ID",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          },
+          {
+            "description": "Required exact protocol 1.4 for business requests.",
+            "in": "header",
+            "name": "X-ProdOps-Protocol",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Required exact protocol 1.4 for business requests.",
+              "title": "X-Prodops-Protocol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "description": "SSE RunEvent JSON; stream.error uses ErrorResponse without an id; heartbeat comments.",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gone"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Content Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "426": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Upgrade Required"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Events",
+        "tags": [
+          "development tasks"
+        ],
+        "x-prodops-event-schema": {
+          "$ref": "#/components/schemas/ReservedContracts/properties/event"
+        },
+        "x-prodops-stream-error-schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        }
+      }
+    },
     "/api/v1/runs/{run_id}/recover": {
       "post": {
         "operationId": "recover_api_v1_runs__run_id__recover_post",
@@ -2727,7 +2905,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2740,7 +2918,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -2873,7 +3051,7 @@
         "operationId": "workspaces_api_v1_workspaces_get",
         "parameters": [
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -2886,7 +3064,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -3049,7 +3227,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -3062,7 +3240,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -3193,7 +3371,7 @@
             }
           },
           {
-            "description": "Required exact protocol 1.3 for business requests.",
+            "description": "Required exact protocol 1.4 for business requests.",
             "in": "header",
             "name": "X-ProdOps-Protocol",
             "required": false,
@@ -3206,7 +3384,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Required exact protocol 1.3 for business requests.",
+              "description": "Required exact protocol 1.4 for business requests.",
               "title": "X-Prodops-Protocol"
             }
           }
@@ -3387,7 +3565,7 @@
       }
     }
   },
-  "x-prodops-protocol-version": "1.3",
+  "x-prodops-protocol-version": "1.4",
   "x-prodops-reserved-models": {
     "$ref": "#/components/schemas/ReservedContracts"
   }

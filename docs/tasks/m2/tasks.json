@@ -132,7 +132,7 @@
   {
     "id": "M2-T05",
     "title": "SSE 与历史补发",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M2-T04"
     ],
@@ -147,9 +147,18 @@
       "M2-T05-AC02",
       "M2-T05-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "services/agent/src/prodops/adapters/storage/events.py",
+      "services/agent/src/prodops/api/stream.py",
+      "services/agent/src/prodops/api/business.py",
+      "services/agent/tests/test_events.py",
+      "packages/api-client/src/events.ts",
+      "packages/api-client/tests/events.test.mjs",
+      "packages/api-client/scripts/generate-validators.mjs",
+      "scripts/check.py"
+    ],
+    "verification": "docs/verification/m2-t05.json",
+    "review": "docs/reviews/m2-t05.json"
   },
   {
     "id": "M2-T06",

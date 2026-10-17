@@ -8,5 +8,5 @@
     "types": [],
     "skipLibCheck": false
   },
-  "include": ["src/schema.d.ts", "tests/*.ts"]
+  "include": ["src/*.ts", "tests/*.ts"]
 }

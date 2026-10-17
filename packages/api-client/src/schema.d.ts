@@ -90,6 +90,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/runs/{run_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Events */
+        get: operations["events_api_v1_runs__run_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/runs/{run_id}/recover": {
         parameters: {
             query?: never;
@@ -300,9 +317,8 @@ export interface components {
             /**
              * Event Stream
              * @default false
-             * @constant
              */
-            event_stream: false;
+            event_stream: boolean;
             /**
              * Execution Enabled
              * @default false
@@ -313,7 +329,7 @@ export interface components {
              * Protocol Version
              * @constant
              */
-            protocol_version: "1.3";
+            protocol_version: "1.4";
             /**
              * Runs
              * @default false
@@ -1045,7 +1061,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Omit for discovery; when supplied it must exactly match 1.3. */
+                /** @description Omit for discovery; when supplied it must exactly match 1.4. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path?: never;
@@ -1089,7 +1105,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1198,7 +1214,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1305,7 +1321,7 @@ export interface operations {
             query?: never;
             header: {
                 "Idempotency-Key": string;
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1415,7 +1431,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1521,7 +1537,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1627,12 +1643,128 @@ export interface operations {
             };
         };
     };
+    events_api_v1_runs__run_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Last-Event-ID"?: string | null;
+                /** @description Required exact protocol 1.4 for business requests. */
+                "X-ProdOps-Protocol"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Gone */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Content Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Upgrade Required */
+            426: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     recover_api_v1_runs__run_id__recover_post: {
         parameters: {
             query?: never;
             header: {
                 "Idempotency-Key": string;
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1742,7 +1874,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path?: never;
@@ -1849,7 +1981,7 @@ export interface operations {
                 cursor?: string | null;
             };
             header?: {
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {
@@ -1955,7 +2087,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Required exact protocol 1.3 for business requests. */
+                /** @description Required exact protocol 1.4 for business requests. */
                 "X-ProdOps-Protocol"?: string | null;
             };
             path: {

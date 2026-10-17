@@ -14,16 +14,17 @@
 | GET /api/v1/conversations/{conversation_id}/messages | 分页消息 |
 | GET/POST /api/v1/conversations/{conversation_id}/runs | 分页任务 / 原子提交，提交返回 202 |
 | GET /api/v1/runs/{run_id} | 持久任务快照，含待核对的unknown_tool_call_ids |
+| GET /api/v1/runs/{run_id}/events | 持久事件SSE，支持Last-Event-ID排他补发 |
 | POST /api/v1/runs/{run_id}/cancel | 幂等取消，正文{reason?: string/null}，返回200当前快照 |
 | POST /api/v1/runs/{run_id}/recover | 按版本核对后恢复，要求Idempotency-Key，返回202原始恢复回执 |
 
-数据库配置后 deployment_id、workspace_id 持久化；未配置时能力发现返回实例临时 ID。配置且就绪时 authentication 为 development_token，conversations/runs 为 true。execution_enabled 随显式开发执行开关与调度器健康状态变化，event_stream 仍为 false。执行器从数据库领取并保存进度，SSE 在后续任务实现。
+数据库配置后 deployment_id、workspace_id 持久化；未配置时能力发现返回实例临时 ID。配置且就绪时 authentication 为 development_token，conversations/runs 为 true。execution_enabled 随显式开发执行开关与调度器健康状态变化，event_stream在配置且就绪时为true；即使未启用执行器，也可补看持久历史。执行器与事件流分别报告能力。
 
 会话、消息、任务和新分页响应来自正式 DTO。ReservedContracts 继续注册未来事件、工具和提案模型，不增加虚假的路由。
 
 ## 版本、输入与错误
 
-- API 主版本仍为 /api/v1；业务协议为精确 1.3，新写事件 schema 为 1.1，读取兼容已存1.0事件。能力发现可省略 X-ProdOps-Protocol，提供时须精确匹配；业务请求必须提供 1.3，旧版 1.0/1.1/1.2 返回 426。
+- API 主版本仍为 /api/v1；业务协议为精确 1.4，新写事件 schema 为 1.1，读取兼容已存1.0事件。能力发现可省略 X-ProdOps-Protocol，提供时须精确匹配；业务请求必须提供 1.4，旧版1.0至1.3 返回 426。
 - 业务请求要求单个 Authorization: Bearer 开发令牌，使用恒定时间比较。没有或无效令牌返回 401，重复认证头拒绝；任何 Origin 业务请求返回 403，不授予 CORS。仅使用项目启动入口的 127.0.0.1 绑定，Host 也受限。该单身份机制不代表 M4 多用户登录和角色权限完成。
 - 创建会话 title 1 至 512 字符；提交任务 content 去除首尾空白后 1 至 32000 字符，必须显式 execution_mode: mock；其他执行模式和额外字段拒绝。业务写请求体最多 256 KiB，含分块输入，超出返回 413。
 - 提交必须提供 UUID Idempotency-Key。在当前数据库部署、工作区、开发身份、会话和操作范围内绑定规范化请求摘要。同键同请求返回原始 202 快照及 Idempotency-Replayed: true；同键异请求返回 409 idempotency_conflict；不同键遇到会话已有活跃任务返回 409 conflict。
@@ -32,7 +33,7 @@
 - 错误为 {error: {code, message, retryable}, request_id}，设置 no-store 和 X-Request-ID；固定消息不回显输入、SQL、路径或令牌。未知路径和 Host 错误仍使用框架响应。
 - DTO 拒绝额外字段，标识为 UUID，时间必须是 UTC。事件 seq 为严格整数 1 至 2^53−1；快照水位允许 0，拒绝布尔、字符串及浮点，保持 TS 精度。
 
-协议1.3增加取消与核对恢复、未知调用ID快照和run.recovery_approved事件。新事件写1.1，既有1.0信封仍可读取；新恢复批准事件仅允许1.1。桌面状态读取同步升级。实际 API 见[提交验证](../docs/verification/2026-10-16-m2-t02-api.md)，执行见[模拟排查验证](../docs/verification/2026-10-17-m2-t03-execution.md)。
+协议1.4增加正式SSE，前一版已增加取消、核对恢复与未知调用ID快照。新事件写1.1，既有1.0信封仍可读取；新恢复批准事件仅允许1.1。桌面状态读取同步升级。实际 API 见[提交验证](../docs/verification/2026-10-16-m2-t02-api.md)，执行见[模拟排查验证](../docs/verification/2026-10-17-m2-t03-execution.md)。
 
 ## 事件与快照
 
@@ -40,7 +41,13 @@ RunEvent 通过 event_type 判别 13 种事件，每种 payload 都是正式 Pyd
 
 快照 status 与 resolution_status 分开；任务 succeeded 不意味着故障 resolved。工具结果中的 unknown 表示需核对，取消表示停止后续调度，不表示在途设备操作已撤销。[示例](examples.json) 覆盖全部事件、成功、失败、取消、待核对及版本不兼容错误，均为人工契约夹具；列表中的事件展示不同分支，不是一段合法的连续运行轨迹。
 
-未来 SSE 的 id 使用任务内十进制 seq，Last-Event-ID 为排他水位；首次连接从快照 last_event_seq 继续，消费者以 `(run_id, seq)` 去重。游标过期在启动流前返回 410 cursor_expired，然后读取新快照再订阅。持久状态与取消/恢复已有行为验证；SSE衔接、断线补发和游标过期仍按后续任务验收。
+SSE的id使用任务内十进制seq，Last-Event-ID为排他水位；缺失时从0开始，必须单头非负安全整数，未来水位422。首次读取快照后从last_event_seq继续订阅，消费者以(run_id,seq)去重。所有业务认证、Host/Origin和工作区检查同样生效。
+
+开流前在短事务中读取任务状态、水位与最多32条已提交事件，校验正式RunEvent后再返回200 text/event-stream。后续一直从同一数据库序列分页补读，不切换到可能漏事件的内存广播；数据库事务在网络发送前释放。响应no-store、X-Accel-Buffering:no并带关联X-Request-ID。无业务数据时默认15秒发送一次注释心跳，心跳不带id、不写数据库。succeeded/failed/cancelled的全部事件送达后关闭；recovery_required仍可等待核对后继续。
+
+游标早于保留起点或遇到缺口，在流开始前返回410 cursor_expired，调用方应读取新快照再订阅。当前没有自动删除事件策略；隔离测试用明确裁剪夹具验证过期行为，不承诺保留时长。开流后的存储故障或游标过期发送event: stream.error，其data为正式ErrorResponse，关联ID与响应头一致，没有id且随后关闭；HTTP状态已发出，不能再改为503/410。不能将该错误当作任务执行失败或推进水位。
+
+客户端[RunEventCursor](../packages/api-client/src/events.ts)使用同源生成的RunEvent运行时校验器，校验运行ID、事件名和id/data序号一致；重复序号忽略，序号缺口要求刷新快照。只保存单任务水位，连接切换时重新创建。该包处理已分帧事件，不自动实现网络订阅、重连或桌面UI；这些在M3接入。实际断线、补发、分页、心跳和错误证据见[验证记录](../docs/verification/2026-10-17-m2-t05-events.md)。
 
 ## 生成与检查
 

@@ -19,7 +19,7 @@
 | REQ-005 | M2 | 进行中 | 8 11 | [数据库调度](../services/agent/src/prodops/runtime/scheduler.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock提交后独立执行、持久步骤与结果已验证；SSE和桌面实时展示待后续 |
 | REQ-006 | M2 | 进行中 | 8 9 13 | [证据持久化](../services/agent/src/prodops/adapters/storage/execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock来源/采集时间/最终回复与独立解决状态已验证；真实来源和授权原始结果待后续 |
 | REQ-007 | M2 | 进行中 | 13 | [业务历史API](../services/agent/src/prodops/api/business.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话/消息/任务分页及服务重开保持记录已验证；完整结果和桌面历史仍待后续 |
-| REQ-008 | M2 | 进行中 | 11 | [快照与重放 DTO](../services/agent/src/prodops/api/models.py) | [契约切片验证](verification/2026-10-16-m1-t03-contracts.md) | 事件序列、水位与游标模型已验证；SSE、持久化补发与去重仍在 M2 |
+| REQ-008 | M2 | 进行中 | 11 | [持久SSE](../services/agent/src/prodops/api/stream.py)、[客户端水位](../packages/api-client/src/events.ts) | [SSE验证](verification/2026-10-17-m2-t05-events.md) | 实际回环断线执行继续、补发无遗漏/去重与过期游标已验证；桌面自动重连待M3 |
 | REQ-009 | M2 | 进行中 | 9 | [取消事务](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 排队/在途/步骤边界取消和结果保留已验证；桌面取消入口仍待M3 |
 | REQ-010 | M2 | 进行中 | 9 | [启动核对与恢复](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 真实进程硬退出后unknown、明确核对、新尝试与预算保留已验证；实际设备动作核对待连接器阶段 |
 | REQ-011 | M4 | 进行中 | 7 8 | [显式mock适配器](../services/agent/src/prodops/adapters/mock_tools.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock及异常不降级已验证；实际模型协议与不可用场景仍在M4 |
@@ -35,7 +35,7 @@
 | REQ-021 | M6 | 未开始 | 12 17 | - | - | 协议与离线升级 |
 | NFR-001 | M4 | 未开始 | 6 18 | - | - | 双模式场景集 |
 | NFR-002 | M4 | 进行中 | 5 14 15 | [受限桥接](../apps/desktop/src/preload/index.ts)、[请求边界](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md) | 无凭据开发状态读取边界已验证；生产密钥、授权资源与导出脱敏仍在后续阶段 |
-| NFR-003 | M2 | 未开始 | 11 15 | - | - | 关联日志与错误分类 |
+| NFR-003 | M2 | 进行中 | 11 15 | [流关联错误](../services/agent/src/prodops/api/stream.py) | [SSE验证](verification/2026-10-17-m2-t05-events.md) | SSE请求/运行ID与安全流错误已验证；模型/工具/身份分类日志与耗时观测仍待后续 |
 | NFR-004 | M4 | 进行中 | 9 12 13 | [事务任务存储](../services/agent/src/prodops/adapters/storage/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | SQLite原子回滚、幂等与会话并发活跃槽已验证；执行状态转换和PostgreSQL仍待后续 |
 | NFR-005 | M6 | 待定 | 10 18 | - | - | 参考环境与数值门槛待测量 |
 | NFR-006 | M0 | 已验证 | 18 | [追踪表](traceability.md)、[阶段交付校验](../scripts/check_delivery.py) | [跨阶段追踪验证](verification/2026-10-16-m2-t01-storage.md) | 当前需求/阶段/实现/AC证据映射与跨阶段依赖验证通过；后续变更持续维护 |
@@ -50,7 +50,7 @@
 | HAR-004 | M1 | 已验证 | 5 12 | [契约检查器](../scripts/check_contracts.py)、[正式模型](../services/agent/src/prodops/api/models.py)、[生成类型](../packages/api-client/src/schema.d.ts)、[生成校验器](../packages/api-client/src/validators.cjs)、[IPC 校验](../apps/desktop/src/main/ipc.ts) | [桥接验证](verification/2026-10-16-m1-t05-bridge.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 当前 API、事件、IPC 边界及三类生成漂移在本地和 CI 验证；后续新增契约持续遵守 |
 | HAR-005 | M1 | 已验证 | 17 | [统一入口](../scripts/check.py)、[冻结依赖流水线](../.github/workflows/quality.yml) | [产品检查](verification/2026-10-16-m1-t06-gates.md)、[实际 CI](verification/2026-10-16-m1-t07-ci.md) | 本地默认 M1 与真实 Windows CI 通过；不代表产品发布验收 |
 | HAR-006 | M4 | 进行中 | 8 18 | [模拟执行回归](../services/agent/tests/test_execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock、歧义、异常与预算基线通过；真实模型及完整评测集仍在M4 |
-| HAR-007 | M2 | 进行中 | 9 18 | [隔离故障回归](../services/agent/tests/test_recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 工具异常/超时、取消、真实硬退出、unknown与事务故障通过；SSE断线/补发在下一任务 |
+| HAR-007 | M2 | 进行中 | 9 18 | [故障回归](../services/agent/tests/test_recovery.py)、[流回归](../services/agent/tests/test_events.py) | [SSE验证](verification/2026-10-17-m2-t05-events.md) | 重复/并发、取消、硬退出、unknown、SSE断线与过期已验证；阶段集成与真实CI在下一任务 |
 | HAR-008 | M3 | 未开始 | 5 6 17 | - | - | 桌面与安装包验证待建立 |
 | HAR-009 | M1 | 进行中 | 17 | [GitHub 流水线](../.github/workflows/quality.yml) | [实际 CI 与审计](verification/2026-10-16-m1-t07-ci.md) | Windows CI 已成功运行；main 必要检查合并限制未配置，影响与退出条件见[范围记录](decisions/2026-10-16-ci-merge-enforcement.md) |
 | HAR-010 | M0 | 已实现 | 18 | [开发入口](../AGENTS.md) | - | 人工执行的变更规则，持续有效性按变更审阅 |
