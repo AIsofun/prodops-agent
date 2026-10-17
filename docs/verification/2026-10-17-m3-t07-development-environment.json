@@ -1,0 +1,212 @@
+{
+    "schema_version":  1,
+    "collected_at":  "2026-10-17T08:36:20.2306302Z",
+    "environment_scope":  "development",
+    "status":  "NOT_READY",
+    "os":  {
+               "caption":  "Microsoft Windows 11 Pro",
+               "version":  "10.0.26200",
+               "build":  "26200",
+               "architecture":  "64-bit",
+               "process_architecture":  "AMD64"
+           },
+    "installer":  {
+                      "name":  "ProdOps-Dev-0.1.0-windows-x64-setup.exe",
+                      "sha256":  "7030ef6c910e23682dd55617d2f7bd91c81884448e1f2cf2e26c95b11a374820",
+                      "bytes":  110032637,
+                      "signature":  "NotSigned"
+                  },
+    "development_runtime_detected":  true,
+    "commands":  [
+                     {
+                         "name":  "node",
+                         "path":  "E:\\Application\\nodejs\\node.exe"
+                     },
+                     {
+                         "name":  "node",
+                         "path":  "C:\\Users\\LEGION\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+                     },
+                     {
+                         "name":  "npm",
+                         "path":  "E:\\Application\\nodejs\\npm.cmd"
+                     },
+                     {
+                         "name":  "npm",
+                         "path":  "E:\\Application\\nodejs\\npm"
+                     },
+                     {
+                         "name":  "python",
+                         "path":  "E:\\Application\\Miniconda3\\python.exe"
+                     },
+                     {
+                         "name":  "python",
+                         "path":  "C:\\Python314\\python.exe"
+                     },
+                     {
+                         "name":  "python",
+                         "path":  "E:\\Application\\python310\\python.exe"
+                     },
+                     {
+                         "name":  "python",
+                         "path":  "C:\\Users\\LEGION\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe"
+                     },
+                     {
+                         "name":  "python3",
+                         "path":  "C:\\Users\\LEGION\\AppData\\Local\\Microsoft\\WindowsApps\\python3.exe"
+                     },
+                     {
+                         "name":  "py",
+                         "path":  "C:\\Windows\\py.exe"
+                     },
+                     {
+                         "name":  "uv",
+                         "path":  "C:\\Users\\LEGION\\.local\\bin\\uv.exe"
+                     }
+                 ],
+    "registered_runtimes":  [
+                                {
+                                    "DisplayName":  "Python 3.10.0 (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Miniconda3 py313_25.3.1-1 (Python 3.13.2 64-bit)",
+                                    "DisplayVersion":  "py313_25.3.1-1"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Development Libraries (64-bit debug)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Core Interpreter (64-bit debug)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Tcl/Tk Support (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Node.js",
+                                    "DisplayVersion":  "24.14.1"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Add to Path (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Executables (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Documentation (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Executables (64-bit symbols)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Utility Scripts (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Executables (64-bit debug)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Test Suite (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Standard Library (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Test Suite (64-bit debug)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Development Libraries (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Test Suite (64-bit symbols)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Add to Path (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Standard Library (64-bit symbols)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Standard Library (64-bit debug)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Core Interpreter (64-bit symbols)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Documentation (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Development Libraries (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Tcl/Tk Support (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Core Interpreter (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Standard Library (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Tcl/Tk Support (64-bit symbols)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Core Interpreter (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 pip Bootstrap (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Executables (64-bit)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 Test Suite (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.14.4 pip Bootstrap (64-bit)",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python 3.10.0 Tcl/Tk Support (64-bit debug)",
+                                    "DisplayVersion":  "3.10.150.0"
+                                },
+                                {
+                                    "DisplayName":  "Python Launcher",
+                                    "DisplayVersion":  "3.14.4150.0"
+                                }
+                            ],
+    "manual_review_required":  true,
+    "clean_machine_verified":  false,
+    "application_test_executed":  false,
+    "limitation":  "Read-only inventory; inspect portable runtimes and confirm a dedicated clean Windows host before product acceptance. Does not install, launch or modify the application."
+}

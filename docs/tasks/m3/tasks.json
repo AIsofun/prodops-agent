@@ -183,7 +183,7 @@
   {
     "id": "M3-T07",
     "title": "Windows桌面阶段集成验收",
-    "state": "not_started",
+    "state": "in_progress",
     "depends_on": [
       "M3-T06"
     ],
@@ -203,7 +203,10 @@
       "M3-T07-AC02",
       "M3-T07-AC03"
     ],
-    "implementation": [],
+    "implementation": [
+      "apps/desktop/scripts/collect-acceptance-environment.ps1",
+      "docs/verification/2026-10-17-m3-t07-acceptance.md"
+    ],
     "verification": null,
     "review": null
   }
