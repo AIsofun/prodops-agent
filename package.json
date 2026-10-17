@@ -17,7 +17,7 @@
     "desktop:start": "electron apps/desktop",
     "desktop:smoke": "node apps/desktop/scripts/smoke.mjs",
     "contracts:validators": "node packages/api-client/scripts/generate-validators.mjs",
-    "desktop:test": "node --test apps/desktop/tests/connection.test.cjs apps/desktop/tests/service.test.cjs apps/desktop/tests/business.test.cjs"
+    "desktop:test": "node --test apps/desktop/tests/connection.test.cjs apps/desktop/tests/service.test.cjs apps/desktop/tests/business.test.cjs apps/desktop/tests/progress.test.cjs"
   },
   "devDependencies": {
     "@types/node": "24.10.1",

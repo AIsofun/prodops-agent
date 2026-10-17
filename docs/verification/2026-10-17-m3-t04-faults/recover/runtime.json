@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "versions": {
+    "node": "24.22.0",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.8",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.2",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "149",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "0.0.0",
+    "simdjson": "4.6.11",
+    "simdutf": "7.7.0",
+    "sqlite": "3.53.4",
+    "tz": "2026d",
+    "undici": "7.29.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "15.2.124.43-electron.0",
+    "zlib": "1.3.2.1-motley",
+    "zstd": "1.6.0",
+    "electron": "44.8.0",
+    "chrome": "152.0.7977.167"
+  },
+  "preferences": {
+    "contextIsolation": true,
+    "sandbox": true,
+    "nodeIntegration": false,
+    "webSecurity": true,
+    "webviewTag": false
+  },
+  "renderer": {
+    "title": "ProdOps · 设备异常排查",
+    "heading": "从异常描述开始排查",
+    "body": "P\nProdOps\n当前连接\n本机开发环境\n模拟诊断\n＋ 新建排查\n排查记录\n暂无会话记录\n\n从右侧描述一个问题开始\n开发预览\nv0.1.0\n设备异常排查\n模拟环境 · 只读\nPRODUCTION OPERATIONS\n从异常描述开始排查\n\n描述问题，逐步核对指标、日志和操作手册，查看带来源的建议。\n\n◎\n正在检查服务\n\n正在连接当前服务。\n\n检查连接\n异常描述\n只查询模拟数据，不执行设备处置\n发送 ↑\n\n模拟结果不代表现场事实。任务完成与故障恢复分别记录。",
+    "node": "undefined",
+    "process": "undefined",
+    "bridgeKeys": [
+      "business",
+      "connections",
+      "events",
+      "getInfo"
+    ],
+    "info": {
+      "name": "ProdOps",
+      "version": "0.1.0"
+    },
+    "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'",
+    "connection": {
+      "state": "ready",
+      "text": "◎\n服务已就绪\n\n当前使用模拟诊断，不连接真实设备或模型。\n\n检查连接"
+    },
+    "fault": {
+      "run_id": "e4ef0374-48ac-4832-a8cc-7108bcb221a5",
+      "unknown_calls": 1,
+      "status": "succeeded",
+      "evidence_count": 3,
+      "explicit_review_required": true
+    }
+  },
+  "checks": [
+    "React rendered",
+    "renderer has no Node globals",
+    "restricted bridge",
+    "window closes and app exits"
+  ],
+  "process_exit_code": 0
+}

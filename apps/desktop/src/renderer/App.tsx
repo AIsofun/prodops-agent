@@ -1,5 +1,6 @@
 import { busyRun, useWorkspace, type Snapshot } from "./useWorkspace.js";
 import type { RunEvent } from "../shared/business.js";
+import { useState } from "react";
 
 const labels = {
   ready: ["服务已就绪", "当前使用模拟诊断，不连接真实设备或模型。"],
@@ -31,6 +32,18 @@ function eventText(event: RunEvent): string {
   }
 }
 const time = (value: string) => new Date(value).toLocaleString("zh-CN", { hour12: false });
+function RecoveryPanel({ run, disabled, recover }: { run: Snapshot; disabled: boolean; recover(ids: string[]): Promise<void> }) {
+  const [reviewed, setReviewed] = useState<string[]>([]);
+  const [confirmed, setConfirmed] = useState(false);
+  const unknown = run.unknown_tool_call_ids ?? [];
+  return <section className="recovery-panel" aria-label="中断结果核对"><h3>核对未确认的查询</h3>
+    <p>服务中断时，以下查询没有确认结果。核对记录后，可以明确允许重做尚未确认的模拟只读查询；已有证据会保留。</p>
+    {unknown.map((id) => <label key={id}><input type="checkbox" data-review-call={id} disabled={disabled} checked={reviewed.includes(id)}
+      onChange={(event) => setReviewed((previous) => event.target.checked ? [...previous, id] : previous.filter((item) => item !== id))} />我已核对查询记录 <code>{id}</code></label>)}
+    <label><input type="checkbox" data-action="confirm-recovery" disabled={disabled} checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />我确认继续执行模拟只读查询，允许重做尚未确认的步骤。</label>
+    <button data-action="recover-run" disabled={disabled || !confirmed || reviewed.length !== unknown.length} onClick={() => void recover(reviewed)}>{disabled ? "提交核对中…" : "确认后继续排查"}</button>
+  </section>;
+}
 function Pagination({ earlier, recent, onEarlier, onRecent, label }: { earlier: boolean; recent: boolean; onEarlier(): void; onRecent(): void; label: string }) {
   if (!earlier && !recent) return null;
   return <div className="pagination">{recent && <button onClick={onRecent}>最近{label}</button>}{earlier && <button onClick={onEarlier}>更早{label}</button>}</div>;
@@ -75,14 +88,17 @@ export function App() {
           {state.selected && !state.loading && state.messages.length === 0 && <p className="empty-view">这是一个新会话。可输入相机掉线、OCR质量下降、Kafka堆积或推理延迟。</p>}
         </section>
         {state.run && <section className="run-card" aria-label="任务状态" data-run-id={state.run.run_id} data-run-status={state.run.status}>
-          <div className="run-heading"><h2>{statuses[state.run.status]}</h2><span className="mock-tag">显式模拟</span></div>
+          <div className="run-heading"><h2>{statuses[state.run.status]}</h2><span className="mock-tag">显式模拟</span>
+            {["queued", "running", "cancelling"].includes(state.run.status) && <button data-action="cancel-run" disabled={state.acting || state.run.status === "cancelling"} onClick={() => void state.cancelRun()}>{state.run.status === "cancelling" ? "等待当前步骤收尾…" : "取消排查"}</button>}</div>
           <p className="run-reference">任务 {state.run.run_id}</p>
           <p className="resolution" data-resolution={state.run.resolution_status}>故障是否恢复：{({ unknown: "尚未核验", unresolved: "未恢复", resolved: "已核验恢复" })[state.run.resolution_status]}</p>
-          {state.run.error && <p className="problem">本次排查未完成（{state.run.error.code}）。已有证据保留；请核对问题与执行预算后再发起新排查。</p>}
-          {state.run.status === "recovery_required" && <p>上次执行中断，请保留当前记录并核对未知结果。恢复操作将在后续交互中接入。</p>}
-          <details className="progress" open><summary>排查进度 <span>{state.events.length} 条已保存事件</span></summary>
+          {state.run.error && state.run.status === "failed" && <p className="problem">{state.run.error.code === "budget_exceeded" ? "本次排查超过执行预算，已停止后续查询。" : "本次排查未完成，请检查连接与问题描述。"}已有证据保留，核对后可发起新排查。</p>}
+          {state.run.status === "cancelling" && <p>正在停止后续步骤；在途查询的结果仍会保留。</p>}
+          {state.run.status === "recovery_required" && <RecoveryPanel key={`${state.run.run_id}:${state.run.version}`} run={state.run} disabled={state.acting} recover={state.recoverRun} />}
+          <p className="stream-status" data-stream-state={state.stream} aria-live="polite">{state.stream === "reconnecting" ? "进度连接中断，正在按原进度重新连接。任务状态以服务记录为准。" : state.stream === "restoring" ? "正在重新读取任务快照，避免遗漏进度。" : state.stream === "open" ? "正在接收进度…" : state.stream === "ended" ? "进度已同步" : "进度连接已停止，可刷新记录核对。"}</p>
+          {state.restored && <p className="stream-status">已恢复完整任务快照；下方继续展示新收到的进度。</p>}
+          <details className="progress" open><summary>排查进度 <span>{state.events.length} 条近期进度记录</span></summary>
             <ol>{state.events.map((event) => <li key={event.seq} data-event-seq={event.seq}><span>{eventText(event)}</span><time>{new Date(event.occurred_at).toLocaleTimeString("zh-CN", { hour12: false })}</time></li>)}</ol>
-            {state.stream === "open" && <p className="stream-status">正在接收进度…</p>}
           </details>
           <div className="evidence-grid" aria-label="诊断证据">
             {state.run.evidence.map((item) => <article className="evidence" key={item.evidence_id} data-evidence-id={item.evidence_id}><h3>模拟证据</h3><p>{item.summary}</p><code>{item.source}</code><time>采集：{time(item.collected_at)}</time>

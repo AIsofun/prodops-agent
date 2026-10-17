@@ -92,7 +92,7 @@
   {
     "id": "M3-T04",
     "title": "取消恢复与断线交互",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M3-T03"
     ],
@@ -110,9 +110,15 @@
       "M3-T04-AC02",
       "M3-T04-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "apps/desktop/src/shared/progress.ts",
+      "apps/desktop/src/renderer/useWorkspace.ts",
+      "apps/desktop/src/renderer/App.tsx",
+      "apps/desktop/tests/progress.test.cjs",
+      "apps/desktop/scripts/verify-faults.mjs"
+    ],
+    "verification": "docs/verification/m3-t04.json",
+    "review": "docs/reviews/m3-t04.json"
   },
   {
     "id": "M3-T05",

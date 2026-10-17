@@ -31,7 +31,9 @@ events在主进程持有Bearer并解析SSE。每窗口最多4个订阅，每订�
 
 当前已接入真实会话界面：新建/选择会话、消息和任务历史分页、模拟任务提交、进度与证据记录。分页每页20条，可读更早记录或返回最近；服务端历史保留，界面不一次加载全部。草稿按会话保存在当前窗口内存，任务忙碌时可以编辑但不能重复提交，关闭应用后不承诺恢复未发送草稿。HTTP结果未确认时保留草稿及同内容幂等键，用户先刷新记录核对，界面不自动重发。
 
-同会话“继续排查”使用服务端授权历史，最多最近8条、每条2000字符、总计8000字符。新会话不混入旧会话，明确新问题优先；当前仍为四类确定性mock，不声称接入真实模型。任务状态、最终回复、证据来源/采集时间与故障恢复状态分别展示。取消、核对恢复及自动重连接下来接入。
+同会话“继续排查”使用服务端授权历史，最多最近8条、每条2000字符、总计8000字符。新会话不混入旧会话，明确新问题优先；当前仍为四类确定性mock，不声称接入真实模型。任务状态、最终回复、证据来源/采集时间与故障恢复状态分别展示。
+
+当前可在界面取消排查；在途查询先收尾并保留结果，界面不反复发起取消。中断后显示未知查询，需要逐项勾选核对并明确批准继续模拟只读查询，携带当前版本与同次确认幂等键；失败不自动重发。读进度断开后按已交付水位补发并去重，按0.5/1/2/4/8秒最多五次退避；410、缺口或溢出先读取完整快照再续接。网络只改变进度连接提示，不自行修改任务终态。切换会话/关闭视图会释放订阅与退避等待，旧部署/会话的数据拒绝进入当前视图。
 
 窗口启用 contextIsolation、sandbox、webSecurity，关闭 nodeIntegration 和 webview，拒绝新窗口、导航及权限请求。构建界面 CSP 禁止直接网络；仅 Vite 开发态允许本源模块、样式注入和回环 HMR WebSocket。开发加载地址只允许回环 HTTP 根路径，打包后拒绝开发地址。
 
@@ -50,6 +52,7 @@ python scripts/check.py
 node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-integration
 node apps/desktop/scripts/verify-connection.mjs .quality-reports/connection-dev --dev
 node apps/desktop/scripts/verify-workspace.mjs .quality-reports/workspace-integration
+node apps/desktop/scripts/verify-faults.mjs .quality-reports/desktop-faults
 ```
 
 smoke 测试在真实 Electron 内导入正式主入口，探测渲染、权限设置和桥接范围，保存 desktop.png 与 runtime.json，并验证关闭窗口后进程正常退出。每次使用隔离 userData，结束后清理；--managed 强制走自动服务入口，--business通过正式沙箱preload执行隔离模拟任务、事件和历史检查，尚不等同业务界面按钮验收。测试需要桌面会话与允许启动 Electron 的环境，不能用浏览器截图替代。Windows 故障测试需要允许回收测试创建的进程树。构建验证不包含随包 Python、托盘或安装包。
@@ -57,5 +60,7 @@ smoke 测试在真实 Electron 内导入正式主入口，探测渲染、权限�
 连接集成脚本启动隔离 Python local/server 开发进程，分别验证就绪与离线，并使用明确的 426 夹具验证不兼容界面。脚本会终止自己启动的 Python 进程，不代表生产退出策略验收。HTTP 运行时校验器更新使用 `npm run contracts:validators`；契约检查也会拒绝生成器漂移。生成方式依据 [Ajv standalone](https://ajv.js.org/standalone)。
 
 workspace集成在真实Electron里操作正式React表单与按钮，先验证模拟诊断、忙碌草稿、追问和会话隔离，再用正式受保护API准备超过一页的隔离历史，点击三种分页入口；完整退出Electron与本机服务后，以同一隔离userData再次启动，验证消息和证据。保存create/reopen运行记录与实际截图，结束清理隔离数据，不复用用户数据库。
+
+faults集成只在测试进程替换开发入口为tests/desktop_fault_entry.py，以文件门控暂停模拟查询、明确注入一次410或丢失一帧；网络断开作用于测试自身真实SSE请求，硬中断只终止该桌面创建的服务进程树。生产入口不读取这些测试开关。验证取消保留在途证据、重连水位、缺口快照及硬退出后人工核对；不是生产设备测试。
 
 实现依据：[Electron 安全建议](https://www.electronjs.org/docs/latest/tutorial/security)、[Vite 开发与构建](https://vite.dev/guide/)。

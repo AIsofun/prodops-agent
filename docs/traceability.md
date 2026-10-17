@@ -19,9 +19,9 @@
 | REQ-005 | M2 | 进行中 | 8 11 | [数据库调度](../services/agent/src/prodops/runtime/scheduler.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock独立执行、持久SSE步骤与真实桌面进度/最终结果已验证；真实模型待M4 |
 | REQ-006 | M2 | 进行中 | 8 9 13 | [证据持久化](../services/agent/src/prodops/adapters/storage/execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock来源/采集时间、最终回复、独立解决状态及桌面证据记录已验证；真实来源和附件待后续 |
 | REQ-007 | M2 | 进行中 | 13 | [业务历史API](../services/agent/src/prodops/api/business.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 实际桌面三类分页、完整mock回复/证据与整个本机链路重开历史已验证；正式远端权限待M4 |
-| REQ-008 | M2 | 进行中 | 11 | [持久SSE](../services/agent/src/prodops/api/stream.py)、[客户端水位](../packages/api-client/src/events.ts) | [SSE验证](verification/2026-10-17-m2-t05-events.md)、[桌面桥接](verification/2026-10-17-m3-t02-bridge.md) | 实际回环断线执行继续、补发/去重、过期游标及桌面有限SSE桥接已验证；UI自动重连待M3 |
-| REQ-009 | M2 | 进行中 | 9 | [取消事务](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 排队/在途/步骤边界取消和结果保留已验证；桌面取消入口仍待M3 |
-| REQ-010 | M2 | 进行中 | 9 | [启动核对与恢复](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 真实进程硬退出后unknown、明确核对、新尝试与预算保留已验证；实际设备动作核对待连接器阶段 |
+| REQ-008 | M2 | 进行中 | 11 | [持久SSE](../services/agent/src/prodops/api/stream.py)、[客户端水位](../packages/api-client/src/events.ts) | [SSE验证](verification/2026-10-17-m2-t05-events.md)、[桌面故障验证](verification/2026-10-17-m3-t04-recovery.md) | 实际桌面原水位重连/去重、410/缺口快照恢复已验证；正式内网代理待M4 |
+| REQ-009 | M2 | 进行中 | 9 | [取消事务](../services/agent/src/prodops/adapters/storage/recovery.py) | [桌面取消恢复](verification/2026-10-17-m3-t04-recovery.md) | 服务及真实桌面在途取消、重复互斥和证据保留已验证；真实设备处置待M5 |
+| REQ-010 | M2 | 进行中 | 9 | [启动核对与恢复](../services/agent/src/prodops/adapters/storage/recovery.py) | [桌面取消恢复](verification/2026-10-17-m3-t04-recovery.md) | 真实桌面服务硬退出、unknown逐项核对/明确批准与同任务恢复已验证；实际设备动作核对待连接器阶段 |
 | REQ-011 | M4 | 进行中 | 7 8 | [显式mock适配器](../services/agent/src/prodops/adapters/mock_tools.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock及异常不降级已验证；实际模型协议与不可用场景仍在M4 |
 | REQ-012 | M5 | 未开始 | 7 14 | - | - | 现场连接器未确定 |
 | REQ-013 | M4 | 进行中 | 6.3 13 | [固定开发连接](../apps/desktop/src/main/connection.ts)、[受限 IPC](../apps/desktop/src/main/ipc.ts) | [开发连接验证](verification/2026-10-16-m1-t05-bridge.md) | T05 固定回环连接和状态读取已验证；持久配置、切换及跨连接缓存隔离仍在 M4 |
@@ -29,7 +29,7 @@
 | REQ-015 | M4 | 未开始 | 12 13 | - | - | P1 附件，上限待定 |
 | REQ-016 | M5 | 未开始 | 14 | - | - | P1，开放写操作前必需 |
 | REQ-017 | M5 | 未开始 | 9 14 | - | - | P1，验证与冲突控制 |
-| REQ-018 | M3 | 进行中 | 12 16 | [界面错误状态](../apps/desktop/src/renderer/useWorkspace.ts) | [桌面会话验证](verification/2026-10-17-m3-t03-workspace.md) | 固定错误分类、关联ID、草稿保留与刷新核对已接入；自动重连和恢复交互待后续 |
+| REQ-018 | M3 | 进行中 | 12 16 | [界面错误状态](../apps/desktop/src/renderer/useWorkspace.ts) | [桌面会话验证](verification/2026-10-17-m3-t03-workspace.md) | 固定错误分类/关联ID、草稿保留、自动读重连及明确恢复交互已验证；实际模型/安装场景待后续 |
 | REQ-019 | M2 | 进行中 | 10 | [持久执行预算](../services/agent/src/prodops/adapters/storage/execution.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 队列/并发、次数/时长、取消与恢复预算保留已验证；等待确认预算按处置切片 |
 | REQ-020 | M6 | 未开始 | 13 17 | - | - | 数据及附件恢复 |
 | REQ-021 | M6 | 未开始 | 12 17 | - | - | 协议与离线升级 |

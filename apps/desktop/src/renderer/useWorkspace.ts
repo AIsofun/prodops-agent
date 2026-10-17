@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { components } from "../../../../packages/api-client/src/schema.js";
-import type { BridgeCode, BridgeResult, RunEvent, StreamState } from "../shared/business.js";
+import type { BridgeCode, BridgeResult, RunEvent } from "../shared/business.js";
+import { ProgressSession, type ProgressState } from "../shared/progress.js";
 import type { ConnectionStatus } from "../shared/connection.js";
 
 type Schema = components["schemas"];
@@ -46,14 +47,17 @@ export function useWorkspace() {
   const [runCursor, setRunCursor] = useState<string | null>(null);
   const [run, setRun] = useState<Snapshot | null>(null);
   const [events, setEvents] = useState<RunEvent[]>([]);
-  const [stream, setStream] = useState<StreamState>("closed");
+  const [stream, setStream] = useState<ProgressState>("closed");
+  const [restored, setRestored] = useState(false);
+  const [acting, setActing] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [problem, setProblem] = useState<{ text: string; requestId: string | null } | null>(null);
   const epoch = useRef(0);
-  const watchEpoch = useRef(0);
-  const subscription = useRef<{ runId: string; id: string } | null>(null);
+  const progress = useRef<ProgressSession | null>(null);
+  const action = useRef(false);
+  const recovery = useRef<{ runId: string; version: number; key: string } | null>(null);
   const sending = useRef(false);
   const messagePage = useRef<string | null>(null);
   const runPage = useRef<string | null>(null);
@@ -67,10 +71,8 @@ export function useWorkspace() {
       { text: "操作暂未完成，请刷新记录后核对。草稿已保留。", requestId: null });
   }
   function stopWatching() {
-    watchEpoch.current++;
-    const active = subscription.current;
-    subscription.current = null;
-    if (active) void window.prodops.events.close(active.runId, active.id).catch(() => undefined);
+    progress.current?.stop();
+    progress.current = null;
   }
   async function readConversations(workspace: string, cursor: string | null) {
     const query = ++conversationQuery.current;
@@ -80,45 +82,25 @@ export function useWorkspace() {
   }
   async function watch(snapshot: Snapshot, token: number) {
     stopWatching();
-    const watching = watchEpoch.current;
-    const current = () => epoch.current === token && watchEpoch.current === watching;
-    let id: string | null = null;
-    try {
-      setEvents([]); setStream("open");
-      id = unwrap(await window.prodops.events.open(snapshot.run_id, 0)).subscription_id;
-      if (!current()) return;
-      subscription.current = { runId: snapshot.run_id, id };
-      let after = 0;
-      while (current()) {
-        const batch = unwrap(await window.prodops.events.read(snapshot.run_id, id));
+    setEvents([]); setStream("open"); setRestored(false);
+    const current = () => epoch.current === token && progress.current === session;
+    const session = new ProgressSession({ ...window.prodops.events, snapshot: (id) => api().run(id) }, snapshot, {
+      state: (value) => { if (current()) setStream(value); },
+      events: (items) => { if (current()) setEvents((previous) => [...previous, ...items].slice(-80)); },
+      snapshot: (latest, reset) => {
         if (!current()) return;
-        for (const event of batch.events) {
-          if (event.seq !== after + 1) throw new BridgeFailure("cursor_expired", null);
-          after = event.seq;
-        }
-        if (batch.last_seq !== after) throw new BridgeFailure("invalid_response", null);
-        setEvents((previous) => [...previous, ...batch.events].slice(-80));
-        const latest = unwrap(await api().run(snapshot.run_id));
-        if (!current()) return;
-        setRun(latest);
-        setRuns((previous) => previous.map((item) => item.run_id === latest.run_id ? latest : item));
-        setStream(batch.state);
-        if (batch.state !== "open") {
-          if (messagePage.current === null) {
-            const history = unwrap(await api().messages(snapshot.conversation_id, page(null)));
-            if (current() && messagePage.current === null) { setMessages(history.items); setMessageNext(history.next_cursor); }
-          }
-          if (!["ended", "closed"].includes(batch.state)) {
-            setProblem({ text: "进度连接已停止，任务结果以服务记录为准。请刷新任务快照。", requestId: null });
-          }
-          return;
-        }
-      }
-    } catch (error) { if (current()) { report(error); setStream("offline"); } }
-    finally {
-      if (id !== null) void window.prodops.events.close(snapshot.run_id, id).catch(() => undefined);
-      if (current()) subscription.current = null;
-    }
+        setRun(latest); setRuns((previous) => previous.map((item) => item.run_id === latest.run_id ? latest : item));
+        if (reset) { setEvents([]); setRestored(true); }
+      },
+      finished: async () => {
+        if (messagePage.current !== null || !current()) return;
+        const history = unwrap(await api().messages(snapshot.conversation_id, page(null)));
+        if (current() && messagePage.current === null) { setMessages(history.items); setMessageNext(history.next_cursor); }
+      },
+      failure: (code) => { if (current()) report(new BridgeFailure(code, null)); },
+    });
+    progress.current = session;
+    await session.run();
   }
   async function selectConversation(conversation: Conversation) {
     const token = ++epoch.current;
@@ -225,7 +207,33 @@ export function useWorkspace() {
     if (busyRun(run)) return;
     setRun(snapshot); setProblem(null); void watch(snapshot, epoch.current);
   }
+  async function cancelRun() {
+    if (!run || action.current || !["queued", "running"].includes(run.status)) return;
+    const token = epoch.current;
+    action.current = true; setActing(true); setProblem(null);
+    try {
+      const latest = unwrap(await api().cancel(run.run_id, {}));
+      if (epoch.current === token) { setRun(latest); void watch(latest, token); }
+    } catch (error) { if (epoch.current === token) report(error); }
+    finally { action.current = false; setActing(false); }
+  }
+  async function recoverRun(reviewed: string[]) {
+    const unknown = run?.unknown_tool_call_ids ?? [];
+    if (!run || action.current || run.status !== "recovery_required" || reviewed.length !== unknown.length ||
+        new Set(reviewed).size !== reviewed.length || reviewed.some((id) => !unknown.includes(id))) return;
+    const token = epoch.current;
+    action.current = true; setActing(true); setProblem(null);
+    try {
+      if (recovery.current?.runId !== run.run_id || recovery.current.version !== run.version) {
+        recovery.current = { runId: run.run_id, version: run.version, key: crypto.randomUUID() };
+      }
+      const latest = unwrap(await api().recover(run.run_id, { expected_version: run.version, reviewed_tool_call_ids: reviewed, decision: "retry_mock_reads" }, recovery.current.key));
+      recovery.current = null;
+      if (epoch.current === token) { setRun(latest); void watch(latest, token); }
+    } catch (error) { if (epoch.current === token) report(error); }
+    finally { action.current = false; setActing(false); }
+  }
   return { connection, checking, workspaceId, conversations, conversationCursor, conversationNext, selected,
-    messages, messageCursor, messageNext, runs, runCursor, runNext, run, events, stream, draft, loading, submitting, problem,
-    setDraft, checkConnection, createConversation, selectConversation, selectRun, submit, paginate };
+    messages, messageCursor, messageNext, runs, runCursor, runNext, run, events, stream, restored, acting, draft, loading, submitting, problem,
+    setDraft, checkConnection, createConversation, selectConversation, selectRun, submit, paginate, cancelRun, recoverRun };
 }

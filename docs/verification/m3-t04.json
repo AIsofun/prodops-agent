@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T04",
+  "environment": {"os": "Windows 11", "arch": "AMD64", "python": "3.13.2", "node": "24.14.1", "electron": "44.8.0"},
+  "source": {"revision": "773a3d0", "worktree": "cooperative cancellation, explicit recovery and bounded progress reconnection"},
+  "criteria": [
+    {"id": "M3-T04-AC01", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t04-recovery.md"},
+    {"id": "M3-T04-AC02", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t04-recovery.md"},
+    {"id": "M3-T04-AC03", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t04-recovery.md"}
+  ]
+}

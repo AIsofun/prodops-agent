@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T04",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-17-m3-t04-recovery.md",
+  "findings": [
+    {"id": "R1", "severity": "P2", "status": "fixed", "reason": "Only durable snapshots determine task status; network errors cannot fabricate task failure."},
+    {"id": "R2", "severity": "P2", "status": "fixed", "reason": "Restore snapshots for missing history and bind watermarks to task/deployment/view lifetime."},
+    {"id": "R3", "severity": "P2", "status": "fixed", "reason": "Review exact unknown IDs with explicit approval, expected version and stable confirmation idempotency."},
+    {"id": "R4", "severity": "P2", "status": "fixed", "reason": "Recovery-required state uses its dedicated review flow rather than suggesting a conflicting new task."}
+  ]
+}

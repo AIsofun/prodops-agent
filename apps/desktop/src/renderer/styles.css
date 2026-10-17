@@ -99,4 +99,12 @@ button:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2
 .composer button:not(:disabled) { color: #fff; background: #176e61; font-size: 13px; padding: 9px 15px; }
 textarea { color: #314950; height: 88px; line-height: 1.8; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+.run-heading > button { margin-left: auto; font-size: 11px; color: #8a6138; background: #faf0e3; }
+.recovery-panel { border: 1px solid #e6d4b6; border-radius: 8px; background: #fff9ee; padding: 15px; margin: 15px 0; }
+.recovery-panel h3 { font-size: 14px; margin-top: 0; }
+.recovery-panel p, .recovery-panel label { font-size: 12px; line-height: 1.8; }
+.recovery-panel label { display: block; margin: 12px 0; overflow-wrap: anywhere; }
+.recovery-panel input { margin-right: 8px; accent-color: #176e61; }
+.recovery-panel code { font-size: 10px; }
+.recovery-panel button:not(:disabled) { color: white; background: #176e61; font-size: 12px; }
 @media (max-width: 1050px) { .content { padding: 25px; } .sidebar { width: 218px; } .evidence-grid { grid-template-columns: 1fr; } }
