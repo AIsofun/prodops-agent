@@ -30,7 +30,7 @@
   {
     "id": "M3-T02",
     "title": "受限业务与事件桥接",
-    "state": "not_started",
+    "state": "verified",
     "depends_on": [
       "M3-T01"
     ],
@@ -48,9 +48,15 @@
       "M3-T02-AC02",
       "M3-T02-AC03"
     ],
-    "implementation": [],
-    "verification": null,
-    "review": null
+    "implementation": [
+      "apps/desktop/src/main/business.ts",
+      "apps/desktop/src/main/events.ts",
+      "apps/desktop/src/shared/business.ts",
+      "apps/desktop/src/preload/index.ts",
+      "apps/desktop/tests/business.test.cjs"
+    ],
+    "verification": "docs/verification/m3-t02.json",
+    "review": "docs/reviews/m3-t02.json"
   },
   {
     "id": "M3-T03",

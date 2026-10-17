@@ -1,6 +1,13 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { STATUS_CHANNEL, parseConnectionStatus } from "../shared/connection.js";
 import type { DesktopBridge } from "../shared/desktop.js";
+import { BUSINESS_CHANNEL, EVENTS_CHANNEL, parseBusinessRequest, parseEventRequest, parseResult,
+  validBusinessValue, validSubscription, validEventBatch, type BusinessRequest, type BusinessValues, type BridgeResult } from "../shared/business.js";
+
+async function business<K extends keyof BusinessValues>(request: BusinessRequest & { operation: K }): Promise<BridgeResult<BusinessValues[K]>> {
+  const value: unknown = await ipcRenderer.invoke(BUSINESS_CHANNEL, parseBusinessRequest(request));
+  return parseResult(value, (item): item is BusinessValues[K] => validBusinessValue(request.operation, item));
+}
 
 const bridge: DesktopBridge = Object.freeze({
   getInfo: () => ({ name: "ProdOps", version: "0.1.0" }),
@@ -10,6 +17,29 @@ const bridge: DesktopBridge = Object.freeze({
       const value: unknown = await ipcRenderer.invoke(STATUS_CHANNEL, { connection_id: "development" });
       return parseConnectionStatus(value);
     },
+  }),
+  business: Object.freeze<DesktopBridge["business"]>({
+    workspaces: () => business({ operation: "workspaces", connection_id: "development" }),
+    conversations: (workspace_id, page) => business({ operation: "conversations.list", connection_id: "development", workspace_id, page }),
+    createConversation: (workspace_id, body) => business({ operation: "conversations.create", connection_id: "development", workspace_id, body }),
+    messages: (conversation_id, page) => business({ operation: "messages.list", connection_id: "development", conversation_id, page }),
+    runs: (conversation_id, page) => business({ operation: "runs.list", connection_id: "development", conversation_id, page }),
+    run: (run_id) => business({ operation: "runs.get", connection_id: "development", run_id }),
+    submit: (conversation_id, body, idempotency_key) => business({ operation: "runs.submit", connection_id: "development", conversation_id, body, idempotency_key }),
+    cancel: (run_id, body) => business({ operation: "runs.cancel", connection_id: "development", run_id, body }),
+    recover: (run_id, body, idempotency_key) => business({ operation: "runs.recover", connection_id: "development", run_id, body, idempotency_key }),
+  }),
+  events: Object.freeze<DesktopBridge["events"]>({
+    open: async (run_id, after_seq) => parseResult(await ipcRenderer.invoke(EVENTS_CHANNEL,
+      parseEventRequest({ operation: "open", connection_id: "development", run_id, after_seq })), validSubscription),
+    read: async (run_id, subscription_id) => {
+      const result = parseResult(await ipcRenderer.invoke(EVENTS_CHANNEL,
+        parseEventRequest({ operation: "read", connection_id: "development", run_id, subscription_id })), validEventBatch);
+      if (result.ok && result.value.events.some((event) => event.run_id.toLowerCase() !== run_id.toLowerCase())) throw new Error("Invalid event scope");
+      return result;
+    },
+    close: async (run_id, subscription_id) => parseResult(await ipcRenderer.invoke(EVENTS_CHANNEL,
+      parseEventRequest({ operation: "close", connection_id: "development", run_id, subscription_id })), (item): item is null => item === null),
   }),
 });
 

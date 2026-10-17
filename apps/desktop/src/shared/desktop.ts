@@ -1,4 +1,8 @@
 import type { ConnectionStatus } from "./connection.js";
+import type { components } from "../../../../packages/api-client/src/schema.js";
+import type { BusinessValues, BridgeResult, EventBatch, Page } from "./business.js";
+
+type Schema = components["schemas"];
 
 export interface DesktopInfo {
   name: string;
@@ -8,6 +12,22 @@ export interface DesktopInfo {
 export interface DesktopBridge {
   getInfo(): DesktopInfo;
   connections: { getStatus(): Promise<ConnectionStatus> };
+  business: {
+    workspaces(): Promise<BridgeResult<BusinessValues["workspaces"]>>;
+    conversations(workspace_id: string, page: Page): Promise<BridgeResult<BusinessValues["conversations.list"]>>;
+    createConversation(workspace_id: string, body: Schema["ConversationCreateRequest"]): Promise<BridgeResult<BusinessValues["conversations.create"]>>;
+    messages(conversation_id: string, page: Page): Promise<BridgeResult<BusinessValues["messages.list"]>>;
+    runs(conversation_id: string, page: Page): Promise<BridgeResult<BusinessValues["runs.list"]>>;
+    run(run_id: string): Promise<BridgeResult<BusinessValues["runs.get"]>>;
+    submit(conversation_id: string, body: Schema["RunCreateRequest"], idempotency_key: string): Promise<BridgeResult<BusinessValues["runs.submit"]>>;
+    cancel(run_id: string, body: Schema["CancelRunRequest"]): Promise<BridgeResult<BusinessValues["runs.cancel"]>>;
+    recover(run_id: string, body: Schema["RecoverRunRequest"], idempotency_key: string): Promise<BridgeResult<BusinessValues["runs.recover"]>>;
+  };
+  events: {
+    open(run_id: string, after_seq: number): Promise<BridgeResult<{ subscription_id: string }>>;
+    read(run_id: string, subscription_id: string): Promise<BridgeResult<EventBatch>>;
+    close(run_id: string, subscription_id: string): Promise<BridgeResult<null>>;
+  };
 }
 
 declare global {

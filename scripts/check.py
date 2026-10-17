@@ -143,7 +143,7 @@ def run(root: Path, profile: str) -> list[Result]:
     results.append(execute("product-typescript-boundaries", [node, "scripts/check_ts_boundaries.ts"], root, [tsc], unready_exit=True))
     results.append(execute("product-contracts", [str(python), "-m", "scripts.check_contracts", "--node", node], root, [python], unready_exit=True))
     results.append(execute("product-desktop-behavior", [node, "apps/desktop/scripts/check.mjs"], root,
-                           [tsc, desktop / "scripts/check.mjs", desktop / "tests/connection.test.cjs", desktop / "tests/service.test.cjs", desktop / "tsconfig.electron.json"]))
+                           [tsc, desktop / "scripts/check.mjs", desktop / "tests/connection.test.cjs", desktop / "tests/service.test.cjs", desktop / "tests/business.test.cjs", desktop / "tsconfig.electron.json"]))
     return results
 
 

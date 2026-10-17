@@ -30,7 +30,7 @@ app.once("browser-window-created", (_event, window) => {
       assert.equal(result.heading, "从异常描述开始排查");
       assert.equal(result.node, "undefined");
       assert.equal(result.process, "undefined");
-      assert.deepEqual(result.bridgeKeys.sort(), ["connections", "getInfo"]);
+      assert.deepEqual(result.bridgeKeys.sort(), ["business", "connections", "events", "getInfo"]);
       assert.equal(result.info.name, "ProdOps");
       assert.ok(result.csp.includes("script-src 'self'"));
       assert.ok(!result.csp.includes("unsafe-eval"));
@@ -46,6 +46,41 @@ app.once("browser-window-created", (_event, window) => {
       const malformed = await window.webContents.executeJavaScript(`window.prodops.connections.getStatus({url:'http://attacker.example'}).then(() => false, () => true)`);
       assert.equal(malformed, true);
       result.connection = state;
+      if (process.env.PRODOPS_SMOKE_BUSINESS === "true") {
+        result.business = await window.webContents.executeJavaScript(`(async () => {
+          const bridge = window.prodops;
+          const unwrap = (response) => { if (!response.ok) throw new Error('Bridge returned ' + response.error.code); return response.value; };
+          const workspace = unwrap(await bridge.business.workspaces()).items[0];
+          const conversation = unwrap(await bridge.business.createConversation(workspace.workspace_id, {title:'桌面桥接验证'}));
+          const key = crypto.randomUUID();
+          const body = {content:'相机掉线',execution_mode:'mock'};
+          const run = unwrap(await bridge.business.submit(conversation.conversation_id, body, key));
+          const replay = unwrap(await bridge.business.submit(conversation.conversation_id, body, key));
+          if (run.run_id !== replay.run_id) throw new Error('Idempotency failed');
+          const subscription = unwrap(await bridge.events.open(run.run_id, 0));
+          let count=0, last=0, state='open';
+          try {
+            while (state === 'open') {
+              const batch = unwrap(await bridge.events.read(run.run_id, subscription.subscription_id));
+              for (const event of batch.events) {
+                if (event.seq !== last + 1) throw new Error('Event sequence failed');
+                last=event.seq; count++;
+              }
+              if (batch.last_seq !== last) throw new Error('Delivery watermark failed');
+              state=batch.state;
+            }
+          } finally { unwrap(await bridge.events.close(run.run_id, subscription.subscription_id)); }
+          if (state !== 'ended') throw new Error('Stream did not finish');
+          const snapshot=unwrap(await bridge.business.run(run.run_id));
+          const messages=unwrap(await bridge.business.messages(conversation.conversation_id,{limit:10,cursor:null}));
+          if (snapshot.status !== 'succeeded' || snapshot.evidence.length !== 3 || messages.items.length !== 2) throw new Error('Result/history failed');
+          const refused=await bridge.business.run('../invalid').then(()=>false,()=>true);
+          if (!refused) throw new Error('Invalid bridge input accepted');
+          return {status:snapshot.status,event_count:count,last_seq:last,evidence_count:snapshot.evidence.length,
+            message_count:messages.items.length,invalid_input_refused:refused};
+        })()`);
+        assert.equal(result.business.status, "succeeded");
+      }
       await new Promise((resolve) => setTimeout(resolve, 350));
       fs.writeFileSync(path.join(output, "desktop.png"), (await window.webContents.capturePage()).toPNG());
       fs.writeFileSync(path.join(output, "runtime.json"), JSON.stringify({ status: "PASS", versions: process.versions, preferences: { contextIsolation: prefs.contextIsolation, sandbox: prefs.sandbox, nodeIntegration: prefs.nodeIntegration, webSecurity: prefs.webSecurity, webviewTag: prefs.webviewTag }, renderer: result, checks: ["React rendered", "renderer has no Node globals", "restricted bridge", "window closes and app exits"] }, null, 2) + "\n");

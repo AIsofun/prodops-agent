@@ -15,11 +15,11 @@
 | REQ-001 | M3 | 进行中 | 5 17 | [桌面开发入口](../apps/desktop/src/main/index.ts) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 开发窗口与冻结安装链路已验证；干净 Windows 安装、双击与随包运行时仍在 M3 |
 | REQ-002 | M3 | 进行中 | 6.1 | [私有服务入口](../services/agent/src/prodops/bootstrap/desktop.py)、[主进程管理器](../apps/desktop/src/main/service.ts) | [本机启动验证](verification/2026-10-17-m3-t01-startup.md) | 开发环境随机端口/令牌、私有握手、认证及正常退出已验证；随包运行时、托盘与单实例待后续M3 |
 | REQ-003 | M4 | 进行中 | 6.2 | [服务入口](../services/agent/src/prodops/bootstrap/cli.py) | [M1 集成验证](verification/2026-10-16-m1-t08-acceptance.md) | 共用业务包的 server 回环开发连接已验证；正式认证、数据库和内网运行仍在 M4 |
-| REQ-004 | M3 | 进行中 | 8 16 | [会话用例](../services/agent/src/prodops/application/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话创建/分页及忙碌冲突已验证；历史上下文执行和桌面多轮交流仍待后续 |
+| REQ-004 | M3 | 进行中 | 8 16 | [会话用例](../services/agent/src/prodops/application/tasks.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话创建/分页、忙碌冲突及桌面业务桥接已验证；历史上下文执行和桌面多轮界面仍待后续 |
 | REQ-005 | M2 | 进行中 | 8 11 | [数据库调度](../services/agent/src/prodops/runtime/scheduler.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock提交后独立执行、持久步骤与结果已验证；SSE和桌面实时展示待后续 |
 | REQ-006 | M2 | 进行中 | 8 9 13 | [证据持久化](../services/agent/src/prodops/adapters/storage/execution.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 四类mock来源/采集时间/最终回复与独立解决状态已验证；真实来源和授权原始结果待后续 |
 | REQ-007 | M2 | 进行中 | 13 | [业务历史API](../services/agent/src/prodops/api/business.py) | [API切片验证](verification/2026-10-16-m2-t02-api.md) | 会话/消息/任务分页及服务重开保持记录已验证；完整结果和桌面历史仍待后续 |
-| REQ-008 | M2 | 进行中 | 11 | [持久SSE](../services/agent/src/prodops/api/stream.py)、[客户端水位](../packages/api-client/src/events.ts) | [SSE验证](verification/2026-10-17-m2-t05-events.md) | 实际回环断线执行继续、补发无遗漏/去重与过期游标已验证；桌面自动重连待M3 |
+| REQ-008 | M2 | 进行中 | 11 | [持久SSE](../services/agent/src/prodops/api/stream.py)、[客户端水位](../packages/api-client/src/events.ts) | [SSE验证](verification/2026-10-17-m2-t05-events.md)、[桌面桥接](verification/2026-10-17-m3-t02-bridge.md) | 实际回环断线执行继续、补发/去重、过期游标及桌面有限SSE桥接已验证；UI自动重连待M3 |
 | REQ-009 | M2 | 进行中 | 9 | [取消事务](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 排队/在途/步骤边界取消和结果保留已验证；桌面取消入口仍待M3 |
 | REQ-010 | M2 | 进行中 | 9 | [启动核对与恢复](../services/agent/src/prodops/adapters/storage/recovery.py) | [取消/恢复验证](verification/2026-10-17-m2-t04-recovery.md) | 真实进程硬退出后unknown、明确核对、新尝试与预算保留已验证；实际设备动作核对待连接器阶段 |
 | REQ-011 | M4 | 进行中 | 7 8 | [显式mock适配器](../services/agent/src/prodops/adapters/mock_tools.py) | [模拟执行验证](verification/2026-10-17-m2-t03-execution.md) | 显式mock及异常不降级已验证；实际模型协议与不可用场景仍在M4 |

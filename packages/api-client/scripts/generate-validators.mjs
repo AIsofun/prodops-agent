@@ -35,6 +35,16 @@ const code = "// Generated from contracts/openapi.json. Do not edit.\n" + standa
   validateDesktopStartupFailure: "prodops-contracts#/$defs/DesktopStartupFailure",
   validateDesktopStopRequest: "prodops-contracts#/$defs/DesktopStopRequest",
   validateWorkspaceList: "prodops-contracts#/$defs/WorkspaceList",
+  validateConversationCreateRequest: "prodops-contracts#/$defs/ConversationCreateRequest",
+  validateRunCreateRequest: "prodops-contracts#/$defs/RunCreateRequest",
+  validateCancelRunRequest: "prodops-contracts#/$defs/CancelRunRequest",
+  validateRecoverRunRequest: "prodops-contracts#/$defs/RecoverRunRequest",
+  validateConversation: "prodops-contracts#/$defs/Conversation",
+  validateConversationPage: "prodops-contracts#/$defs/ConversationPage",
+  validateMessagePage: "prodops-contracts#/$defs/MessagePage",
+  validateRunPage: "prodops-contracts#/$defs/RunPage",
+  validateRunSnapshot: "prodops-contracts#/$defs/RunSnapshot",
+  validateErrorResponse: "prodops-contracts#/$defs/ErrorResponse",
 });
 const target = path.resolve(root, output);
 fs.mkdirSync(path.dirname(target), { recursive: true });

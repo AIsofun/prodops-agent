@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T02",
+  "environment": {"os": "Windows 11", "arch": "AMD64", "python": "3.13.2", "node": "24.14.1", "electron": "44.8.0"},
+  "source": {"revision": "70a9136", "worktree": "finite business IPC and bounded authenticated SSE"},
+  "criteria": [
+    {"id": "M3-T02-AC01", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t02-bridge.md"},
+    {"id": "M3-T02-AC02", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t02-bridge.md"},
+    {"id": "M3-T02-AC03", "status": "PASS", "evidence": "docs/verification/2026-10-17-m3-t02-bridge.md"}
+  ]
+}

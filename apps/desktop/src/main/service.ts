@@ -182,6 +182,8 @@ export class LocalService {
       deployment_id: null, protocol_version: null };
   }
 
+  getConnection(): ManagedConnection | null { return this.stopping ? null : this.connection; }
+
   stop(): Promise<void> {
     this.stopping = true;
     this.shutdown ??= this.performStop();

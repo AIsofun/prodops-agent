@@ -53,6 +53,8 @@ SSE的id使用任务内十进制seq，Last-Event-ID为排他水位；缺失时�
 
 桌面私有管道使用同源预留DTO DesktopStartupRequest/Ready/Failure/StopRequest，启动版本1.0，独立于HTTP协议1.4。请求包含随机实例ID、令牌和数据库绝对路径；令牌字段writeOnly且不参与模型repr。就绪响应带随机回环端口、实际PID/父PID、部署身份和协议，不带令牌。它们不是新增HTTP端点；Electron主进程和Python入口均执行运行时校验，renderer不可调用此管道。当前开发链路证据见[本机启动验证](../docs/verification/2026-10-17-m3-t01-startup.md)。
 
+桌面业务IPC使用[有限共享契约](../apps/desktop/src/shared/business.ts)，只允许development连接及既有API操作；UUID/分页/幂等键与正式请求体都执行运行时校验。新增同源生成校验器覆盖会话、消息、任务和ErrorResponse，不新增HTTP语义版本。事件主进程验证正式RunEvent、归属/序号/帧名，有限拉取批次再次经preload校验；stream.error没有id且不推进水位。详细上限、释放及错误映射见[桌面说明](../apps/desktop/README.md)，UI自动重连另卡实现。
+
 安装环境见 [质量工作流](../docs/quality-workflow.md)。在仓库根目录运行（Windows）：
 
 ```text

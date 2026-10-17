@@ -18,6 +18,7 @@ if (process.argv.includes("--managed")) {
   delete env.PRODOPS_SERVICE_MODE;
   env.PRODOPS_EXPECT_CONNECTION = "ready";
 }
+if (process.argv.includes("--business")) env.PRODOPS_SMOKE_BUSINESS = "true";
 if (process.argv.includes("--dev")) {
   server = await createServer({ configFile: fileURLToPath(new URL("../vite.config.mjs", import.meta.url)), server: { port: 0 } });
   await server.listen();

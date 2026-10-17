@@ -1,9 +1,12 @@
 import { app, BrowserWindow, ipcMain, session } from "electron";
 import path from "node:path";
 import { developmentConnection, getConnectionStatus } from "./connection.js";
-import { createStatusHandler } from "./ipc.js";
+import { createStatusHandler, createBusinessHandler, createEventsHandler } from "./ipc.js";
 import { STATUS_CHANNEL } from "../shared/connection.js";
 import { LocalService, serviceLaunchOptions } from "./service.js";
+import { BusinessClient } from "./business.js";
+import { EventStreams } from "./events.js";
+import { BUSINESS_CHANNEL, EVENTS_CHANNEL } from "../shared/business.js";
 
 let localService: LocalService | null = null;
 let shutdownPending = false;
@@ -45,6 +48,15 @@ async function createWindow(): Promise<void> {
   ipcMain.handle(STATUS_CHANNEL, createStatusHandler(() => window, () => localService !== null ?
     localService.getStatus() : getConnectionStatus(connection!)));
   window.once("closed", () => ipcMain.removeHandler(STATUS_CHANNEL));
+  const provider = () => localService?.getConnection() ?? null;
+  const client = new BusinessClient(provider);
+  const streams = new EventStreams(provider);
+  ipcMain.handle(BUSINESS_CHANNEL, createBusinessHandler(() => window, client));
+  ipcMain.handle(EVENTS_CHANNEL, createEventsHandler(() => window, streams));
+  const dispose = () => { client.dispose(); streams.dispose(); };
+  window.webContents.once("destroyed", dispose);
+  window.webContents.on("render-process-gone", dispose);
+  window.once("closed", () => { dispose(); ipcMain.removeHandler(BUSINESS_CHANNEL); ipcMain.removeHandler(EVENTS_CHANNEL); });
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.webContents.on("will-attach-webview", (event) => event.preventDefault());

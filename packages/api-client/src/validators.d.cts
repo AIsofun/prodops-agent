@@ -8,3 +8,13 @@ export function validateDesktopStartupReady(value: unknown): value is components
 export function validateDesktopStartupFailure(value: unknown): value is components["schemas"]["DesktopStartupFailure"];
 export function validateDesktopStopRequest(value: unknown): value is components["schemas"]["DesktopStopRequest"];
 export function validateWorkspaceList(value: unknown): value is components["schemas"]["WorkspaceList"];
+export function validateConversationCreateRequest(value: unknown): value is components["schemas"]["ConversationCreateRequest"];
+export function validateRunCreateRequest(value: unknown): value is components["schemas"]["RunCreateRequest"];
+export function validateCancelRunRequest(value: unknown): value is components["schemas"]["CancelRunRequest"];
+export function validateRecoverRunRequest(value: unknown): value is components["schemas"]["RecoverRunRequest"];
+export function validateConversation(value: unknown): value is components["schemas"]["Conversation"];
+export function validateConversationPage(value: unknown): value is components["schemas"]["ConversationPage"];
+export function validateMessagePage(value: unknown): value is components["schemas"]["MessagePage"];
+export function validateRunPage(value: unknown): value is components["schemas"]["RunPage"];
+export function validateRunSnapshot(value: unknown): value is components["schemas"]["RunSnapshot"];
+export function validateErrorResponse(value: unknown): value is components["schemas"]["ErrorResponse"];
