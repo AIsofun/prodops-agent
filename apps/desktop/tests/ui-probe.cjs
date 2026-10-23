@@ -32,7 +32,7 @@ module.exports = async function uiProbe(window, output, phase) {
     click('[data-action="toggle-sidebar"]');await wait(()=>!document.querySelector('.sidebar-collapsed')&&!document.querySelector('[data-action="toggle-sidebar"]').disabled,'Expanded persisted');
     ensure(document.querySelector('input[aria-label="模型名称"]').value==='isolated-cloud','Sidebar toggle lost unsaved model draft');
     ensure(document.querySelectorAll('input[type="password"]').length===0,'Renderer exposes secret entry');
-    ensure([...document.querySelectorAll('.settings-page button')].find(x=>x.textContent==='测试连接').disabled,'Unsupported model test is enabled');
+    ensure(!document.querySelector('[data-action="test-model"]').disabled,'Model test is not enabled');
     click('.settings-actions .primary');await stored(value=>value.cloud.model==='isolated-cloud'&&value.cloud.endpoint==='https://model.invalid/v1','Cloud profile');await wait(()=>!document.querySelector('.settings-actions .primary').disabled,'Cloud save settled');
     type('模型服务地址','https://user:password@model.invalid');await pause(10);click('.settings-actions .primary');
     await wait(()=>document.querySelector('.settings-notice').textContent.includes('保存失败'),'Credential URL rejected');
@@ -46,9 +46,10 @@ module.exports = async function uiProbe(window, output, phase) {
     const after=await window.prodops.connections.getStatus();ensure(after.deployment_id===original.deployment_id&&after.mode===original.mode,'Draft switched active deployment');
     click('[aria-label="返回排查"]');click('[data-action="toggle-sidebar"]');await wait(()=>document.querySelector('.sidebar-collapsed')&&!document.querySelector('[data-action="toggle-sidebar"]').disabled,'Final collapsed persisted');
     return {phase:'create',same_titlebar_color:true,logo_popup_without_settings:true,chat_draft_preserved:true,unsaved_model_draft_preserved:true,
-      local_and_cloud_saved:true,credential_url_refused:true,no_renderer_key_input:true,unsupported_operations_disabled:true,server_draft_saved:true,active_connection_unchanged:true};
+      local_and_cloud_saved:true,credential_url_refused:true,no_renderer_key_input:true,model_test_enabled:true,server_draft_saved:true,active_connection_unchanged:true};
   })()`);
   assert.ok(result.phase);
+  result.model_settings = await require("./model-settings-probe.cjs")(window, output, phase);
   await screenshot("desktop");
   if (phase === "create") {
     await window.webContents.executeJavaScript("document.querySelector('[data-action=\"toggle-sidebar\"]').click()");

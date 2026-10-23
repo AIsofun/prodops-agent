@@ -18,7 +18,7 @@
     "desktop:smoke": "node apps/desktop/scripts/smoke.mjs",
     "desktop:package": "node apps/desktop/scripts/package.mjs",
     "contracts:validators": "node packages/api-client/scripts/generate-validators.mjs",
-    "desktop:test": "node --test apps/desktop/tests/connection.test.cjs apps/desktop/tests/service.test.cjs apps/desktop/tests/business.test.cjs apps/desktop/tests/progress.test.cjs apps/desktop/tests/preferences.test.cjs"
+    "desktop:test": "node --test apps/desktop/tests/connection.test.cjs apps/desktop/tests/service.test.cjs apps/desktop/tests/business.test.cjs apps/desktop/tests/progress.test.cjs apps/desktop/tests/preferences.test.cjs apps/desktop/tests/models.test.cjs"
   },
   "devDependencies": {
     "@types/node": "24.10.1",

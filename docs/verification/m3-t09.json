@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T09",
+  "environment": {"os": "Windows 11 10.0.26200 development machine", "arch": "AMD64", "python": "3.13.2", "node": "24.14.1", "electron": "44.8.0", "verified_on": "2026-10-23"},
+  "source": {"revision": "52ef7cc", "worktree": "User-requested model preflight, isolated encrypted key entry and single content scrollbar; final unsigned local package with source hashes"},
+  "criteria": [
+    {"id": "M3-T09-AC01", "status": "PASS", "evidence": "docs/verification/2026-10-23-m3-t09-settings.md"},
+    {"id": "M3-T09-AC02", "status": "PASS", "evidence": "docs/verification/2026-10-23-m3-t09-settings.md"},
+    {"id": "M3-T09-AC03", "status": "PASS", "evidence": "docs/verification/2026-10-23-m3-t09-settings.md"},
+    {"id": "M3-T09-AC04", "status": "PASS", "evidence": "docs/verification/2026-10-23-m3-t09-settings.md"}
+  ]
+}

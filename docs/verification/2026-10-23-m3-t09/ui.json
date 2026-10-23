@@ -1,0 +1,45 @@
+{
+  "status": "PASS",
+  "results": [
+    {
+      "phase": "create",
+      "same_titlebar_color": true,
+      "logo_popup_without_settings": true,
+      "chat_draft_preserved": true,
+      "unsaved_model_draft_preserved": true,
+      "local_and_cloud_saved": true,
+      "credential_url_refused": true,
+      "no_renderer_key_input": true,
+      "model_test_enabled": true,
+      "server_draft_saved": true,
+      "active_connection_unchanged": true,
+      "model_settings": {
+        "local_button_sends_real_get": true,
+        "cloud_auth_failure_and_success": true,
+        "key_dialog_cancel_save_update_remove": true,
+        "encrypted_windows_storage": true,
+        "no_key_in_settings_renderer": true,
+        "endpoint_binding": true,
+        "test_does_not_save_draft": true,
+        "single_chat_scroll_and_fixed_titlebar": true,
+        "fixture_requests": 5
+      },
+      "native_file_menu_dispatch": true,
+      "foreign_shell_frame_refused": true,
+      "window_controls": {
+        "maximize_restore": true,
+        "minimize": true,
+        "close_hides_to_tray": true
+      }
+    },
+    {
+      "phase": "reopen",
+      "preferences_reopened": true,
+      "sidebar_restored": true,
+      "execution_mode": "mock",
+      "model_settings": {
+        "encrypted_key_survived_process_restart": true
+      }
+    }
+  ]
+}

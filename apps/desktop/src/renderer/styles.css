@@ -1,5 +1,6 @@
 :root { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; color: #242424; background: #f7f7f7; font-synthesis: none; --sidebar: #f7f7f7; --line: #e6e6e6; --muted: #737373; --hover: #eaeaea; }
 * { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; min-height: 0; overflow: hidden; }
 body { margin: 0; }
 button, textarea, input { font: inherit; color: inherit; }
 button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 8px; padding: 8px 11px; background: transparent; cursor: pointer; }
@@ -9,7 +10,7 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 button svg { flex-shrink: 0; }
 [hidden] { display: none !important; }
 h1, h2, h3, p { margin: 0; }
-.app-shell { --nav-width: 218px; display: grid; grid-template-columns: var(--nav-width) minmax(0, 1fr); grid-template-rows: 42px minmax(0, 1fr); height: 100dvh; min-height: 500px; background: var(--sidebar); }
+.app-shell { --nav-width: 218px; display: grid; grid-template-columns: var(--nav-width) minmax(0, 1fr); grid-template-rows: 42px minmax(0, 1fr); height: 100dvh; min-height: 0; overflow: hidden; background: var(--sidebar); }
 .titlebar { grid-column: 1 / -1; display: flex; align-items: stretch; background: var(--sidebar); color: var(--muted); user-select: none; }
 .titlebar button { -webkit-app-region: no-drag; border-radius: 0; }
 .sidebar-toggle { width: 48px; flex-shrink: 0; padding: 0; }
@@ -45,7 +46,7 @@ h1, h2, h3, p { margin: 0; }
 .sidebar-collapsed .sidebar-bottom { margin-top: auto; padding: 0; justify-items: center; }
 .sidebar-collapsed .settings-entry { width: 36px; height: 36px; padding: 0; }
 .main-panel { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; display: flex; flex-direction: column; background: #fff; border-radius: 15px 15px 0 0; }
-.contextbar { display: flex; justify-content: space-between; align-items: center; padding: 17px 30px; gap: 12px; color: var(--muted); font-size: 12px; }
+.contextbar { display: flex; flex-shrink: 0; justify-content: space-between; align-items: center; padding: 17px 30px; gap: 12px; color: var(--muted); font-size: 12px; }
 .runtime-anchor { position: relative; margin-left: auto; }
 .runtime-anchor > button { font-size: 12px; padding: 3px 4px; }
 .runtime-popover { position: absolute; z-index: 10; right: 0; top: calc(100% + 10px); width: 295px; background: #fff; padding: 17px; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 30px #00000018; }
@@ -54,7 +55,7 @@ h1, h2, h3, p { margin: 0; }
 .runtime-popover button { font-size: 12px; border: 1px solid var(--line); margin: 8px 5px 0 0; }
 .connection-state { color: #444; }
 .shell-problem { color: #87451e; background: #fff6ea; padding: 10px 20px; font-size: 12px; }
-.chat-screen { flex: 1; min-height: 0; display: flex; }
+.chat-screen { flex: 1; min-height: 0; min-width: 0; overflow: hidden; display: flex; }
 .content { flex: 1; min-width: 0; overflow-y: auto; padding: 14px 34px 20px; }
 .chat-column { max-width: 790px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
 .chat-column.welcome { max-width: 614px; justify-content: center; padding-bottom: 55px; }
@@ -103,7 +104,7 @@ summary { cursor: pointer; }
 .run-history button[aria-pressed="true"] { background: #ddd; color: #333; }
 .pagination { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0; }
 .pagination button { font-size: 11px; padding: 6px 9px; color: var(--muted); border: 1px solid var(--line); }
-.composer { width: 100%; background: #f4f4f4; border: 1px solid #eee; border-radius: 25px; padding: 17px; margin-top: auto; }
+.composer { position: relative; width: 100%; background: #f4f4f4; border: 1px solid #eee; border-radius: 25px; padding: 17px; margin-top: auto; }
 .welcome .composer { margin-top: 0; }
 .composer textarea { display: block; resize: vertical; width: 100%; height: 73px; min-height: 55px; max-height: 240px; border: 0; background: transparent; padding: 0 2px; font-size: 14px; line-height: 1.8; }
 .composer textarea::placeholder { color: #888; }
@@ -124,7 +125,7 @@ summary { cursor: pointer; }
 .recovery-panel input { accent-color: #555; margin-right: 8px; }
 .recovery-panel code { font-size: 11px; }
 .recovery-panel button { border: 1px solid #d6c9b1; }
-.settings-page { width: 100%; max-width: 660px; margin: 0 auto; padding: 24px 34px 40px; overflow-y: auto; }
+.settings-page { flex: 1; min-height: 0; width: 100%; max-width: 660px; margin: 0 auto; padding: 24px 34px 40px; overflow-y: auto; }
 .settings-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
 .settings-heading h1 { font-size: 22px; font-weight: 500; }
 .settings-description { color: var(--muted); font-size: 12px; line-height: 1.8; }

@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { STATUS_CHANNEL, parseConnectionStatus } from "../shared/connection.js";
 import type { DesktopBridge } from "../shared/desktop.js";
 import { QUIT_CHANNEL } from "../shared/desktop.js";
-import { SHELL_CHANNEL, parseShellRequest, parsePreferences, parseMenuAction } from "../shared/shell.js";
+import { SHELL_CHANNEL, parseShellRequest, parsePreferences, parseMenuAction, parseModelCheck, parseModelKeyStatus } from "../shared/shell.js";
 import { BUSINESS_CHANNEL, EVENTS_CHANNEL, parseBusinessRequest, parseEventRequest, parseResult,
   validBusinessValue, validSubscription, validEventBatch, type BusinessRequest, type BusinessValues, type BridgeResult } from "../shared/business.js";
 
@@ -24,6 +24,12 @@ const bridge: DesktopBridge = Object.freeze({
     preferences: async () => parsePreferences(await ipcRenderer.invoke(SHELL_CHANNEL, { operation: "preferences.get" })),
     savePreferences: async (value) => parsePreferences(await ipcRenderer.invoke(SHELL_CHANNEL,
       parseShellRequest({ operation: "preferences.save", value }))),
+    testModel: async (source, draft) => parseModelCheck(await ipcRenderer.invoke(SHELL_CHANNEL,
+      parseShellRequest({ operation: "model.test", source, draft }))),
+    modelKey: async (action, source, draft) => {
+      if (!["status", "edit", "remove"].includes(action)) throw new Error("Invalid model key action");
+      return parseModelKeyStatus(await ipcRenderer.invoke(SHELL_CHANNEL, parseShellRequest({ operation: `model.key.${action}`, source, draft })));
+    },
   }),
   app: Object.freeze({ quit: async (...args: unknown[]) => {
     if (args.length) throw new Error("Application quit takes no arguments");

@@ -12,6 +12,7 @@
 | [M3-T06 开发安装包](06-package.md) | Windows AMD64随包运行时与隔离安装 |
 | [M3-T07 集成验收](07-acceptance.md) | 真实无开发运行时的干净Windows验收 |
 | [M3-T08 已确认界面](08-interface.md) | 中性聊天布局、统一菜单栏、窗口控制、SVG Logo 与独立设置入口 |
+| [M3-T09 设置与滚动修复](09-model-settings.md) | 实际模型连接预检、独立加密密钥录入与单层内容滚动 |
 
 M2最终验收已verified，T01至T06已verified，当前下一任务为T07集成验收。T06已构建未签名、未发布的随包运行时，实际移走源码/开发依赖后安装、模拟诊断、重开历史与卸载通过，见[交付记录](../../verification/2026-10-17-m3-t06-package.md)。当前Windows11 AMD64仅作为开发验证环境，不推导为所有Windows平台承诺。干净电脑/虚拟机必须实际可用且符合验收条件；未取得该环境时不能把开发机隔离PATH检查写成已验证。签名、正式发布、升级与备份仍按M6及相关授权推进。
 
@@ -20,3 +21,5 @@ M2最终验收已verified，T01至T06已verified，当前下一任务为T07集�
 2026-10-22 用户确认新增 T08 界面切片，2026-10-23 完成交付记录；已通过实际 Electron 与既有业务回归，见[界面验收](../../verification/2026-10-22-m3-t08-interface.md)和[self_review](../../reviews/2026-10-22-m3-t08-interface.md)。它依赖已验证的 T05，与缺少干净环境的 T07 分开推进。T08 完成不代表真实模型或服务器接入，T07 后续应使用包含新界面的重新构建安装包验收。
 
 T07已in_progress，现场步骤及缺口见[验收进展](../../verification/2026-10-17-m3-t07-acceptance.md)。独立PowerShell环境采集无需Node/Python，不会安装或启动应用；当前开发机实际采集为NOT_READY。缺少可访问的独立干净Windows环境时，本卡保持未验证。
+
+2026-10-23 用户追加 T09，设置按钮、密钥隔离及单层滚动修复已 verified，见[实际验证](../../verification/2026-10-23-m3-t09-settings.md)与[self_review](../../reviews/2026-10-23-m3-t09-settings.md)。最新本地包已实际运行；模型预检不改变模拟诊断，T07 干净环境与 M4 正式接入继续保持原边界。

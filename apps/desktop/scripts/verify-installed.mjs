@@ -5,6 +5,7 @@ import path from "node:path";
 import http from "node:http";
 import net from "node:net";
 import { createHash } from "node:crypto";
+import { verifyPackagedModels } from "./verify-packaged-models.mjs";
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const output = path.resolve(root, process.argv[2] ?? ".quality-reports/installed-verification");
 const phase = process.argv[3] ?? "run";
@@ -12,7 +13,8 @@ const testRoot = path.resolve(root, ".quality-reports/installed-development");
 const unpackedDirectory = process.argv[5];
 if (unpackedDirectory && phase !== "run") throw new Error("Unpacked directory override is only allowed for runtime verification");
 const installation = path.resolve(root, unpackedDirectory ?? path.join(testRoot, "application"));
-const profile = path.join(testRoot, "profile");
+fs.mkdirSync(testRoot, { recursive: true });
+const profile = unpackedDirectory && phase === "run" ? fs.mkdtempSync(path.join(testRoot, "preview-profile-")) : path.join(testRoot, "profile");
 const executable = path.join(installation, "ProdOps Dev.exe");
 const installer = path.resolve(root, process.argv[4] ?? ".quality-reports/installers/ProdOps-Dev-0.1.0-windows-x64-setup.exe");
 const system = process.env.SystemRoot;
@@ -113,6 +115,7 @@ if (phase === "install") {
         return {conversation_id:selected,run_id:document.querySelector('[data-run-id]').dataset.runId,status:'succeeded',evidence_count:3,message_count:document.querySelectorAll('[data-message-id]').length,
           node_globals_absent:true,invalid_quit_refused:bad,bridge_keys:Object.keys(window.prodops).sort()};
       })()`);
+      if (mode === "create") result.model_settings = await verifyPackagedModels(evaluate, port);
       const servicePath = path.join(installation, "resources/agent/prodops-agent.exe");
       const processes = JSON.parse(powershell(`ConvertTo-Json -InputObject @(Get-CimInstance Win32_Process -Filter 'ParentProcessId = ${child.pid}' | Where-Object { $_.ExecutablePath -eq ${quote(servicePath)} } | Select-Object ProcessId,ParentProcessId,ExecutablePath) -Compress`));
       if (processes.length !== 1) throw new Error("Installed app did not own exactly one bundled service");

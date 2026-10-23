@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, session } from "electron";
+import { app, BrowserWindow, ipcMain, session, safeStorage } from "electron";
 import path from "node:path";
 import { developmentConnection, getConnectionStatus } from "./connection.js";
 import { createStatusHandler, createBusinessHandler, createEventsHandler, createQuitHandler } from "./ipc.js";
@@ -12,6 +12,9 @@ import { QUIT_CHANNEL } from "../shared/desktop.js";
 import { SHELL_CHANNEL } from "../shared/shell.js";
 import { PreferencesStore } from "./preferences.js";
 import { createShellHandler } from "./shell.js";
+import { ModelKeyVault } from "./model-keys.js";
+import { ModelProbe } from "./model-probe.js";
+import { ModelKeyDialog } from "./model-key-dialog.js";
 
 if (app.commandLine.hasSwitch("user-data-dir")) {
   const directory = app.commandLine.getSwitchValue("user-data-dir");
@@ -67,7 +70,11 @@ async function createWindow(): Promise<void> {
   ipcMain.handle(BUSINESS_CHANNEL, createBusinessHandler(() => window, client));
   ipcMain.handle(EVENTS_CHANNEL, createEventsHandler(() => window, streams));
   ipcMain.handle(QUIT_CHANNEL, createQuitHandler(() => window, () => app.quit()));
-  ipcMain.handle(SHELL_CHANNEL, createShellHandler(() => window, new PreferencesStore(app.getPath("userData"))));
+  const vault = new ModelKeyVault(app.getPath("userData"), { available: () => safeStorage.isEncryptionAvailable() &&
+    (process.platform !== "linux" || safeStorage.getSelectedStorageBackend() !== "basic_text"),
+    encrypt: value => safeStorage.encryptString(value), decrypt: value => safeStorage.decryptString(value) });
+  ipcMain.handle(SHELL_CHANNEL, createShellHandler(() => window, new PreferencesStore(app.getPath("userData")),
+    { vault, probe: new ModelProbe(vault), dialog: new ModelKeyDialog(vault) }));
   const dispose = () => { client.dispose(); streams.dispose(); };
   window.webContents.once("destroyed", dispose);
   window.webContents.on("render-process-gone", dispose);

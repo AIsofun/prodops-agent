@@ -1,0 +1,11 @@
+✔ model IPC rejects secret fields and unknown actions/results (0.8321ms)
+✔ real HTTP model-list probe checks auth, model identity, limits, failures and never follows redirects (289.4394ms)
+✔ keys are encrypted, bound to exact endpoint/source, survive restart and never fall back to plaintext (9.0562ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 354.9378

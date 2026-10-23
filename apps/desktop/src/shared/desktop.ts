@@ -1,7 +1,7 @@
 import type { ConnectionStatus } from "./connection.js";
 import type { components } from "../../../../packages/api-client/src/schema.js";
 import type { BusinessValues, BridgeResult, EventBatch, Page } from "./business.js";
-import type { DesktopPreferences, WindowAction, MenuName, MenuAction } from "./shell.js";
+import type { DesktopPreferences, WindowAction, MenuName, MenuAction, ModelSource, ModelDraft, ModelCheckResult, ModelKeyStatus } from "./shell.js";
 
 type Schema = components["schemas"];
 export const QUIT_CHANNEL = "prodops:app:quit";
@@ -19,6 +19,8 @@ export interface DesktopBridge {
     menu(name: MenuName): Promise<MenuAction>;
     preferences(): Promise<DesktopPreferences>;
     savePreferences(value: DesktopPreferences): Promise<DesktopPreferences>;
+    testModel(source: ModelSource, draft: ModelDraft): Promise<ModelCheckResult>;
+    modelKey(action: "status" | "edit" | "remove", source: ModelSource, draft: ModelDraft): Promise<ModelKeyStatus>;
   };
   connections: { getStatus(): Promise<ConnectionStatus> };
   business: {

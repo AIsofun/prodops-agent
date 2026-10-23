@@ -246,5 +246,44 @@
     ],
     "verification": "docs/verification/m3-t08.json",
     "review": "docs/reviews/m3-t08.json"
+  },
+  {
+    "id": "M3-T09",
+    "title": "模型设置可用性与滚动修复",
+    "state": "verified",
+    "depends_on": [
+      "M3-T08",
+      "M3-T06"
+    ],
+    "requirements": [
+      "REQ-004",
+      "REQ-011",
+      "REQ-018",
+      "NFR-002",
+      "HAR-004",
+      "HAR-008",
+      "HAR-010"
+    ],
+    "card": "docs/tasks/m3/09-model-settings.md",
+    "acceptance": [
+      "M3-T09-AC01",
+      "M3-T09-AC02",
+      "M3-T09-AC03",
+      "M3-T09-AC04"
+    ],
+    "implementation": [
+      "apps/desktop/src/main/model-probe.ts",
+      "apps/desktop/src/main/model-keys.ts",
+      "apps/desktop/src/main/model-key-dialog.ts",
+      "apps/desktop/src/preload/model-key.ts",
+      "apps/desktop/credentials.html",
+      "apps/desktop/src/renderer/Settings.tsx",
+      "apps/desktop/src/renderer/styles.css",
+      "apps/desktop/tests/models.test.cjs",
+      "apps/desktop/tests/model-settings-probe.cjs",
+      "apps/desktop/scripts/verify-packaged-models.mjs"
+    ],
+    "verification": "docs/verification/m3-t09.json",
+    "review": "docs/reviews/m3-t09.json"
   }
 ]

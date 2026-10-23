@@ -2,8 +2,12 @@ import { Menu, type BrowserWindow, type IpcMainInvokeEvent, type MenuItemConstru
 import { assertSender } from "./ipc.js";
 import { parseShellRequest, type MenuAction, type MenuName } from "../shared/shell.js";
 import type { PreferencesStore } from "./preferences.js";
+import type { ModelProbe } from "./model-probe.js";
+import type { ModelKeyVault } from "./model-keys.js";
+import type { ModelKeyDialog } from "./model-key-dialog.js";
 
-export function createShellHandler(getWindow: () => BrowserWindow, store: PreferencesStore) {
+export function createShellHandler(getWindow: () => BrowserWindow, store: PreferencesStore,
+  models?: { probe: ModelProbe; vault: ModelKeyVault; dialog: ModelKeyDialog }) {
   let menuPending = false;
   return async (event: IpcMainInvokeEvent, input: unknown) => {
     const window = getWindow();
@@ -11,12 +15,22 @@ export function createShellHandler(getWindow: () => BrowserWindow, store: Prefer
     const request = parseShellRequest(input);
     if (request.operation === "preferences.get") return store.get();
     if (request.operation === "preferences.save") return store.save(request.value);
+    if (request.operation === "model.test" || request.operation === "model.key.status" || request.operation === "model.key.edit" || request.operation === "model.key.remove") {
+      if (!models) throw new Error("Model settings unavailable");
+      if (request.operation === "model.test") return models.probe.test(request.source, request.draft);
+      try {
+        if (request.operation === "model.key.edit") await models.dialog.edit(window, request.source, request.draft.endpoint);
+        if (request.operation === "model.key.remove") await models.vault.set(request.source, request.draft.endpoint, null);
+        return { configured: await models.vault.configured(request.source, request.draft.endpoint) };
+      } catch { throw new Error("Model key management unavailable"); }
+    }
     if (request.operation === "window") {
       if (request.action === "minimize") window.minimize();
       if (request.action === "maximize") { if (window.isMaximized()) window.unmaximize(); else window.maximize(); }
       if (request.action === "close") setTimeout(() => { if (!window.isDestroyed()) window.close(); }, 0);
       return { maximized: window.isMaximized() };
     }
+    if (request.operation !== "menu") throw new Error("Invalid desktop menu request");
     if (menuPending) return null;
     menuPending = true;
     try {

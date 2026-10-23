@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   root: fileURLToPath(new URL(".", import.meta.url)),
   base: "./",
-  build: { outDir: "dist/renderer", emptyOutDir: true },
+  build: { outDir: "dist/renderer", emptyOutDir: true, rolldownOptions: { input: { index: fileURLToPath(new URL("index.html", import.meta.url)), credentials: fileURLToPath(new URL("credentials.html", import.meta.url)) } } },
   server: { host: "127.0.0.1" },
   plugins: [{
     name: "development-csp",
