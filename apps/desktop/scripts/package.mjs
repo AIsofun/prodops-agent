@@ -9,6 +9,10 @@ const root = fileURLToPath(new URL("../../../", import.meta.url));
 const require = createRequire(import.meta.url);
 if (process.platform !== "win32" || process.arch !== "x64") throw new Error("This development package targets Windows AMD64");
 const reports = path.join(root, ".quality-reports");
+const outputArguments = process.argv.slice(2);
+if (outputArguments.length > 1) throw new Error("Usage: package.mjs [output-directory]");
+const installers = path.resolve(root, outputArguments[0] ?? ".quality-reports/installers");
+if (!installers.startsWith(path.resolve(reports) + path.sep)) throw new Error("Package output must be inside .quality-reports");
 const appDirectory = path.join(reports, "package-app");
 const inherited = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(CSC_|WIN_CSC_|AZURE_)/i.test(key)));
 const env = { ...inherited, PYINSTALLER_CONFIG_DIR: path.join(reports, "pyinstaller-cache"),
@@ -33,8 +37,7 @@ for (const directory of ["preload", "renderer"]) {
 const metadata = JSON.parse(fs.readFileSync(path.join(root, "apps/desktop/package.json"), "utf8"));
 fs.writeFileSync(path.join(appDirectory, "package.json"), JSON.stringify({ name: "prodops-desktop-development", productName: "ProdOps Dev",
   version: metadata.version, description: "Windows desktop agent development build with explicit mock diagnostics", author: "ProdOps contributors", type: "commonjs", main: "main/index.js", private: true }, null, 2) + "\n");
-run(process.execPath, ["node_modules/electron-builder/cli.js", "--win", "nsis", "--x64", "--publish", "never", "--config", "apps/desktop/electron-builder.cjs"]);
-const installers = path.join(reports, "installers");
+run(process.execPath, ["node_modules/electron-builder/cli.js", "--win", "nsis", "--x64", "--publish", "never", "--config", "apps/desktop/electron-builder.cjs", `--config.directories.output=${installers}`]);
 const name = `ProdOps-Dev-${metadata.version}-windows-x64-setup.exe`;
 const executable = path.join(installers, name);
 const checksum = file => createHash("sha256").update(fs.readFileSync(file)).digest("hex");
@@ -42,7 +45,7 @@ function sourceFiles(directory) {
   return fs.readdirSync(path.join(root, directory), { withFileTypes: true }).flatMap(entry => {
     const target = path.join(directory, entry.name);
     if (entry.name === "__pycache__") return [];
-    return entry.isDirectory() ? sourceFiles(target) : /\.(ts|tsx|css|py|json)$/.test(entry.name) ? [target] : [];
+    return entry.isDirectory() ? sourceFiles(target) : /\.(ts|tsx|css|svg|py|json)$/.test(entry.name) ? [target] : [];
   });
 }
 const sources = ["package-lock.json", "uv.lock", "pyproject.toml", "contracts/openapi.json", "apps/desktop/electron-builder.cjs", "services/agent/packaging/prodops-agent.spec",

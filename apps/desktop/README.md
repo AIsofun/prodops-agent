@@ -14,7 +14,7 @@
 node apps/desktop/scripts/verify-ui.mjs .quality-reports/desktop-ui
 ```
 
-需先完成下文的 `npm run desktop:build`。该检查使用独立 userData 与模拟服务；不使用用户历史，不连接 `.invalid` 资料中的服务。证据和限制见[界面交付](../../docs/verification/2026-10-22-m3-t08-interface.md)。本轮未重新构建安装包，旧安装包不自动包含新界面。
+需先完成下文的 `npm run desktop:build`。该检查使用独立 userData 与模拟服务；不使用用户历史，不连接 `.invalid` 资料中的服务。证据和限制见[界面交付](../../docs/verification/2026-10-22-m3-t08-interface.md)。2026-10-23 本地预览版本已重新打包，见[构建与运行记录](../../docs/verification/2026-10-23-local-preview.md)。
 
 ## 开发与既有能力
 
@@ -98,6 +98,20 @@ npm run desktop:package
 ```
 
 输出`.quality-reports/installers/ProdOps-Dev-0.1.0-windows-x64-setup.exe`、同名sha256及build-manifest.json。构建环境需要联网准备依赖；安装包包含Electron和独立Python服务，运行只使用明确mock，无需开发Node/Python、源码或模型权重。当前为未签名、未发布的开发版本，安装身份ProdOps Dev；当前用户安装、卸载保留历史。正式签名、升级与生产使用仍待后续阶段。
+
+如已有旧版在运行，使用独立输出目录避免覆盖运行文件：
+
+```text
+npm run desktop:package -- .quality-reports/local-preview-20261023
+```
+
+输出目录必须位于 `.quality-reports` 内。其中 `win-unpacked/ProdOps Dev.exe` 可直接双击运行，需保留整个目录；同级 `setup.exe` 为安装入口。2026-10-23 预览的实际文件名为 `ProdOps-Dev-0.1.0-windows-x64-setup.exe`。
+
+该未安装目录的隔离运行验证使用以下命令，报告明确记录 `package_kind: unpacked-directory`，不代替安装或干净 Windows 验收：
+
+```text
+node apps/desktop/scripts/verify-installed.mjs .quality-reports/local-preview-runtime run .quality-reports/local-preview-20261023/ProdOps-Dev-0.1.0-windows-x64-setup.exe .quality-reports/local-preview-20261023/win-unpacked
+```
 
 实际开发机验收命令：
 

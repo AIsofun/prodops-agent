@@ -1,0 +1,106 @@
+{
+  "status": "PASS",
+  "environment_scope": "current development Windows; not a clean machine",
+  "runtime": [
+    {
+      "mode": "create",
+      "conversation_id": "e611eabe-4489-4e6d-b567-9c6ff583627c",
+      "run_id": "5495abcd-d07a-4bb0-aa69-2120bf44f49f",
+      "status": "succeeded",
+      "evidence_count": 3,
+      "message_count": 2,
+      "node_globals_absent": true,
+      "invalid_quit_refused": true,
+      "bridge_keys": [
+        "app",
+        "business",
+        "connections",
+        "events",
+        "getInfo",
+        "shell"
+      ],
+      "process_exit_code": 0,
+      "owned_service_stopped": true,
+      "parent_pid": 50276,
+      "service": {
+        "ProcessId": 47368,
+        "ParentProcessId": 50276,
+        "ExecutablePath": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\local-preview-20261023\\win-unpacked\\resources\\agent\\prodops-agent.exe"
+      },
+      "page_loaded_from_installed_asar": false,
+      "page_loaded_from_packaged_asar": true,
+      "package_kind": "unpacked-directory",
+      "development_path_removed": true,
+      "cwd": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\empty-working-directory",
+      "profile": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\profile",
+      "source_isolation": [
+        {
+          "name": ".venv",
+          "unavailable": false
+        },
+        {
+          "name": "node_modules",
+          "unavailable": false
+        },
+        {
+          "name": "apps/desktop/src",
+          "unavailable": false
+        },
+        {
+          "name": "services/agent/src",
+          "unavailable": false
+        }
+      ]
+    },
+    {
+      "mode": "reopen",
+      "conversation_id": "e611eabe-4489-4e6d-b567-9c6ff583627c",
+      "run_id": "5495abcd-d07a-4bb0-aa69-2120bf44f49f",
+      "status": "succeeded",
+      "evidence_count": 3,
+      "message_count": 2,
+      "node_globals_absent": true,
+      "invalid_quit_refused": true,
+      "bridge_keys": [
+        "app",
+        "business",
+        "connections",
+        "events",
+        "getInfo",
+        "shell"
+      ],
+      "process_exit_code": 0,
+      "owned_service_stopped": true,
+      "parent_pid": 47052,
+      "service": {
+        "ProcessId": 24940,
+        "ParentProcessId": 47052,
+        "ExecutablePath": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\local-preview-20261023\\win-unpacked\\resources\\agent\\prodops-agent.exe"
+      },
+      "page_loaded_from_installed_asar": false,
+      "page_loaded_from_packaged_asar": true,
+      "package_kind": "unpacked-directory",
+      "development_path_removed": true,
+      "cwd": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\empty-working-directory",
+      "profile": "F:\\code\\myCode\\prodops-agent\\.quality-reports\\installed-development\\profile",
+      "source_isolation": [
+        {
+          "name": ".venv",
+          "unavailable": false
+        },
+        {
+          "name": "node_modules",
+          "unavailable": false
+        },
+        {
+          "name": "apps/desktop/src",
+          "unavailable": false
+        },
+        {
+          "name": "services/agent/src",
+          "unavailable": false
+        }
+      ]
+    }
+  ]
+}

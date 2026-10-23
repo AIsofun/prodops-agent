@@ -9,10 +9,12 @@ const root = fileURLToPath(new URL("../../../", import.meta.url));
 const output = path.resolve(root, process.argv[2] ?? ".quality-reports/installed-verification");
 const phase = process.argv[3] ?? "run";
 const testRoot = path.resolve(root, ".quality-reports/installed-development");
-const installation = path.join(testRoot, "application");
+const unpackedDirectory = process.argv[5];
+if (unpackedDirectory && phase !== "run") throw new Error("Unpacked directory override is only allowed for runtime verification");
+const installation = path.resolve(root, unpackedDirectory ?? path.join(testRoot, "application"));
 const profile = path.join(testRoot, "profile");
 const executable = path.join(installation, "ProdOps Dev.exe");
-const installer = path.join(root, ".quality-reports/installers/ProdOps-Dev-0.1.0-windows-x64-setup.exe");
+const installer = path.resolve(root, process.argv[4] ?? ".quality-reports/installers/ProdOps-Dev-0.1.0-windows-x64-setup.exe");
 const system = process.env.SystemRoot;
 if (process.platform !== "win32" || !system) throw new Error("Windows verification required");
 fs.mkdirSync(output, { recursive: true });
@@ -124,13 +126,13 @@ if (phase === "install") {
       const serviceStillRunning = powershell(`@(Get-CimInstance Win32_Process -Filter 'ProcessId = ${processes[0].ProcessId}' | Where-Object { $_.ExecutablePath -eq ${quote(servicePath)} }).Count`);
       if (serviceStillRunning !== "0") throw new Error("Installed app left its bundled service running");
       if (!fs.existsSync(path.join(profile, "agent/prodops.sqlite3"))) throw new Error("Custom isolated history was not persisted");
-      const report = { mode, ...result, process_exit_code: code, owned_service_stopped: true, parent_pid: child.pid, service: processes[0], page_loaded_from_installed_asar: true,
-        development_path_removed: true, cwd: outside, profile, source_isolation: [".venv", "node_modules", "apps/desktop/src", "services/agent/src"].map(name => ({ name, unavailable: !fs.existsSync(path.join(root, name)) })) };
+      const report = { mode, ...result, process_exit_code: code, owned_service_stopped: true, parent_pid: child.pid, service: processes[0], page_loaded_from_installed_asar: !unpackedDirectory, page_loaded_from_packaged_asar: true,
+        package_kind: unpackedDirectory ? "unpacked-directory" : "installed", development_path_removed: true, cwd: outside, profile, source_isolation: [".venv", "node_modules", "apps/desktop/src", "services/agent/src"].map(name => ({ name, unavailable: !fs.existsSync(path.join(root, name)) })) };
       fs.writeFileSync(path.join(output, `${mode}.json`), JSON.stringify(report, null, 2) + "\n"); runtime.push(report);
       return result.conversation_id;
     } finally { socket?.close(); clearTimeout(timer); if (child.exitCode === null && child.signalCode === null) { child.kill(); await exited; } }
   }
   const conversation = await launch("create"); await launch("reopen", conversation);
   fs.writeFileSync(path.join(output, "summary.json"), JSON.stringify({ status: "PASS", environment_scope: "current development Windows; not a clean machine", runtime }, null, 2) + "\n");
-  console.log("PASS: actual installed app, bundled service, mock diagnosis and reopened history without development PATH/source/runtime directories");
+  console.log("PASS: packaged app, bundled service, mock diagnosis and reopened history; source/runtime isolation is recorded in the report");
 } else throw new Error("Unknown installed verification phase");
