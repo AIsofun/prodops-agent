@@ -8,7 +8,7 @@ fs.mkdirSync(output, { recursive: true });
 if (!path.isAbsolute(process.env.PRODOPS_SMOKE_USER_DATA ?? "")) throw new Error("Isolated desktop data directory required");
 app.setPath("userData", process.env.PRODOPS_SMOKE_USER_DATA);
 const fault = process.env.PRODOPS_SMOKE_FAULT ? require("./fault-probe.cjs").install(process.env.PRODOPS_SMOKE_FAULT, process.env.PRODOPS_SMOKE_GATE) : null;
-const timer = setTimeout(() => { console.error("Desktop smoke test timed out"); app.exit(1); }, process.env.PRODOPS_SMOKE_WORKSPACE ? 90000 : 30000);
+const timer = setTimeout(() => { console.error("Desktop smoke test timed out"); app.exit(1); }, process.env.PRODOPS_SMOKE_WORKSPACE || process.env.PRODOPS_SMOKE_UI ? 90000 : 30000);
 let completed = false;
 app.once("browser-window-created", (_event, window) => {
   window.webContents.once("did-finish-load", async () => {
@@ -28,10 +28,10 @@ app.once("browser-window-created", (_event, window) => {
             csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]').content });
         } probe();
       })`);
-      if (process.env.PRODOPS_SMOKE_WORKSPACE !== "reopen" && process.env.PRODOPS_SMOKE_FAULT !== "recover") assert.equal(result.heading, "从异常描述开始排查");
+      if (process.env.PRODOPS_SMOKE_WORKSPACE !== "reopen" && process.env.PRODOPS_SMOKE_FAULT !== "recover") assert.equal(result.heading, "今天，一起排查什么问题？");
       assert.equal(result.node, "undefined");
       assert.equal(result.process, "undefined");
-      assert.deepEqual(result.bridgeKeys.sort(), ["app", "business", "connections", "events", "getInfo"]);
+      assert.deepEqual(result.bridgeKeys.sort(), ["app", "business", "connections", "events", "getInfo", "shell"]);
       assert.equal(result.info.name, "ProdOps");
       assert.ok(result.csp.includes("script-src 'self'"));
       assert.ok(!result.csp.includes("unsafe-eval"));
@@ -83,6 +83,7 @@ app.once("browser-window-created", (_event, window) => {
         assert.equal(result.business.status, "succeeded");
       }
       if (process.env.PRODOPS_SMOKE_WORKSPACE) result.workspace = await require("./workspace-probe.cjs")(window, output, process.env.PRODOPS_SMOKE_WORKSPACE);
+      if (process.env.PRODOPS_SMOKE_UI) result.ui = await require("./ui-probe.cjs")(window, output, process.env.PRODOPS_SMOKE_UI);
       if (fault) {
         result.fault = await require("./fault-probe.cjs").run(window, output, process.env.PRODOPS_SMOKE_FAULT, process.env.PRODOPS_SMOKE_GATE, fault);
         await window.webContents.executeJavaScript("document.querySelector('.run-card')?.scrollIntoView({block:'start'})");

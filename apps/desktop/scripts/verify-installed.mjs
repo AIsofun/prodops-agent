@@ -118,7 +118,7 @@ if (phase === "install") {
       await pause(100);
       const screenshot = await command("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
       fs.writeFileSync(path.join(output, `${mode}.png`), Buffer.from(screenshot.data, "base64"));
-      await evaluate("document.querySelector('[data-action=\"quit-app\"]').click();void 0").catch(() => undefined);
+      await evaluate("window.prodops.app.quit();void 0").catch(() => undefined);
       const code = await exited;
       if (code !== 0) throw new Error("Installed app did not exit successfully");
       const serviceStillRunning = powershell(`@(Get-CimInstance Win32_Process -Filter 'ProcessId = ${processes[0].ProcessId}' | Where-Object { $_.ExecutablePath -eq ${quote(servicePath)} }).Count`);

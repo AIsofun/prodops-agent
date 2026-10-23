@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "status": "cancelled",
+      "run_id": "a4f5fc1b-5512-456b-ba67-5262fccaa426",
+      "evidence_count": 1,
+      "repeated_cancel_blocked": true,
+      "in_flight_result_retained": true
+    },
+    {
+      "run_id": "b0344e40-5417-47e1-9420-148bb08eb46c",
+      "status": "succeeded",
+      "evidence_count": 3,
+      "sequences": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "restored": false,
+      "reconnect_after_sequences": [
+        0,
+        4
+      ],
+      "explicit_disconnect": true
+    },
+    {
+      "run_id": "4731d08c-b49f-4e40-a602-e81037e9c6b7",
+      "status": "succeeded",
+      "evidence_count": 3,
+      "sequences": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "restored": true,
+      "reconnect_after_sequences": [
+        0,
+        4,
+        4
+      ],
+      "explicit_disconnect": true
+    },
+    {
+      "run_id": "d6ce3010-ed53-45c0-8a35-8174a804f97e",
+      "status": "succeeded",
+      "evidence_count": 3,
+      "sequences": [],
+      "restored": true,
+      "reconnect_after_sequences": [
+        0
+      ],
+      "explicit_disconnect": false
+    },
+    {
+      "status": "running",
+      "run_id": "1354adc5-c752-4d8c-ba51-60c5a6f10502",
+      "network_did_not_fail_task": true,
+      "owned_service_hard_stopped": true
+    },
+    {
+      "run_id": "1354adc5-c752-4d8c-ba51-60c5a6f10502",
+      "unknown_calls": 1,
+      "status": "succeeded",
+      "evidence_count": 3,
+      "explicit_review_required": true
+    }
+  ]
+}

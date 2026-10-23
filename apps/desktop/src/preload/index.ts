@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { STATUS_CHANNEL, parseConnectionStatus } from "../shared/connection.js";
 import type { DesktopBridge } from "../shared/desktop.js";
 import { QUIT_CHANNEL } from "../shared/desktop.js";
+import { SHELL_CHANNEL, parseShellRequest, parsePreferences, parseMenuAction } from "../shared/shell.js";
 import { BUSINESS_CHANNEL, EVENTS_CHANNEL, parseBusinessRequest, parseEventRequest, parseResult,
   validBusinessValue, validSubscription, validEventBatch, type BusinessRequest, type BusinessValues, type BridgeResult } from "../shared/business.js";
 
@@ -12,6 +13,18 @@ async function business<K extends keyof BusinessValues>(request: BusinessRequest
 
 const bridge: DesktopBridge = Object.freeze({
   getInfo: () => ({ name: "ProdOps", version: "0.1.0" }),
+  shell: Object.freeze<DesktopBridge["shell"]>({
+    window: async (action) => {
+      const result: unknown = await ipcRenderer.invoke(SHELL_CHANNEL, parseShellRequest({ operation: "window", action }));
+      if (typeof result !== "object" || result === null || Object.keys(result).join(",") !== "maximized" ||
+          !("maximized" in result) || typeof result.maximized !== "boolean") throw new Error("Invalid window response");
+      return { maximized: result.maximized };
+    },
+    menu: async (name) => parseMenuAction(await ipcRenderer.invoke(SHELL_CHANNEL, parseShellRequest({ operation: "menu", name }))),
+    preferences: async () => parsePreferences(await ipcRenderer.invoke(SHELL_CHANNEL, { operation: "preferences.get" })),
+    savePreferences: async (value) => parsePreferences(await ipcRenderer.invoke(SHELL_CHANNEL,
+      parseShellRequest({ operation: "preferences.save", value }))),
+  }),
   app: Object.freeze({ quit: async (...args: unknown[]) => {
     if (args.length) throw new Error("Application quit takes no arguments");
     const result: unknown = await ipcRenderer.invoke(QUIT_CHANNEL, {});

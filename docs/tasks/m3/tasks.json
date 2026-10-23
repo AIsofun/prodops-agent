@@ -209,5 +209,42 @@
     ],
     "verification": null,
     "review": null
+  },
+  {
+    "id": "M3-T08",
+    "title": "已确认界面方案落地",
+    "state": "verified",
+    "depends_on": [
+      "M3-T05"
+    ],
+    "requirements": [
+      "REQ-004",
+      "REQ-006",
+      "REQ-011",
+      "REQ-013",
+      "REQ-018",
+      "NFR-002",
+      "HAR-004",
+      "HAR-008",
+      "HAR-010"
+    ],
+    "card": "docs/tasks/m3/08-interface.md",
+    "acceptance": [
+      "M3-T08-AC01",
+      "M3-T08-AC02",
+      "M3-T08-AC03",
+      "M3-T08-AC04"
+    ],
+    "implementation": [
+      "apps/desktop/src/renderer/DesktopShell.tsx",
+      "apps/desktop/src/renderer/Settings.tsx",
+      "apps/desktop/src/renderer/App.tsx",
+      "apps/desktop/src/main/shell.ts",
+      "apps/desktop/src/main/preferences.ts",
+      "apps/desktop/src/shared/shell.ts",
+      "apps/desktop/scripts/verify-ui.mjs"
+    ],
+    "verification": "docs/verification/m3-t08.json",
+    "review": "docs/reviews/m3-t08.json"
   }
 ]

@@ -1,6 +1,7 @@
 import type { ConnectionStatus } from "./connection.js";
 import type { components } from "../../../../packages/api-client/src/schema.js";
 import type { BusinessValues, BridgeResult, EventBatch, Page } from "./business.js";
+import type { DesktopPreferences, WindowAction, MenuName, MenuAction } from "./shell.js";
 
 type Schema = components["schemas"];
 export const QUIT_CHANNEL = "prodops:app:quit";
@@ -13,6 +14,12 @@ export interface DesktopInfo {
 export interface DesktopBridge {
   getInfo(): DesktopInfo;
   app: { quit(): Promise<void> };
+  shell: {
+    window(action: WindowAction): Promise<{ maximized: boolean }>;
+    menu(name: MenuName): Promise<MenuAction>;
+    preferences(): Promise<DesktopPreferences>;
+    savePreferences(value: DesktopPreferences): Promise<DesktopPreferences>;
+  };
   connections: { getStatus(): Promise<ConnectionStatus> };
   business: {
     workspaces(): Promise<BridgeResult<BusinessValues["workspaces"]>>;

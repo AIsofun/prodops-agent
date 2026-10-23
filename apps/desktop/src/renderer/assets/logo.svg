@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="logo-title logo-desc">
+  <title id="logo-title">ProdOps 四维超立方体</title>
+  <desc id="logo-desc">深色圆形底上的青紫色超立方体投影，由两组八顶点立方体和八条对应顶点连线组成。</desc>
+  <defs>
+    <radialGradient id="space" cx="32%" cy="24%" r="90%"><stop stop-color="#202742"/><stop offset=".56" stop-color="#111726"/><stop offset="1" stop-color="#090d17"/></radialGradient>
+    <linearGradient id="spectrum" x1="88" y1="88" x2="424" y2="424" gradientUnits="userSpaceOnUse"><stop stop-color="#7ce9ff"/><stop offset=".45" stop-color="#8eafff"/><stop offset="1" stop-color="#c78aff"/></linearGradient>
+    <linearGradient id="rim" x1="40" y1="40" x2="472" y2="472" gradientUnits="userSpaceOnUse"><stop stop-color="#9aeaff" stop-opacity=".7"/><stop offset=".5" stop-color="#8d94c9" stop-opacity=".16"/><stop offset="1" stop-color="#cf9bff" stop-opacity=".5"/></linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="251" fill="url(#space)"/>
+  <circle cx="256" cy="256" r="247" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  <path d="M176 88H424V336L336 424H88V176Z" fill="url(#spectrum)" opacity=".055"/>
+  <g fill="none" stroke="url(#spectrum)" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M88 176H336V424H88ZM176 88H424V336H176ZM88 176L176 88M336 176L424 88M336 424L424 336M88 424L176 336" stroke-width="8"/>
+    <path d="M180.4 220H292V331.6H180.4ZM220 180.4H331.6V292H220ZM180.4 220L220 180.4M292 220L331.6 180.4M292 331.6L331.6 292M180.4 331.6L220 292" stroke-width="7"/>
+    <path d="M88 176L180.4 220M336 176L292 220M336 424L292 331.6M88 424L180.4 331.6M176 88L220 180.4M424 88L331.6 180.4M424 336L331.6 292M176 336L220 292" stroke-width="5" opacity=".64"/>
+  </g>
+  <g fill="#d4eeff"><circle cx="176" cy="88" r="6"/><circle cx="336" cy="424" r="6"/><circle cx="331.6" cy="180.4" r="5"/></g>
+</svg>

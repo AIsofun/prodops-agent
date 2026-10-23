@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "task_id": "M3-T08",
+  "reviewer": "Codex implementation agent, separate self-review pass",
+  "mode": "self_review",
+  "decision": "approved",
+  "record": "docs/reviews/2026-10-22-m3-t08-interface.md",
+  "findings": [
+    {"id": "R1", "severity": "P1", "status": "fixed", "reason": "Finite validated shell capabilities retain owning main-frame checks; foreign shell frame is refused."},
+    {"id": "R2", "severity": "P1", "status": "fixed", "reason": "Only inactive non-secret drafts are stored; credential URLs and unknown fields are rejected and unsupported connection operations remain disabled."},
+    {"id": "R3", "severity": "P2", "status": "fixed", "reason": "Sidebar changes preserve unsaved model edits, writes are serialized, and initial preferences load completes before toggling."},
+    {"id": "R4", "severity": "P2", "status": "fixed", "reason": "Existing workspace, pagination, draft, replay, cancellation and recovery behavior passes actual Electron regression."},
+    {"id": "R5", "severity": "P2", "status": "fixed", "reason": "Window close preserves tray lifecycle and explicit quit preserves managed service shutdown."}
+  ]
+}

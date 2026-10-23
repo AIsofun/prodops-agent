@@ -9,6 +9,9 @@ import { EventStreams } from "./events.js";
 import { BUSINESS_CHANNEL, EVENTS_CHANNEL } from "../shared/business.js";
 import { DesktopLifecycle } from "./lifecycle.js";
 import { QUIT_CHANNEL } from "../shared/desktop.js";
+import { SHELL_CHANNEL } from "../shared/shell.js";
+import { PreferencesStore } from "./preferences.js";
+import { createShellHandler } from "./shell.js";
 
 if (app.commandLine.hasSwitch("user-data-dir")) {
   const directory = app.commandLine.getSwitchValue("user-data-dir");
@@ -40,7 +43,8 @@ async function createWindow(): Promise<void> {
     minWidth: 900,
     minHeight: 650,
     title: "ProdOps · 设备异常排查",
-    backgroundColor: "#f5f7f9",
+    backgroundColor: "#f7f7f7",
+    frame: false,
     show: false,
     autoHideMenuBar: true,
     webPreferences: {
@@ -63,10 +67,11 @@ async function createWindow(): Promise<void> {
   ipcMain.handle(BUSINESS_CHANNEL, createBusinessHandler(() => window, client));
   ipcMain.handle(EVENTS_CHANNEL, createEventsHandler(() => window, streams));
   ipcMain.handle(QUIT_CHANNEL, createQuitHandler(() => window, () => app.quit()));
+  ipcMain.handle(SHELL_CHANNEL, createShellHandler(() => window, new PreferencesStore(app.getPath("userData"))));
   const dispose = () => { client.dispose(); streams.dispose(); };
   window.webContents.once("destroyed", dispose);
   window.webContents.on("render-process-gone", dispose);
-  window.once("closed", () => { dispose(); ipcMain.removeHandler(BUSINESS_CHANNEL); ipcMain.removeHandler(EVENTS_CHANNEL); ipcMain.removeHandler(QUIT_CHANNEL); });
+  window.once("closed", () => { dispose(); ipcMain.removeHandler(BUSINESS_CHANNEL); ipcMain.removeHandler(EVENTS_CHANNEL); ipcMain.removeHandler(QUIT_CHANNEL); ipcMain.removeHandler(SHELL_CHANNEL); });
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.webContents.on("will-navigate", (event) => event.preventDefault());
   window.webContents.on("will-attach-webview", (event) => event.preventDefault());
